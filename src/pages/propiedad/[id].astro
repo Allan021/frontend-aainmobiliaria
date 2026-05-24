@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PropertyPage from '../../ui/components/property/PropertyPage';
+import { serverFetch } from '../../infrastructure/api/client';
+import type { Property, PaginatedResponse } from '../../core/domain/entities/types';
+
+export async function getStaticPaths() {
+  try {
+    const data = await serverFetch<PaginatedResponse<Property>>(
+      '/properties?limit=200&status=disponible'
+    );
+    const properties: Property[] = data.data ?? [];
+    return properties.map((p) => ({
+      params: { id: p.id },
+      props: { property: p },
+    }));
+  } catch {
+    return [];
+  }
+}
+
+const { property } = Astro.props as { property: Property };
+
+const rawDesc = `${property.type} en ${property.municipio}, ${property.departamento}. ${property.description}`;
+const pageDescription = rawDesc.slice(0, 155).trimEnd() + (rawDesc.length > 155 ? '...' : '');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'RealEstateListing',
+  name: property.title,
+  description: property.description,
+  url: `https://aainmobiliaria.hn/propiedad/${property.id}`,
+  image: property.images?.[0]?.url || '',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: property.municipio,
+    addressRegion: property.departamento,
+    addressCountry: 'HN',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: property.price,
+    priceCurrency: property.currency === 'L' ? 'HNL' : 'USD',
+    availability: 'https://schema.org/InStock',
+  },
+};
+---
+
+<BaseLayout
+  title={`${property.title} — A&A Inmobiliaria`}
+  description={pageDescription}
+  ogTitle={`${property.title} — A&A Inmobiliaria`}
+  ogDescription={pageDescription}
+  ogImage={property.images?.[0]?.url}
+  canonical={`https://aainmobiliaria.hn/propiedad/${property.id}`}
+  jsonLd={jsonLd}
+>
+  <PropertyPage property={property} client:only="react" />
+</BaseLayout>

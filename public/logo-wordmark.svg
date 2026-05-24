@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 72" role="img" aria-label="A&amp;A Inmobiliaria">
+  <g fill="#111113">
+    
+    <rect x="4" y="12" width="48" height="48" rx="4" fill="#111113"></rect>
+    <text x="28" y="48" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-weight="500" font-size="28" fill="#D4B254" letter-spacing="-1">A&amp;A</text>
+    
+    <text x="66" y="38" font-family="Cormorant Garamond, Georgia, serif" font-weight="500" font-size="24" fill="#111113" letter-spacing="0.5">A&amp;A Inmobiliaria</text>
+    <text x="66" y="56" font-family="Inter, sans-serif" font-weight="500" font-size="9" fill="#8C6F1C" letter-spacing="2.2">PROPIEDADES · HONDURAS</text>
+  </g>
+</svg>
