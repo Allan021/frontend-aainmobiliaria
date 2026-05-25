@@ -19,10 +19,10 @@ function applyTheme(theme: 'light' | 'dark') {
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 48 48">
-      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
     </svg>
   );
 }
@@ -41,7 +41,7 @@ function LoginNavbar({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: ()
       <div className="max-w-[1280px] mx-auto px-6 md:px-12 h-[72px] flex items-center justify-between">
         <a href="/" className="flex items-center gap-3.5 cursor-pointer no-underline">
           <div className="w-[44px] h-[44px] rounded-lg bg-obsidian-900 flex items-center justify-center overflow-hidden shrink-0">
-            <img src="/logo-mark.jpg" alt="A&A" className="w-[44px] h-[44px] object-cover" style={{ mixBlendMode: 'screen' }} />
+            <img src="/logo-mark.webp" alt="A&A" className="w-[44px] h-[44px] object-cover" style={{ mixBlendMode: 'screen' }} />
           </div>
           <div>
             <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: isDark ? '#FAF8F3' : '#111113', lineHeight: 1.2, letterSpacing: '-0.01em' }}>A&A Inmobiliaria</div>
@@ -280,7 +280,7 @@ function LoginForm() {
 
       {/* Main — 2-column */}
       <div style={{ flex: 1, display: 'flex', background: pageBg, transition: 'background 0.3s ease' }}>
-        
+
         {/* Left — Brand panel (hidden mobile) */}
         <div ref={leftRef} style={{
           flex: 1, position: 'relative', display: 'none',
@@ -307,7 +307,7 @@ function LoginForm() {
               Publica tu <span style={{ color: '#D4B254' }}>propiedad</span> con nosotros.
             </h2>
             <p style={{ fontSize: '0.9375rem', lineHeight: 1.7, color: '#9A9383', marginBottom: '2.5rem' }}>
-              Crea tu cuenta y publica terrenos, lotes o casas en la plataforma de bienes raíces 
+              Crea tu cuenta y publica terrenos, lotes o casas en la plataforma de bienes raíces
               líder de El Progreso, Yoro. Tu propiedad será vista por cientos de compradores activos.
             </p>
 

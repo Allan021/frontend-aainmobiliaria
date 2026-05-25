@@ -266,7 +266,7 @@ export function AdminSidebar({
             width: '2.5rem', height: '2.5rem', borderRadius: '0.5rem', background: '#0A0A0B',
             overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>
-            <img src="/logo-mark.jpg" alt="A&A" style={{
+            <img src="/logo-mark.webp" alt="A&A" style={{
               width: '2.5rem', height: '2.5rem', objectFit: 'cover', mixBlendMode: 'screen',
             }} />
           </div>

@@ -113,7 +113,7 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
               overflow: 'hidden', flexShrink: 0,
               transition: 'background 0.3s, border 0.3s',
             }}>
-              <img src="/logo-mark.jpg" alt="A&A" style={{ width: 40, height: 40, objectFit: 'cover', mixBlendMode: 'screen' }} />
+              <img src="/logo-mark.webp" alt="A&A" style={{ width: 40, height: 40, objectFit: 'cover', mixBlendMode: 'screen' }} />
             </div>
             <div>
               <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: logoTextColor, letterSpacing: '-0.02em', lineHeight: 1.2, transition: 'color 0.3s' }}>
