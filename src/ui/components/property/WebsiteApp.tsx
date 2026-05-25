@@ -37,7 +37,6 @@ function usePublicTheme() {
 /* ── WhatsApp FAB ───────────────────────────────────────────── */
 export function WhatsAppFAB({ onClick }: { onClick?: () => void }) {
   const [expanded, setExpanded] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
   const fabRef = useRef<HTMLButtonElement>(null);
 
   const handleClick = () => {
@@ -47,18 +46,6 @@ export function WhatsAppFAB({ onClick }: { onClick?: () => void }) {
       window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: null } }));
     }
   };
-
-  // Show tooltip after 4s on first visit
-  useEffect(() => {
-    const seen = sessionStorage.getItem('fab_tooltip_seen');
-    if (seen) return;
-    const t = setTimeout(() => {
-      setShowTooltip(true);
-      sessionStorage.setItem('fab_tooltip_seen', '1');
-      setTimeout(() => setShowTooltip(false), 4000);
-    }, 4000);
-    return () => clearTimeout(t);
-  }, []);
 
   // Entrance animation
   useEffect(() => {
@@ -78,30 +65,6 @@ export function WhatsAppFAB({ onClick }: { onClick?: () => void }) {
 
   return (
     <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 500, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, pointerEvents: 'none' }}>
-      {/* Tooltip bubble */}
-      <div style={{
-        background: '#fff',
-        border: '1px solid #E6E0D2',
-        borderRadius: 12,
-        padding: '0.625rem 1rem',
-        boxShadow: '0 8px 24px rgba(17,17,19,0.12)',
-        fontSize: '0.8125rem', fontWeight: 600, color: '#111113',
-        whiteSpace: 'nowrap',
-        transition: 'opacity 0.3s, transform 0.3s',
-        opacity: showTooltip ? 1 : 0,
-        transform: showTooltip ? 'translateY(0) scale(1)' : 'translateY(8px) scale(0.95)',
-        pointerEvents: 'none',
-        transformOrigin: 'bottom right',
-      }}>
-        ¿Preguntas? Escribanos 💬
-        <div style={{
-          position: 'absolute', bottom: -6, right: 20,
-          width: 12, height: 12, background: '#fff',
-          borderRight: '1px solid #E6E0D2', borderBottom: '1px solid #E6E0D2',
-          transform: 'rotate(45deg)',
-        }} />
-      </div>
-
       {/* FAB */}
       <button
         ref={fabRef}

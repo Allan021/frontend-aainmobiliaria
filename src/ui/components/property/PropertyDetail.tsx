@@ -10,7 +10,6 @@ import { QuickStats } from './detail/QuickStats';
 import { SpecItem } from './detail/SpecItem';
 import { PropertyMap } from './detail/PropertyMap';
 import { FAQSection } from './detail/FAQSection';
-import { ShareBar } from './detail/ShareBar';
 import { PriceCard } from './detail/PriceCard';
 import { LeadCaptureModal } from './detail/LeadCaptureModal';
 import { WhatsAppButton } from '../shared/WhatsAppButton';
@@ -198,8 +197,7 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
             ))}
           </nav>
 
-          {/* Share buttons */}
-          <ShareBar property={property} />
+          {/* Share buttons removed to prevent duplication */}
         </div>
       </div>
 
@@ -362,7 +360,6 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
                   { label: 'Modalidad', value: property.financing ? 'Contado o financiado' : 'Solo contado' },
                   ...(property.financing && property.financing_prima ? [{ label: 'Prima mínima', value: `${property.financing_prima}%` }] : []),
                   ...(property.financing && property.financing_plazo_meses ? [{ label: 'Plazo', value: `Hasta ${Math.round(property.financing_plazo_meses / 12)} años` }] : []),
-                  { label: 'Referencia', value: property.id.slice(0, 8).toUpperCase() },
                 ].map(({ label, value }) => (
                   <SpecItem key={label} label={label} value={value} />
                 ))}
