@@ -235,24 +235,23 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
             <button
               onClick={onWhatsApp}
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: 7,
-                padding: '0.5rem 1rem', borderRadius: 9,
-                background: '#25D366', border: 'none', cursor: 'pointer',
-                color: '#fff', fontSize: '0.875rem', fontWeight: 600,
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '0.625rem 1.25rem', borderRadius: '9999px',
+                background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+                border: 'none', cursor: 'pointer',
+                color: '#fff', fontSize: '0.875rem', fontWeight: 700,
                 fontFamily: 'inherit',
-                transition: 'background 0.2s, transform 0.15s, box-shadow 0.2s',
-                boxShadow: '0 2px 10px rgba(37,211,102,0.28)',
+                transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)',
                 whiteSpace: 'nowrap',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.background = '#1DB954';
-                e.currentTarget.style.transform = 'scale(1.03)';
-                e.currentTarget.style.boxShadow = '0 4px 16px rgba(37,211,102,0.38)';
+                e.currentTarget.style.transform = 'translateY(-1px) scale(1.04)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.45)';
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.background = '#25D366';
-                e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = '0 2px 10px rgba(37,211,102,0.28)';
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(37, 211, 102, 0.3)';
               }}
             >
               <WhatsAppIcon size={15} />
@@ -402,12 +401,22 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
               <button
                 onClick={onWhatsApp}
                 style={{
-                  width: '100%', padding: '0.875rem',
-                  background: '#25D366', border: 'none', borderRadius: 12,
-                  color: '#fff', fontSize: '0.9375rem', fontWeight: 600,
+                  width: '100%', padding: '0.875rem 1.25rem',
+                  background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+                  border: 'none', borderRadius: '9999px',
+                  color: '#fff', fontSize: '0.9375rem', fontWeight: 700,
                   cursor: 'pointer', fontFamily: 'inherit',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  boxShadow: '0 2px 12px rgba(37,211,102,0.25)',
+                  boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)',
+                  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.45)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(37, 211, 102, 0.3)';
                 }}
               >
                 <WhatsAppIcon size={17} />

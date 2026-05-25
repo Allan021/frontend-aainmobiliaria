@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { formatPrice, type Property } from '../../../core/domain/entities/types';
 import { WhatsAppIcon } from '../shared/Icon';
 
@@ -303,7 +303,7 @@ function GalleryModal({
 
 /* ── Quick-stats strip ─────────────────────────────────────── */
 function QuickStats({ property }: { property: Property }) {
-  const items: { icon: JSX.Element; label: string; value: string }[] = [];
+  const items: { icon: ReactNode; label: string; value: string }[] = [];
 
   items.push({
     icon: (

@@ -17,12 +17,13 @@ function HeartIcon({ saved, onClick }: { saved: boolean; onClick: (e: React.Mous
       style={{
         position: 'absolute', top: 12, right: 12,
         width: 36, height: 36, borderRadius: '50%',
-        background: 'rgba(255,255,255,0.92)',
-        backdropFilter: 'blur(8px)',
-        border: 'none', cursor: 'pointer',
+        background: 'rgba(255,255,255,0.85)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255,255,255,0.3)',
+        cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-        transition: 'transform 0.15s',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+        transition: 'all 0.20s ease',
         zIndex: 2,
       }}
       onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
@@ -44,12 +45,14 @@ function Badge({ children, gold }: { children: React.ReactNode; gold?: boolean }
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center',
-      padding: '0.25rem 0.625rem',
+      padding: '0.3rem 0.75rem',
       borderRadius: 999, fontSize: '0.6875rem', fontWeight: 700,
       letterSpacing: '0.04em',
-      background: gold ? '#D4B254' : 'rgba(17,17,19,0.82)',
+      background: gold ? 'linear-gradient(135deg, #D4B254 0%, #B8962E 100%)' : 'rgba(17, 17, 19, 0.65)',
       color: gold ? '#111113' : '#FAF8F3',
-      backdropFilter: 'blur(8px)',
+      backdropFilter: 'blur(12px)',
+      border: gold ? '1px solid rgba(212, 178, 84, 0.4)' : '1px solid rgba(255, 255, 255, 0.15)',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
     }}>
       {children}
     </span>
@@ -93,19 +96,19 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
       onMouseLeave={() => setHover(false)}
       onClick={() => onOpen(property)}
       style={{
-        borderRadius: 16,
+        borderRadius: 20,
         overflow: 'hidden',
         cursor: 'pointer',
-        background: '#fff',
-        border: '1px solid #E6E0D2',
+        background: 'var(--main-card-bg, #ffffff)',
+        border: '1px solid var(--main-border, #E6E0D2)',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease',
+        transition: 'all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)',
         boxShadow: hover
-          ? '0 20px 48px -12px rgba(17,17,19,0.2), 0 4px 16px rgba(17,17,19,0.08)'
-          : '0 2px 8px rgba(17,17,19,0.05)',
-        transform: hover ? 'translateY(-4px)' : 'translateY(0)',
-        borderColor: hover ? '#D4B254' : '#E6E0D2',
+          ? '0 24px 48px -12px rgba(17,17,19,0.12), 0 8px 24px -4px rgba(212, 178, 84, 0.08)'
+          : '0 4px 20px -2px rgba(17,17,19,0.04), 0 2px 8px -1px rgba(17,17,19,0.02)',
+        transform: hover ? 'translateY(-6px)' : 'translateY(0)',
+        borderColor: hover ? '#D4B254' : 'var(--main-border, #E6E0D2)',
       }}
     >
       {/* Image */}
@@ -166,13 +169,15 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
           opacity: hover ? 1 : 0, transition: 'opacity 0.25s',
         }}>
           <div style={{
-            background: 'rgba(10,10,11,0.75)', backdropFilter: 'blur(10px)',
-            borderRadius: 10, padding: '0.375rem 0.75rem',
+            background: 'rgba(10, 10, 11, 0.65)', backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            borderRadius: 10, padding: '0.4rem 0.8rem',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
           }}>
-            <div style={{ fontSize: '0.625rem', color: '#D4B254', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 1 }}>
+            <div style={{ fontSize: '0.625rem', color: '#D4B254', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>
               Precio
             </div>
-            <div style={{ fontSize: '1rem', fontWeight: 700, color: '#FAF8F3', fontFeatureSettings: "'tnum' 1" }}>
+            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#FAF8F3', fontFeatureSettings: "'tnum' 1" }}>
               {property.discount_price
                 ? formatPrice(property.discount_price, property.currency)
                 : formatPrice(property.price, property.currency)}
@@ -185,14 +190,14 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
       <div style={{ padding: '1rem 1.125rem 1.125rem', display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
         {/* Location + area */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: '#5A5A63', fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: 'var(--main-text-muted, #5A5A63)', fontWeight: 600 }}>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D4B254" strokeWidth="2.5" strokeLinecap="round">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
               <circle cx="12" cy="10" r="3" />
             </svg>
             <span>{property.municipio}, {property.departamento}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.75rem', fontWeight: 600, color: '#111113' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.75rem', fontWeight: 600, color: 'var(--main-text, #111113)' }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="#D4B254" stroke="none">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
@@ -203,7 +208,7 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
         {/* Title */}
         <h3 style={{
           fontSize: '1rem', fontWeight: 700,
-          color: '#111113', margin: 0, lineHeight: 1.3,
+          color: 'var(--main-text, #111113)', margin: 0, lineHeight: 1.4,
           letterSpacing: '-0.02em',
           display: '-webkit-box', WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical', overflow: 'hidden',
@@ -212,7 +217,7 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
         </h3>
 
         {/* Area */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: '#9A9383' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: 'var(--main-text-dim, #9A9383)' }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <rect x="3" y="3" width="18" height="18" rx="2" />
             <path d="M3 9h18M9 21V9" />
@@ -224,7 +229,7 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
         {/* Divider + price + CTA */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          marginTop: 8, paddingTop: 12, borderTop: '1px solid #F3EFE6',
+          marginTop: 10, paddingTop: 12, borderTop: '1px solid var(--main-border, #F3EFE6)',
         }}>
           <div style={{ fontFeatureSettings: "'tnum' 1" }}>
             {property.discount_price ? (
@@ -232,12 +237,12 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
                 <div style={{ fontSize: '0.6875rem', color: '#E53E3E', textDecoration: 'line-through', opacity: 0.7, lineHeight: 1 }}>
                   {formatPrice(property.price, property.currency)}
                 </div>
-                <div style={{ fontSize: '1.125rem', fontWeight: 700, color: '#111113', lineHeight: 1.2 }}>
+                <div style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--main-text, #111113)', lineHeight: 1.2 }}>
                   {formatPrice(property.discount_price, property.currency)}
                 </div>
               </>
             ) : (
-              <div style={{ fontSize: '1.125rem', fontWeight: 700, color: '#111113', lineHeight: 1.2 }}>
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--main-text, #111113)', lineHeight: 1.2 }}>
                 {formatPrice(property.price, property.currency)}
               </div>
             )}
@@ -247,13 +252,22 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
             onClick={e => { e.stopPropagation(); onWhatsApp(property); }}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '0.5rem 0.875rem', borderRadius: 999,
-              background: '#25D366', border: 'none', cursor: 'pointer',
-              color: '#fff', fontSize: '0.75rem', fontWeight: 600,
-              fontFamily: 'inherit', transition: 'background 0.15s, transform 0.15s',
+              padding: '0.55rem 1rem', borderRadius: '9999px',
+              background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+              border: 'none', cursor: 'pointer',
+              color: '#fff', fontSize: '0.75rem', fontWeight: 700,
+              fontFamily: 'inherit',
+              transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+              boxShadow: '0 4px 12px rgba(37, 211, 102, 0.2)',
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#1DB954'; e.currentTarget.style.transform = 'scale(1.04)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = '#25D366'; e.currentTarget.style.transform = 'scale(1)'; }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-1px) scale(1.04)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(37, 211, 102, 0.35)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0) scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 211, 102, 0.2)';
+            }}
           >
             <WhatsAppIcon size={13} />
             WhatsApp

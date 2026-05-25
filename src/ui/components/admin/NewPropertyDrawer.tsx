@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button, Eyebrow } from '../shared/Button';
 import { Icon } from '../shared/Icon';
-import { useCreateProperty, useUpdateProperty } from '../../hooks/useProperties';
+import { useCreateProperty, useUpdateProperty, useDeleteProperty } from '../../hooks/useProperties';
 import { useHondurasData } from '../../hooks/useHondurasData';
 import { SelectField } from '../shared/SelectField';
 import { api } from '../../../infrastructure/api/client';
+import { ConfirmModal } from './ConfirmModal';
 import type { Property } from '../../../core/domain/entities/types';
 
 interface Props {
@@ -50,8 +51,21 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
 
   const createProperty = useCreateProperty();
   const updateProperty = useUpdateProperty();
+  const deleteProperty = useDeleteProperty();
   const queryClient = useQueryClient();
   const { departamentos } = useHondurasData();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const handleDelete = () => {
+    setConfirmDelete(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!property?.id) return;
+    await deleteProperty.mutateAsync(property.id);
+    setConfirmDelete(false);
+    onClose();
+  };
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -740,6 +754,29 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
           </Button>
           <Button variant="ghost" size="lg" onClick={onClose} >Cancelar</Button>
 
+          {property && (
+            <button
+              onClick={handleDelete}
+              style={{
+                marginLeft: 'auto',
+                padding: '10px 16px',
+                background: 'none',
+                border: '1px solid rgba(140,58,46,0.3)',
+                color: '#8C3A2E',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: 600,
+                fontFamily: 'inherit',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(140,58,46,0.06)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
+            >
+              {property.property_type === 'lotificadora' ? 'Eliminar lotificación' : 'Eliminar propiedad'}
+            </button>
+          )}
+
           {/* Status feedback */}
           {fbResult === 'ok' && (
             <span style={{ fontSize: '13px', color: '#4A7C59', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -758,6 +795,25 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
           )}
         </div>
       </div>
+
+      {confirmDelete && property && (
+        <ConfirmModal
+          title={property.property_type === 'lotificadora' ? `¿Eliminar lotificación "${property.title}"?` : `¿Eliminar "${property.title}"?`}
+          message={property.property_type === 'lotificadora' ? "Se eliminarán todos los lotes y los pagos asociados a esta lotificación. Esta acción no se puede deshacer." : "Si fue publicada en Facebook, también se eliminará ese post. Esta acción no se puede deshacer."}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setConfirmDelete(false)}
+          m={{
+            mainBg: bg,
+            mainSurface: surface,
+            mainBorder: border,
+            mainText: text,
+            mainTextMuted: textMuted,
+            mainTextDim: textDim,
+            mainCardBg: surface,
+            mainTopbarBg: bg,
+          }}
+        />
+      )}
     </div>
   );
 }
