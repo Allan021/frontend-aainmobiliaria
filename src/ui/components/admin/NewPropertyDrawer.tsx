@@ -287,7 +287,10 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
       if (shouldPostFb) {
         setFbResult('posting');
         try {
-          await api.post(`/properties/${propertyId}/publish`);
+          await api.post(`/properties/${propertyId}/publish`, {
+            facebook_title: form.facebook_title.trim() || undefined,
+            facebook_description: form.facebook_description.trim() || undefined,
+          });
           setFbResult('ok');
         } catch {
           setFbResult('error');
