@@ -7,7 +7,6 @@ interface Props {
   ogImage?: string;
   canonical?: string;
   jsonLd?: object;
-  preloadImage?: string;
 }
 
 const {
@@ -18,7 +17,6 @@ const {
   ogImage,
   canonical,
   jsonLd,
-  preloadImage,
 } = Astro.props;
 
 const resolvedOgTitle = ogTitle || title;
@@ -37,17 +35,16 @@ const resolvedOgImage = ogImage || 'https://www.aabienes.com/banner-web.jpg';
 
     {canonical && <link rel="canonical" href={canonical} />}
 
-    <!-- Preconnect to Cloudinary for faster image loading -->
+    <!-- Preconnect to Cloudinary and OpenStreetMap -->
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
     <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+    <link rel="preconnect" href="https://www.openstreetmap.org" />
+    <link rel="dns-prefetch" href="https://www.openstreetmap.org" />
 
     <!-- Preload critical fonts (WOFF2 — 68% smaller than TTF) -->
     <link rel="preload" href="/fonts/PlusJakartaSans-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/PlusJakartaSans-SemiBold.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/PlusJakartaSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
-
-    <!-- LCP image preload — discovered immediately by browser -->
-    {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -71,7 +68,16 @@ const resolvedOgImage = ogImage || 'https://www.aabienes.com/banner-web.jpg';
   </body>
 </html>
 
+<!-- Critical CSS inlined to avoid render-blocking on first paint -->
+<style is:inline>
+  @font-face{font-family:'Plus Jakarta Sans';src:url('/fonts/PlusJakartaSans-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Plus Jakarta Sans';src:url('/fonts/PlusJakartaSans-SemiBold.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+  @font-face{font-family:'Plus Jakarta Sans';src:url('/fonts/PlusJakartaSans-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+  html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#111113;background:#FAF8F3;margin:0}
+</style>
+
+<!-- Full CSS loaded normally (still render-blocking but browser already has critical styles above) -->
 <style is:global>
   @import '../styles/global.css';
 </style>
-

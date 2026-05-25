@@ -40,7 +40,7 @@ export function PhotoGrid({ images, onImageClick }: PhotoGridProps) {
           alt={main.title || ''}
           width={768}
           height={432}
-          fetchPriority="high"
+          loading="eager"
           decoding="async"
           style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer', aspectRatio: '16/9' }}
           onClick={() => onImageClick(0)}
@@ -66,7 +66,7 @@ export function PhotoGrid({ images, onImageClick }: PhotoGridProps) {
           alt={main.title || ''}
           width={768}
           height={432}
-          fetchPriority="high"
+          loading="eager"
           decoding="async"
           style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
           onClick={() => onImageClick(0)}
@@ -102,7 +102,7 @@ export function PhotoGrid({ images, onImageClick }: PhotoGridProps) {
             alt={main.title || ''}
             width={800}
             height={600}
-            fetchPriority="high"
+            loading="eager"
             decoding="async"
             style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
             onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.04)')}

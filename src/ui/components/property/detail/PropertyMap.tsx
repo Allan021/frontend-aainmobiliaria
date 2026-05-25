@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef } from 'react';
+
 const DEPT_COORDS: Record<string, { lat: number; lng: number }> = {
   'Yoro':                { lat: 15.3992, lng: -87.8028 },
   'Cortés':              { lat: 15.4997, lng: -88.0249 },
@@ -59,20 +61,58 @@ interface PropertyMapProps {
   mapUrl?: string;
 }
 
+/**
+ * Lazy-loads the OpenStreetMap iframe only when the container scrolls into view,
+ * avoiding the ~291KB JS bundle from OpenStreetMap on initial page load.
+ */
 export function PropertyMap({ departamento, municipio, mapUrl = '' }: PropertyMapProps) {
   const { src, externalLink } = parseMapUrl(mapUrl, departamento);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid var(--main-border, #E6E0D2)', position: 'relative' }}>
-      <iframe
-        src={src}
-        width="100%"
-        height="400"
-        style={{ border: 'none', display: 'block' }}
-        loading="lazy"
-        title={`Ubicación: ${municipio}, ${departamento}`}
-        sandbox="allow-scripts allow-same-origin"
-      />
+    <div ref={containerRef} style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid var(--main-border, #E6E0D2)', position: 'relative', minHeight: 400 }}>
+      {visible ? (
+        <iframe
+          src={src}
+          width="100%"
+          height="400"
+          style={{ border: 'none', display: 'block' }}
+          title={`Ubicación: ${municipio}, ${departamento}`}
+          sandbox="allow-scripts allow-same-origin"
+        />
+      ) : (
+        /* Placeholder while waiting to intersect */
+        <div style={{
+          width: '100%', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'var(--main-bg, #F3EFE6)', color: 'var(--main-text-dim, #9A9383)',
+          fontSize: '0.875rem', fontWeight: 500,
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" style={{ marginBottom: 8, opacity: 0.5 }}>
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <div>Cargando mapa…</div>
+          </div>
+        </div>
+      )}
       <div style={{
         position: 'absolute', bottom: 12, left: 12,
         background: 'rgba(17,17,19,0.85)', backdropFilter: 'blur(8px)',
