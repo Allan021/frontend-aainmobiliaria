@@ -7,6 +7,7 @@ interface Props {
   ogImage?: string;
   canonical?: string;
   jsonLd?: object;
+  preloadImage?: string;
 }
 
 const {
@@ -17,6 +18,7 @@ const {
   ogImage,
   canonical,
   jsonLd,
+  preloadImage,
 } = Astro.props;
 
 const resolvedOgTitle = ogTitle || title;
@@ -28,12 +30,24 @@ const resolvedOgImage = ogImage || 'https://www.aabienes.com/banner-web.jpg';
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/jpeg" href="/logo-mark.webp" />
+    <link rel="icon" type="image/webp" href="/logo-mark.webp" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title}</title>
 
     {canonical && <link rel="canonical" href={canonical} />}
+
+    <!-- Preconnect to Cloudinary for faster image loading -->
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+
+    <!-- Preload critical fonts (WOFF2 — 68% smaller than TTF) -->
+    <link rel="preload" href="/fonts/PlusJakartaSans-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/PlusJakartaSans-SemiBold.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/PlusJakartaSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- LCP image preload — discovered immediately by browser -->
+    {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -60,3 +74,4 @@ const resolvedOgImage = ogImage || 'https://www.aabienes.com/banner-web.jpg';
 <style is:global>
   @import '../styles/global.css';
 </style>
+

@@ -49,19 +49,19 @@ function getStoredTheme(): 'light' | 'dark' {
 }
 
 /* ── Topbar ─────────────────────────────────────────── */
-function Topbar({ title, subtitle, action, onToggleSidebar, m }: {
+function Topbar({ title, subtitle, action, onToggleSidebar, isOpen, m }: {
   title: string; subtitle: string; action?: React.ReactNode;
   onToggleSidebar: () => void;
+  isOpen: boolean;
   m: ReturnType<typeof getMainTheme>;
 }) {
   return (
-    <div style={{
-      display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
-      padding: '2rem 2.5rem 1.5rem', borderBottom: `1px solid ${m.mainBorder}`,
-      background: m.mainTopbarBg, transition: 'background 0.3s ease, border-color 0.3s ease',
+    <div className="admin-topbar" style={{
+      borderBottom: `1px solid ${m.mainBorder}`,
+      background: m.mainTopbarBg,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <SidebarMobileToggle isOpen={false} toggle={onToggleSidebar} isDark={getStoredTheme() === 'dark'} />
+        <SidebarMobileToggle isOpen={isOpen} toggle={onToggleSidebar} isDark={getStoredTheme() === 'dark'} />
         <div>
           <Eyebrow>{subtitle}</Eyebrow>
           <h1 style={{
@@ -76,8 +76,8 @@ function Topbar({ title, subtitle, action, onToggleSidebar, m }: {
 }
 
 /* ── Dashboard ──────────────────────────────────────── */
-function Dashboard({ onNew, onToggleSidebar, m, onNavigate }: {
-  onNew: () => void; onToggleSidebar: () => void;
+function Dashboard({ onNew, onToggleSidebar, isOpen, m, onNavigate }: {
+  onNew: () => void; onToggleSidebar: () => void; isOpen: boolean;
   m: ReturnType<typeof getMainTheme>; onNavigate: (r: string) => void;
 }) {
   const { data: stats } = usePropertyStats();
@@ -97,12 +97,12 @@ function Dashboard({ onNew, onToggleSidebar, m, onNavigate }: {
       <Topbar
         subtitle="Panel de control" title="Buenos días, Allan"
         action={<Button variant="primary" size="md" onClick={onNew}>+ Nueva propiedad</Button>}
-        onToggleSidebar={onToggleSidebar} m={m}
+        onToggleSidebar={onToggleSidebar} isOpen={isOpen} m={m}
       />
-      <div style={{ padding: '1.75rem 2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div className="admin-content-area">
 
         {/* Metric tiles */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+        <div className="admin-metrics-grid">
           <MetricTile
             label="Total propiedades" value={String(stats?.total || 0)}
             sub={`${stats?.disponible || 0} disponibles`} icon="🏗️"
@@ -123,7 +123,7 @@ function Dashboard({ onNew, onToggleSidebar, m, onNavigate }: {
         </div>
 
         {/* Two-column: leads + quick actions */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '1.5rem' }}>
+        <div className="admin-two-column">
 
           {/* Recent leads */}
           <div style={{ ...cardStyle, padding: '1.5rem' }}>
@@ -238,8 +238,9 @@ function Dashboard({ onNew, onToggleSidebar, m, onNavigate }: {
 }
 
 /* ── Catalog (Properties + Lotificaciones tabs) ─────── */
-function CatalogAdminView({ onNew, onEdit, onToggleSidebar, m }: {
+function CatalogAdminView({ onNew, onEdit, onToggleSidebar, isOpen, m }: {
   onNew: () => void; onEdit: (p: any) => void; onToggleSidebar: () => void;
+  isOpen: boolean;
   m: ReturnType<typeof getMainTheme>;
 }) {
   const [tab, setTab] = useState<'properties' | 'lotifications'>('properties');
@@ -283,13 +284,13 @@ function CatalogAdminView({ onNew, onEdit, onToggleSidebar, m }: {
         subtitle="Inventario"
         title={tab === 'properties' ? 'Propiedades' : 'Lotificaciones'}
         action={<Button variant="primary" size="md" onClick={onNew}>+ Nueva propiedad</Button>}
-        onToggleSidebar={onToggleSidebar} m={m}
+        onToggleSidebar={onToggleSidebar} isOpen={isOpen} m={m}
       />
 
       {/* Tab switcher */}
-      <div style={{
-        padding: '0 2.5rem', borderBottom: `1px solid ${m.mainBorder}`,
-        display: 'flex', gap: 0, background: m.mainTopbarBg,
+      <div className="admin-tabs-header" style={{
+        borderBottom: `1px solid ${m.mainBorder}`,
+        background: m.mainTopbarBg,
       }}>
         <button style={tabStyle(tab === 'properties')} onClick={() => setTab('properties')}>
           Propiedades
@@ -300,7 +301,7 @@ function CatalogAdminView({ onNew, onEdit, onToggleSidebar, m }: {
       </div>
 
       {tab === 'properties' && (
-        <div style={{ padding: '1.75rem 2.5rem' }}>
+        <div className="admin-content-area">
           {/* Filters row: search + status pills */}
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap', alignItems: 'center' }}>
             {/* Search */}
@@ -344,20 +345,20 @@ function CatalogAdminView({ onNew, onEdit, onToggleSidebar, m }: {
       )}
 
       {tab === 'lotifications' && (
-        <LotificacionesView onNew={onNew} onEdit={onEdit} onToggleSidebar={onToggleSidebar} m={m} hideTopbar />
+        <LotificacionesView onNew={onNew} onEdit={onEdit} onToggleSidebar={onToggleSidebar} isOpen={isOpen} m={m} hideTopbar />
       )}
     </div>
   );
 }
 
 /* ── Leads ──────────────────────────────────────────── */
-function LeadsView({ onToggleSidebar, m }: { onToggleSidebar: () => void; m: ReturnType<typeof getMainTheme> }) {
+function LeadsView({ onToggleSidebar, isOpen, m }: { onToggleSidebar: () => void; isOpen: boolean; m: ReturnType<typeof getMainTheme> }) {
   const { data } = useLeads();
   const leads = data?.data || [];
   return (
     <div>
-      <Topbar subtitle="Contactos" title="Leads entrantes" onToggleSidebar={onToggleSidebar} m={m} />
-      <div style={{ padding: '1.75rem 2.5rem' }}>
+      <Topbar subtitle="Contactos" title="Leads entrantes" onToggleSidebar={onToggleSidebar} isOpen={isOpen} m={m} />
+      <div className="admin-content-area">
         <LeadsList leads={leads} m={m} />
       </div>
     </div>
@@ -365,13 +366,13 @@ function LeadsView({ onToggleSidebar, m }: { onToggleSidebar: () => void; m: Ret
 }
 
 /* ── Sales ──────────────────────────────────────────── */
-function SalesView({ onToggleSidebar, m }: { onToggleSidebar: () => void; m: ReturnType<typeof getMainTheme> }) {
+function SalesView({ onToggleSidebar, isOpen, m }: { onToggleSidebar: () => void; isOpen: boolean; m: ReturnType<typeof getMainTheme> }) {
   const { data } = useSales();
   const sales = data?.data || [];
   return (
     <div>
-      <Topbar subtitle="Histórico" title="Ventas cerradas" onToggleSidebar={onToggleSidebar} m={m} />
-      <div style={{ padding: '1.75rem 2.5rem' }}>
+      <Topbar subtitle="Histórico" title="Ventas cerradas" onToggleSidebar={onToggleSidebar} isOpen={isOpen} m={m} />
+      <div className="admin-content-area">
         <SalesHistory sales={sales} />
       </div>
     </div>
@@ -434,7 +435,7 @@ function AdminContent() {
     setDrawer(true);
   };
 
-  const sharedProps = { onToggleSidebar: () => setSidebarOpen(p => !p), m };
+  const sharedProps = { onToggleSidebar: () => setSidebarOpen(p => !p), isOpen: sidebarOpen, m };
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
@@ -458,7 +459,7 @@ function AdminContent() {
         {route === 'financing' && (
           <div>
             <Topbar subtitle="Próximamente" title="Financiamiento" {...sharedProps} />
-            <div style={{ padding: '1.75rem 2.5rem', color: m.mainTextDim }}>Esta sección estará disponible pronto.</div>
+            <div className="admin-content-area" style={{ color: m.mainTextDim }}>Esta sección estará disponible pronto.</div>
           </div>
         )}
       </main>

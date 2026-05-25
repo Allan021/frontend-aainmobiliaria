@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { optimizeCloudinaryUrl, cloudinarySrcSet } from '../../../../core/utils/cloudinaryUtils';
 
 interface PhotoGridProps {
   images: { url: string; title?: string }[];
@@ -33,8 +34,15 @@ export function PhotoGrid({ images, onImageClick }: PhotoGridProps) {
     return (
       <div style={{ position: 'relative', overflow: 'hidden', background: '#111113' }} className="photo-grid-wrap">
         <img
-          src={main.url} alt={main.title || ''}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
+          src={optimizeCloudinaryUrl(main.url, 768)}
+          srcSet={cloudinarySrcSet(main.url, 768)}
+          sizes="100vw"
+          alt={main.title || ''}
+          width={768}
+          height={432}
+          fetchPriority="high"
+          decoding="async"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer', aspectRatio: '16/9' }}
           onClick={() => onImageClick(0)}
         />
         <button
@@ -49,10 +57,17 @@ export function PhotoGrid({ images, onImageClick }: PhotoGridProps) {
 
   return (
     <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--main-surface, #111113)' }} className="photo-grid-wrap">
-      {/* Mobile: show only first image */}
-      <div className="photo-mobile-only" style={{ position: 'relative', width: '100%', height: '55vw' }}>
+      {/* Mobile: show only first image — LCP candidate */}
+      <div className="photo-mobile-only" style={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}>
         <img
-          src={main.url} alt={main.title || ''}
+          src={optimizeCloudinaryUrl(main.url, 768)}
+          srcSet={cloudinarySrcSet(main.url, 768)}
+          sizes="100vw"
+          alt={main.title || ''}
+          width={768}
+          height={432}
+          fetchPriority="high"
+          decoding="async"
           style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
           onClick={() => onImageClick(0)}
         />
@@ -81,7 +96,14 @@ export function PhotoGrid({ images, onImageClick }: PhotoGridProps) {
           onClick={() => onImageClick(0)}
         >
           <img
-            src={main.url} alt={main.title || ''}
+            src={optimizeCloudinaryUrl(main.url, 800)}
+            srcSet={cloudinarySrcSet(main.url, 800)}
+            sizes="50vw"
+            alt={main.title || ''}
+            width={800}
+            height={600}
+            fetchPriority="high"
+            decoding="async"
             style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
             onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.04)')}
             onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
@@ -105,7 +127,14 @@ export function PhotoGrid({ images, onImageClick }: PhotoGridProps) {
                 onClick={() => onImageClick(i + 1)}
               >
                 <img
-                  src={img.url} alt={img.title || ''}
+                  src={optimizeCloudinaryUrl(img.url, 400)}
+                  srcSet={cloudinarySrcSet(img.url, 400)}
+                  sizes="25vw"
+                  alt={img.title || ''}
+                  width={400}
+                  height={300}
+                  loading="lazy"
+                  decoding="async"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
                   onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.06)')}
                   onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}

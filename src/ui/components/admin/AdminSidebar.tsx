@@ -211,7 +211,7 @@ export function SidebarMobileToggle({ isOpen, toggle, isDark }: {
       onClick={toggle}
       aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
       style={{
-        display: 'none', alignItems: 'center', justifyContent: 'center',
+        alignItems: 'center', justifyContent: 'center',
         width: '2.5rem', height: '2.5rem', borderRadius: '0.5rem',
         background: isDark ? '#1A1A1D' : '#FFFFFF',
         border: `1px solid ${isDark ? '#26262B' : '#E6E0D2'}`,
@@ -280,7 +280,7 @@ export function AdminSidebar({
           </div>
           {/* Mobile close */}
           <button className="sidebar__close-mobile" onClick={onClose} aria-label="Cerrar menú"
-            style={{ display: 'none', marginLeft: 'auto', background: 'none', border: 'none', color: t.sidebarTextMuted, cursor: 'pointer', padding: '0.25rem', borderRadius: '0.375rem' }}>
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: t.sidebarTextMuted, cursor: 'pointer', padding: '0.25rem', borderRadius: '0.375rem' }}>
             <X size={18} />
           </button>
         </div>

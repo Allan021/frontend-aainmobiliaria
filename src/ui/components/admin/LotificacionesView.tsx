@@ -28,8 +28,9 @@ const statusLabels: Record<string, string> = {
 };
 
 /* ── Main Lotificaciones View ──────────────────────────── */
-export function LotificacionesView({ onNew, onEdit, onToggleSidebar, m, hideTopbar }: {
+export function LotificacionesView({ onNew, onEdit, onToggleSidebar, isOpen = false, m, hideTopbar }: {
   onNew: () => void; onEdit: (p: any) => void; onToggleSidebar: () => void;
+  isOpen?: boolean;
   m: M; hideTopbar?: boolean;
 }) {
   const { data: allData } = useProperties({ limit: 100 });
@@ -52,6 +53,8 @@ export function LotificacionesView({ onNew, onEdit, onToggleSidebar, m, hideTopb
         m={m}
         onBack={() => setSelected(null)}
         onEditLotification={p => { onEdit(p); setSelected(null); }}
+        onToggleSidebar={onToggleSidebar}
+        isOpen={isOpen}
       />
     );
   }
@@ -59,13 +62,12 @@ export function LotificacionesView({ onNew, onEdit, onToggleSidebar, m, hideTopb
   return (
     <div>
       {!hideTopbar && (
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
-          padding: '2rem 2.5rem 1.5rem', borderBottom: `1px solid ${m.mainBorder}`,
+        <div className="admin-topbar" style={{
+          borderBottom: `1px solid ${m.mainBorder}`,
           background: m.mainTopbarBg,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <SidebarMobileToggle isOpen={false} toggle={onToggleSidebar} isDark={m.mainBg === '#111113'} />
+            <SidebarMobileToggle isOpen={isOpen} toggle={onToggleSidebar} isDark={m.mainBg === '#111113'} />
             <div>
               <Eyebrow>Catálogo</Eyebrow>
               <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, marginTop: '0.375rem', letterSpacing: '-0.025em', color: m.mainText, lineHeight: 1.1 }}>Lotificaciones</h1>
@@ -75,7 +77,7 @@ export function LotificacionesView({ onNew, onEdit, onToggleSidebar, m, hideTopb
         </div>
       )}
 
-      <div style={{ padding: '1.75rem 2.5rem' }}>
+      <div className="admin-content-area">
         {lotificaciones.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem', color: m.mainTextDim, fontSize: '0.875rem' }}>
             Sin lotificaciones registradas.

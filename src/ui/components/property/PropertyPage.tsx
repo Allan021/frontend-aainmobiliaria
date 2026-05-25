@@ -5,6 +5,7 @@ import type { Property } from '../../../core/domain/entities/types';
 import type { AstroIslandProps } from '../../../core/domain/entities/astro.types';
 import { Header } from '../layout/Header';
 import { Footer } from '../layout/Footer';
+import { QueryProvider } from '../../providers/QueryProvider';
 
 export interface PropertyPageProps extends AstroIslandProps {
   property: Property;
@@ -28,7 +29,7 @@ export default function PropertyPage({ property }: PropertyPageProps) {
   };
 
   return (
-    <>
+    <QueryProvider>
       <Header
         currentRoute="catalog"
         onNavigate={(r) => { window.location.href = r === 'home' ? '/' : '/'; }}
@@ -50,6 +51,7 @@ export default function PropertyPage({ property }: PropertyPageProps) {
           onClose={() => setWaOpen(false)}
         />
       )}
-    </>
+    </QueryProvider>
   );
 }
+

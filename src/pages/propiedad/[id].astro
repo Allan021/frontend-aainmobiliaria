@@ -28,6 +28,14 @@ const { property } = Astro.props as { property: Property };
 const rawDesc = `${property.type} en ${property.municipio}, ${property.departamento}. ${property.description}`;
 const pageDescription = rawDesc.slice(0, 155).trimEnd() + (rawDesc.length > 155 ? '...' : '');
 
+// Build optimized LCP image URL for preload in <head>
+const firstImageUrl = property.images?.[0]?.url || '';
+const CLOUDINARY_RE = /^(https?:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/.+)$/;
+const lcpMatch = firstImageUrl.match(CLOUDINARY_RE);
+const preloadImage = lcpMatch
+  ? `${lcpMatch[1]}f_auto,q_auto,w_768/${lcpMatch[2]}`
+  : firstImageUrl;
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'RealEstateListing',
@@ -58,6 +66,7 @@ const jsonLd = {
   ogImage={property.images?.[0]?.url}
   canonical={`https://www.aabienes.com/propiedad/${property.id}`}
   jsonLd={jsonLd}
+  preloadImage={preloadImage}
 >
   <Header client:load currentRoute="catalog" />
   <PropertyDetail
@@ -76,5 +85,5 @@ const jsonLd = {
   />
   <Footer />
   <WhatsAppFAB client:visible />
-  <WhatsAppModal client:load open={false} onClose={() => {}} />
+  <WhatsAppModal client:visible open={false} onClose={() => {}} />
 </BaseLayout>

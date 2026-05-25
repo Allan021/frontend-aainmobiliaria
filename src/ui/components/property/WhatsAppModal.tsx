@@ -5,6 +5,7 @@ import { Icon } from '../shared/Icon';
 import { useCreateLead } from '../../hooks/useLeads';
 import { formatPrice, type Property } from '../../../core/domain/entities/types';
 import { QueryProvider } from '../../providers/QueryProvider';
+import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
 
 interface Props {
   open: boolean;
@@ -267,8 +268,11 @@ function WhatsAppModalInner({ open: propOpen, onClose: propOnClose, property: pr
               }}>
                 {activeProperty.images && activeProperty.images.length > 0 && (
                   <img
-                    src={activeProperty.images[0].url}
+                    src={optimizeCloudinaryUrl(activeProperty.images[0].url, 120)}
                     alt=""
+                    width={56}
+                    height={56}
+                    loading="lazy"
                     style={{
                       width: 56,
                       height: 56,

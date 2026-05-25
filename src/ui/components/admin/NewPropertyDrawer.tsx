@@ -39,6 +39,9 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
     precio_financiado: '',
     description: '', dimensions: '', total_lots: '1', available_lots: '1',
     status: 'disponible',
+    map_url: '',
+    facebook_title: '',
+    facebook_description: '',
   });
   const [images, setImages] = useState<ImageItem[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -101,6 +104,9 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         total_lots: String(property.total_lots || '1'),
         available_lots: String(property.available_lots || '1'),
         status: property.status || 'disponible',
+        map_url: (property as any).map_url || '',
+        facebook_title: (property as any).facebook_title || '',
+        facebook_description: (property as any).facebook_description || '',
       });
       setImages(
         (property.images || []).map(img => ({
@@ -120,6 +126,9 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         precio_financiado: '',
         description: '', dimensions: '', total_lots: '1', available_lots: '1',
         status: 'disponible',
+        map_url: '',
+        facebook_title: '',
+        facebook_description: '',
       });
       setImages([]);
     }
@@ -245,6 +254,9 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         precio_financiado: form.precio_financiado ? (Number(form.precio_financiado.replace(/,/g, '')) || null) : null,
         status: form.status,
         images: existingImages,
+        map_url: form.map_url.trim(),
+        facebook_title: form.facebook_title.trim(),
+        facebook_description: form.facebook_description.trim(),
       };
 
       // 1. Save property
@@ -307,11 +319,11 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
     >
       <div
         onClick={e => e.stopPropagation()}
+        className="drawer-container"
         style={{
-          width: '900px', maxWidth: '96vw', background: bg, height: '100vh',
-          overflowY: 'auto', padding: '2.25rem 2.5rem',
-          borderLeft: `1px solid ${border}`, transition: 'background 0.3s ease',
-          display: 'flex', flexDirection: 'column', gap: '1.5rem',
+          background: bg,
+          borderLeft: `1px solid ${border}`,
+          transition: 'background 0.3s ease',
         }}
       >
         {/* Header */}
@@ -344,20 +356,9 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         </div>
 
         {/* Two-column layout */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', flex: 1 }}>
+        <div className="drawer-two-column">
           {/* Left: form fields */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-            <div>
-              <span style={labelStyle}>Título</span>
-              <input
-                style={inputStyle} value={form.title}
-                onChange={e => set('title', e.target.value)}
-                placeholder="Ej: Terreno residencial en Valle de Ángeles"
-                onFocus={e => e.target.style.borderColor = '#D4B254'}
-                onBlur={e => e.target.style.borderColor = border}
-              />
-            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
@@ -391,6 +392,17 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                   />
                 </div>
               </div>
+            </div>
+
+            <div>
+              <span style={labelStyle}>Ubicación en Google Maps (Link o Embed)</span>
+              <input
+                style={inputStyle} value={form.map_url}
+                onChange={e => set('map_url', e.target.value)}
+                placeholder="Ej: https://maps.app.goo.gl/xxx o iframe embed"
+                onFocus={e => e.target.style.borderColor = '#D4B254'}
+                onBlur={e => e.target.style.borderColor = border}
+              />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
@@ -587,17 +599,66 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
               </div>
             </div>
 
-            {/* Description */}
-            <div>
-              <span style={labelStyle}>Descripción</span>
-              <textarea
-                rows={4}
-                style={{ ...inputStyle, resize: 'vertical' }}
-                value={form.description}
-                onChange={e => set('description', e.target.value)}
-                onFocus={e => e.target.style.borderColor = '#D4B254'}
-                onBlur={e => e.target.style.borderColor = border}
-              />
+            {/* Sección: Copys Web */}
+            <div style={{
+              padding: '1.25rem', background: surface, border: `1px solid ${border}`,
+              borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+            }}>
+              <Eyebrow>Contenido para Sitio Web</Eyebrow>
+              <div>
+                <span style={labelStyle}>Título Web</span>
+                <input
+                  style={inputStyle} value={form.title}
+                  onChange={e => set('title', e.target.value)}
+                  placeholder="Ej: Terreno residencial en Valle de Ángeles"
+                  onFocus={e => e.target.style.borderColor = '#D4B254'}
+                  onBlur={e => e.target.style.borderColor = border}
+                />
+              </div>
+              <div>
+                <span style={labelStyle}>Descripción Web</span>
+                <textarea
+                  rows={4}
+                  style={{ ...inputStyle, resize: 'vertical' }}
+                  value={form.description}
+                  onChange={e => set('description', e.target.value)}
+                  placeholder="Describa los detalles completos de la propiedad para la web..."
+                  onFocus={e => e.target.style.borderColor = '#D4B254'}
+                  onBlur={e => e.target.style.borderColor = border}
+                />
+              </div>
+            </div>
+
+            {/* Sección: Copys Facebook */}
+            <div style={{
+              padding: '1.25rem', background: surface, border: `1px solid ${border}`,
+              borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+            }}>
+              <Eyebrow>Contenido para Facebook</Eyebrow>
+              <div>
+                <span style={labelStyle}>Título Facebook (Opcional)</span>
+                <input
+                  style={inputStyle} value={form.facebook_title}
+                  onChange={e => set('facebook_title', e.target.value)}
+                  placeholder="Dejar vacío para usar el Título Web"
+                  onFocus={e => e.target.style.borderColor = '#D4B254'}
+                  onBlur={e => e.target.style.borderColor = border}
+                />
+              </div>
+              <div>
+                <span style={labelStyle}>Descripción Facebook (Opcional)</span>
+                <textarea
+                  rows={4}
+                  style={{ ...inputStyle, resize: 'vertical' }}
+                  value={form.facebook_description}
+                  onChange={e => set('facebook_description', e.target.value)}
+                  placeholder="Dejar vacío para usar la Descripción Web"
+                  onFocus={e => e.target.style.borderColor = '#D4B254'}
+                  onBlur={e => e.target.style.borderColor = border}
+                />
+              </div>
             </div>
           </div>
 

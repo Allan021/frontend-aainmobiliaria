@@ -29,6 +29,9 @@ export interface Property {
   prima_monto?: number;
   precio_financiado?: number;
   plazo_anios?: number;
+  map_url?: string;
+  facebook_title?: string;
+  facebook_description?: string;
   created_at: string;
   updated_at: string;
 }

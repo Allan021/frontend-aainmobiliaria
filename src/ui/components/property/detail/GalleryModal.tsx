@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { optimizeCloudinaryUrl } from '../../../../core/utils/cloudinaryUtils';
 
 interface GalleryModalProps {
   images: { url: string; title?: string; description?: string }[];
@@ -63,7 +64,7 @@ export function GalleryModal({ images, startIdx, onClose }: GalleryModalProps) {
         </button>
         <div style={{ flex: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <img
-            src={img.url} alt={img.title || ''}
+            src={optimizeCloudinaryUrl(img.url, 1200)} alt={img.title || ''}
             style={{ maxHeight: '65vh', maxWidth: '100%', objectFit: 'contain', borderRadius: 12, boxShadow: '0 24px 64px rgba(0,0,0,0.5)' }}
           />
           {(img.title || img.description) && (
@@ -103,7 +104,7 @@ export function GalleryModal({ images, startIdx, onClose }: GalleryModalProps) {
               transition: 'opacity 0.2s, border-color 0.2s',
             }}
           >
-            <img src={thumb.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={optimizeCloudinaryUrl(thumb.url, 120)} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         ))}
       </div>

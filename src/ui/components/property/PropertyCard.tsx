@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { formatPrice, type Property } from '../../../core/domain/entities/types';
 import { WhatsAppButton } from '../shared/WhatsAppButton';
+import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
 
 interface PropertyCardProps {
   property: Property;
@@ -114,14 +115,17 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
       {/* Image */}
       <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#111113', flexShrink: 0 }}>
         <img
-          src={currentImg}
+          src={optimizeCloudinaryUrl(currentImg, 480)}
           alt={property.title}
+          width={480}
+          height={360}
           style={{
             width: '100%', height: '100%', objectFit: 'cover',
             transform: hover ? 'scale(1.06)' : 'scale(1)',
             transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
           }}
           loading="lazy"
+          decoding="async"
         />
 
         {/* Gradient overlay */}

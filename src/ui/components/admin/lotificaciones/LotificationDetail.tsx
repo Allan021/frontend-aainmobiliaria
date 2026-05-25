@@ -6,6 +6,7 @@ import { LoteCard } from './LoteCard';
 import { LoteModal } from './LoteModal';
 import { ConfirmModal } from '../ConfirmModal';
 import { Button, Eyebrow } from '../../shared/Button';
+import { SidebarMobileToggle } from '../AdminSidebar';
 
 interface M {
   mainBg: string; mainSurface: string; mainBorder: string;
@@ -13,8 +14,9 @@ interface M {
   mainCardBg: string; mainTopbarBg: string;
 }
 
-export function LotificationDetail({ lotification, m, onBack, onEditLotification }: {
+export function LotificationDetail({ lotification, m, onBack, onEditLotification, onToggleSidebar, isOpen = false }: {
   lotification: Property; m: M; onBack: () => void; onEditLotification: (p: Property) => void;
+  onToggleSidebar?: () => void; isOpen?: boolean;
 }) {
   const { data: lotes = [], isLoading } = useLotes(lotification.id);
   const [loteModal, setLoteModal] = useState<Lote | null | 'new'>(null);
@@ -33,20 +35,24 @@ export function LotificationDetail({ lotification, m, onBack, onEditLotification
   return (
     <div>
       {/* Topbar */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
-        padding: '2rem 2.5rem 1.5rem', borderBottom: `1px solid ${m.mainBorder}`,
+      <div className="admin-topbar" style={{
+        borderBottom: `1px solid ${m.mainBorder}`,
         background: m.mainTopbarBg,
       }}>
-        <div>
-          <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: m.mainTextMuted, fontSize: '13px', fontWeight: 500, padding: 0, marginBottom: '0.5rem', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            ← Lotificaciones
-          </button>
-          <Eyebrow>Lotificación</Eyebrow>
-          <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, marginTop: '0.375rem', letterSpacing: '-0.025em', color: m.mainText, lineHeight: 1.1 }}>{lotification.title}</h1>
-          <div style={{ fontSize: '0.8125rem', color: m.mainTextDim, marginTop: '4px' }}>{lotification.municipio}, {lotification.departamento}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {onToggleSidebar && (
+            <SidebarMobileToggle isOpen={isOpen} toggle={onToggleSidebar} isDark={m.mainBg === '#111113'} />
+          )}
+          <div>
+            <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: m.mainTextMuted, fontSize: '13px', fontWeight: 500, padding: 0, marginBottom: '0.5rem', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              ← Lotificaciones
+            </button>
+            <Eyebrow>Lotificación</Eyebrow>
+            <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, marginTop: '0.375rem', letterSpacing: '-0.025em', color: m.mainText, lineHeight: 1.1 }}>{lotification.title}</h1>
+            <div style={{ fontSize: '0.8125rem', color: m.mainTextDim, marginTop: '4px' }}>{lotification.municipio}, {lotification.departamento}</div>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <button onClick={() => setConfirmDelete(true)} style={{
             padding: '8px 14px', background: 'none', border: `1px solid rgba(140,58,46,0.3)`,
             color: '#8C3A2E', borderRadius: '6px', cursor: 'pointer', fontSize: '13px',
@@ -62,9 +68,9 @@ export function LotificationDetail({ lotification, m, onBack, onEditLotification
         </div>
       </div>
 
-      <div style={{ padding: '1.75rem 2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div className="admin-content-area">
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+        <div className="admin-metrics-grid">
           {[
             { label: 'Total lotes', value: lotes.length, color: m.mainText },
             { label: 'Disponibles', value: disponibles, color: '#4A7C59' },

@@ -120,98 +120,100 @@ export function ListingsTable({ properties, onEdit, m }: Props) {
       border, overflow: 'hidden',
       transition: 'background 0.3s ease, border-color 0.3s ease',
     }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ background: m?.mainCardBg || '#FFFFFF' }}>
-            <th style={{ ...thStyle, width: 48, paddingRight: 0 }}></th>
-            <th style={thStyle}>Propiedad</th>
-            <th style={thStyle}>Depto.</th>
-            <th style={{ ...thStyle, textAlign: 'right' }}>Precio</th>
-            <th style={thStyle}>Pago</th>
-            <th style={thStyle}>Estado</th>
-            <th style={{ ...thStyle, textAlign: 'right', width: 48 }}></th>
-          </tr>
-        </thead>
-        <tbody>
-          {properties.map((r, idx) => {
-            const thumb = r.images?.[0]?.url;
-            const sc = statusColors[r.status] || statusColors.borrador;
-            const isLast = idx === properties.length - 1;
-            return (
-              <tr key={r.id}
-                onClick={() => onEdit?.(r)}
-                style={{ cursor: 'pointer', transition: 'background 0.12s' }}
-                onMouseEnter={e => (e.currentTarget.style.background = m?.mainSurface === m?.mainCardBg ? (m?.mainBorder ? 'rgba(212,178,84,0.04)' : '#F9F6EE') : 'rgba(212,178,84,0.04)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-              >
-                {/* Thumbnail */}
-                <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, paddingRight: 0, width: 48, verticalAlign: 'middle' }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: '0.375rem', overflow: 'hidden',
-                    background: m?.mainBorder || '#E6E0D2', flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {thumb ? (
-                      <img src={thumb} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <span style={{ fontSize: '1rem' }}>🏗️</span>
-                    )}
-                  </div>
-                </td>
-
-                {/* Title */}
-                <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, fontWeight: 600, maxWidth: 220 }}>
-                  <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {r.title}
-                  </div>
-                  {r.municipio && (
-                    <div style={{ fontSize: '0.6875rem', color: m?.mainTextDim || '#9A9383', marginTop: '2px' }}>
-                      {r.municipio}
-                    </div>
-                  )}
-                </td>
-
-                <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, color: m?.mainTextMuted || '#5A5A63' }}>
-                  {r.dep_code}
-                </td>
-
-                <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, textAlign: 'right', fontWeight: 600, fontFeatureSettings: "'tnum' 1", whiteSpace: 'nowrap' }}>
-                  {formatPrice(r.price, r.currency)}
-                </td>
-
-                <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, color: m?.mainTextMuted || '#5A5A63' }}>
-                  {r.financing ? 'Financiado' : 'Contado'}
-                </td>
-
-                <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border }}>
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center',
-                    padding: '3px 10px', borderRadius: '999px',
-                    fontSize: '0.6875rem', fontWeight: 600,
-                    background: sc.bg, color: sc.text,
-                  }}>
-                    {statusLabels[r.status] || r.status}
-                  </span>
-                </td>
-
-                <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, textAlign: 'right' }}
-                  onClick={e => e.stopPropagation()}>
-                  <ActionMenu property={r} onEdit={onEdit} m={m} />
-                </td>
-              </tr>
-            );
-          })}
-
-          {properties.length === 0 && (
-            <tr>
-              <td colSpan={7} style={{
-                padding: '3rem', textAlign: 'center',
-                color: m?.mainTextDim || '#9A9383', fontSize: '0.875rem',
-              }}>Sin propiedades</td>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
+          <thead>
+            <tr style={{ background: m?.mainCardBg || '#FFFFFF' }}>
+              <th style={{ ...thStyle, width: 48, paddingRight: 0 }}></th>
+              <th style={thStyle}>Propiedad</th>
+              <th style={thStyle}>Depto.</th>
+              <th style={{ ...thStyle, textAlign: 'right' }}>Precio</th>
+              <th style={thStyle}>Pago</th>
+              <th style={thStyle}>Estado</th>
+              <th style={{ ...thStyle, textAlign: 'right', width: 48 }}></th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {properties.map((r, idx) => {
+              const thumb = r.images?.[0]?.url;
+              const sc = statusColors[r.status] || statusColors.borrador;
+              const isLast = idx === properties.length - 1;
+              return (
+                <tr key={r.id}
+                  onClick={() => onEdit?.(r)}
+                  style={{ cursor: 'pointer', transition: 'background 0.12s' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = m?.mainSurface === m?.mainCardBg ? (m?.mainBorder ? 'rgba(212,178,84,0.04)' : '#F9F6EE') : 'rgba(212,178,84,0.04)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  {/* Thumbnail */}
+                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, paddingRight: 0, width: 48, verticalAlign: 'middle' }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: '0.375rem', overflow: 'hidden',
+                      background: m?.mainBorder || '#E6E0D2', flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {thumb ? (
+                        <img src={thumb} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <span style={{ fontSize: '1rem' }}>🏗️</span>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* Title */}
+                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, fontWeight: 600, maxWidth: 220 }}>
+                    <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {r.title}
+                    </div>
+                    {r.municipio && (
+                      <div style={{ fontSize: '0.6875rem', color: m?.mainTextDim || '#9A9383', marginTop: '2px' }}>
+                        {r.municipio}
+                      </div>
+                    )}
+                  </td>
+
+                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, color: m?.mainTextMuted || '#5A5A63' }}>
+                    {r.dep_code}
+                  </td>
+
+                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, textAlign: 'right', fontWeight: 600, fontFeatureSettings: "'tnum' 1", whiteSpace: 'nowrap' }}>
+                    {formatPrice(r.price, r.currency)}
+                  </td>
+
+                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, color: m?.mainTextMuted || '#5A5A63' }}>
+                    {r.financing ? 'Financiado' : 'Contado'}
+                  </td>
+
+                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border }}>
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center',
+                      padding: '3px 10px', borderRadius: '999px',
+                      fontSize: '0.6875rem', fontWeight: 600,
+                      background: sc.bg, color: sc.text,
+                    }}>
+                      {statusLabels[r.status] || r.status}
+                    </span>
+                  </td>
+
+                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, textAlign: 'right' }}
+                    onClick={e => e.stopPropagation()}>
+                    <ActionMenu property={r} onEdit={onEdit} m={m} />
+                  </td>
+                </tr>
+              );
+            })}
+
+            {properties.length === 0 && (
+              <tr>
+                <td colSpan={7} style={{
+                  padding: '3rem', textAlign: 'center',
+                  color: m?.mainTextDim || '#9A9383', fontSize: '0.875rem',
+                }}>Sin propiedades</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

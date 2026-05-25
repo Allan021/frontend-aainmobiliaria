@@ -104,7 +104,7 @@ export function PagoModal({ lote, lotificationId, onClose, m }: {
 
         {/* Summary */}
         {precioTotal > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem' }}>
             {[
               { label: 'Precio total', value: `L ${precioTotal.toLocaleString('en-US')}`, color: m.mainText },
               { label: 'Pagado', value: `L ${totalPagado.toLocaleString('en-US')}`, color: '#4A7C59' },
@@ -133,21 +133,25 @@ export function PagoModal({ lote, lotificationId, onClose, m }: {
         {/* Pagos list */}
         {pagos.length > 0 && (
           <div style={{ border: `1px solid ${b}`, borderRadius: '0.625rem', overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 120px 80px 28px', gap: '0.5rem', padding: '0.5rem 0.75rem', fontSize: '0.625rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#D4B254', borderBottom: `1px solid ${b}` }}>
-              <div>Concepto</div><div>Fecha</div><div>Método</div><div style={{ textAlign: 'right' }}>Monto</div><div></div>
-            </div>
-            {pagos.map((p, i) => (
-              <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1fr 90px 120px 80px 28px', gap: '0.5rem', padding: '0.625rem 0.75rem', alignItems: 'center', borderBottom: i < pagos.length - 1 ? `1px solid ${b}` : 'none' }}>
-                <div>
-                  <div style={{ fontSize: '0.8125rem', color: m.mainText, fontWeight: 500 }}>{p.concepto}</div>
-                  <div style={{ fontSize: '0.625rem', color: m.mainTextDim }}>{p.numero_recibo}</div>
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <div style={{ minWidth: '460px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 120px 80px 28px', gap: '0.5rem', padding: '0.5rem 0.75rem', fontSize: '0.625rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#D4B254', borderBottom: `1px solid ${b}` }}>
+                  <div>Concepto</div><div>Fecha</div><div>Método</div><div style={{ textAlign: 'right' }}>Monto</div><div></div>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: m.mainTextMuted }}>{new Date(p.fecha).toLocaleDateString('es-HN', { day: 'numeric', month: 'short' })}</div>
-                <div style={{ fontSize: '0.75rem', color: m.mainTextMuted, textTransform: 'capitalize' }}>{p.metodo_pago}</div>
-                <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#4A7C59', textAlign: 'right', fontFeatureSettings: "'tnum' 1" }}>L {p.monto.toLocaleString('en-US')}</div>
-                <button onClick={() => setConfirmPago(p)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8C3A2E', fontSize: '14px', padding: '2px', lineHeight: 1 }}>×</button>
+                {pagos.map((p, i) => (
+                  <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1fr 90px 120px 80px 28px', gap: '0.5rem', padding: '0.625rem 0.75rem', alignItems: 'center', borderBottom: i < pagos.length - 1 ? `1px solid ${b}` : 'none' }}>
+                    <div>
+                      <div style={{ fontSize: '0.8125rem', color: m.mainText, fontWeight: 500 }}>{p.concepto}</div>
+                      <div style={{ fontSize: '0.625rem', color: m.mainTextDim }}>{p.numero_recibo}</div>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: m.mainTextMuted }}>{new Date(p.fecha).toLocaleDateString('es-HN', { day: 'numeric', month: 'short' })}</div>
+                    <div style={{ fontSize: '0.75rem', color: m.mainTextMuted, textTransform: 'capitalize' }}>{p.metodo_pago}</div>
+                    <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#4A7C59', textAlign: 'right', fontFeatureSettings: "'tnum' 1" }}>L {p.monto.toLocaleString('en-US')}</div>
+                    <button onClick={() => setConfirmPago(p)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8C3A2E', fontSize: '14px', padding: '2px', lineHeight: 1 }}>×</button>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         )}
 

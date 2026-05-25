@@ -11,27 +11,29 @@ export function SalesHistory({ sales }: Props) {
 
   return (
     <div className="bg-white rounded-xl border border-bone-200 overflow-hidden">
-      <table className="w-full border-collapse">
-        <thead>
-          <tr>
-            {['Referencia', 'Propiedad', 'Comprador', 'Precio', 'Método', 'Fecha'].map(h => (
-              <th key={h} className={thStyle}>{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {sales.map(s => (
-            <tr key={s.id}>
-              <td className={`${tdStyle} font-mono text-xs text-obsidian-500`}>{s.reference}</td>
-              <td className={`${tdStyle} text-obsidian-900 font-medium`}>{s.property_title}</td>
-              <td className={`${tdStyle} text-obsidian-600`}>{s.buyer_name}</td>
-              <td className={`${tdStyle} text-obsidian-900 font-medium`} style={{ fontFeatureSettings: "'tnum' 1" }}>{formatPrice(s.price)}</td>
-              <td className={`${tdStyle} text-obsidian-500`}>{s.payment_method}</td>
-              <td className={`${tdStyle} text-obsidian-500`}>{s.date}</td>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table className="w-full border-collapse" style={{ minWidth: '600px' }}>
+          <thead>
+            <tr>
+              {['Referencia', 'Propiedad', 'Comprador', 'Precio', 'Método', 'Fecha'].map(h => (
+                <th key={h} className={thStyle}>{h}</th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sales.map(s => (
+              <tr key={s.id}>
+                <td className={`${tdStyle} font-mono text-xs text-obsidian-500`}>{s.reference}</td>
+                <td className={`${tdStyle} text-obsidian-900 font-medium`}>{s.property_title}</td>
+                <td className={`${tdStyle} text-obsidian-600`}>{s.buyer_name}</td>
+                <td className={`${tdStyle} text-obsidian-900 font-medium`} style={{ fontFeatureSettings: "'tnum' 1" }}>{formatPrice(s.price)}</td>
+                <td className={`${tdStyle} text-obsidian-500`}>{s.payment_method}</td>
+                <td className={`${tdStyle} text-obsidian-500`}>{s.date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

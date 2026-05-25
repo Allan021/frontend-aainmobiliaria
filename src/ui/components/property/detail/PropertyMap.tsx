@@ -21,18 +21,51 @@ function getMapUrl(departamento: string): string {
   return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - margin}%2C${lat - margin}%2C${lng + margin}%2C${lat + margin}&layer=mapnik&marker=${lat}%2C${lng}`;
 }
 
+function parseMapUrl(input: string, departamento: string): { src: string; externalLink?: string } {
+  if (!input) {
+    return { src: getMapUrl(departamento) };
+  }
+
+  const trimmed = input.trim();
+
+  // 1. If it's an iframe code, extract the src attribute
+  if (trimmed.startsWith('<iframe')) {
+    const srcMatch = trimmed.match(/src=["']([^"']+)["']/);
+    if (srcMatch && srcMatch[1]) {
+      return { src: srcMatch[1] };
+    }
+  }
+
+  // 2. If it's an embeddable Google Maps or OpenStreetMap URL, return it directly
+  if (
+    trimmed.includes('/embed') ||
+    trimmed.includes('/export') ||
+    trimmed.includes('openstreetmap.org/export/embed')
+  ) {
+    return { src: trimmed };
+  }
+
+  // 3. Otherwise, it's a standard link (Google Maps short link, directions link, etc.)
+  // We fall back to showing OpenStreetMap but provide the external link as a button overlay
+  return {
+    src: getMapUrl(departamento),
+    externalLink: trimmed
+  };
+}
+
 interface PropertyMapProps {
   departamento: string;
   municipio: string;
+  mapUrl?: string;
 }
 
-export function PropertyMap({ departamento, municipio }: PropertyMapProps) {
-  const mapUrl = getMapUrl(departamento);
+export function PropertyMap({ departamento, municipio, mapUrl = '' }: PropertyMapProps) {
+  const { src, externalLink } = parseMapUrl(mapUrl, departamento);
 
   return (
     <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid var(--main-border, #E6E0D2)', position: 'relative' }}>
       <iframe
-        src={mapUrl}
+        src={src}
         width="100%"
         height="400"
         style={{ border: 'none', display: 'block' }}
@@ -54,6 +87,32 @@ export function PropertyMap({ departamento, municipio }: PropertyMapProps) {
           {municipio}, {departamento}
         </span>
       </div>
+
+      {externalLink && (
+        <a
+          href={externalLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            position: 'absolute', top: 12, right: 12,
+            background: '#D4B254', color: '#111113',
+            borderRadius: 10, padding: '0.625rem 1rem',
+            display: 'flex', alignItems: 'center', gap: 8,
+            fontSize: '0.75rem', fontWeight: 700, textDecoration: 'none',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#FAF8F3'; e.currentTarget.style.color = '#111113'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = '#D4B254'; e.currentTarget.style.color = '#111113'; }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            <polyline points="15 3 21 3 21 9" />
+            <line x1="10" y1="14" x2="21" y2="3" />
+          </svg>
+          Abrir en Google Maps
+        </a>
+      )}
     </div>
   );
 }

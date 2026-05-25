@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { formatPrice, type Property } from '../../../core/domain/entities/types';
 import { WhatsAppButton } from '../shared/WhatsAppButton';
+import { useCreateLead } from '../../hooks/useLeads';
+import { QueryProvider } from '../../providers/QueryProvider';
 
 // Modular Subcomponents
 import { PhotoGrid } from './detail/PhotoGrid';
@@ -43,10 +45,28 @@ function useReveal(ref: React.RefObject<Element | null>) {
   }, []);
 }
 
-export function PropertyDetail({ property, onBack, onWhatsApp, standalone }: Props) {
+function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props) {
   const [gallery, setGallery] = useState<{ open: boolean; idx: number }>({ open: false, idx: 0 });
   const [descExpanded, setDescExpanded] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
+
+  const createLead = useCreateLead();
+
+  const handleDirectWhatsApp = (p?: Property) => {
+    const targetProperty = p || property;
+    createLead.mutate({
+      name: 'Interesado Web',
+      email: 'anonimo@aabienes.com',
+      property_id: targetProperty.id,
+      property_title: targetProperty.title,
+    });
+
+    const phone = '50499383699';
+    const propertyUrl = `https://www.aabienes.com/propiedad/${targetProperty.id}`;
+    const text = `Hola A&A Inmobiliaria, estoy interesado en la propiedad: "${targetProperty.title}" (${propertyUrl}).`;
+
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   const headerRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLDivElement>(null!);
@@ -370,7 +390,7 @@ export function PropertyDetail({ property, onBack, onWhatsApp, standalone }: Pro
               <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--main-text, #111113)', marginBottom: '1.25rem' }}>
                 Ubicación aproximada
               </h2>
-              <PropertyMap departamento={property.departamento} municipio={property.municipio} />
+              <PropertyMap departamento={property.departamento} municipio={property.municipio} mapUrl={property.map_url} />
               <p style={{ fontSize: '0.8125rem', color: 'var(--main-text-dim, #9A9383)', marginTop: '0.75rem', lineHeight: 1.5 }}>
                 Ubicado en {property.municipio}, {property.departamento}, Honduras. La ubicación exacta se comparte al confirmar su visita.
               </p>
@@ -390,7 +410,7 @@ export function PropertyDetail({ property, onBack, onWhatsApp, standalone }: Pro
             <PriceCard
               property={property}
               priceCardRef={priceCardRef}
-              onWhatsApp={onWhatsApp}
+              onWhatsApp={handleDirectWhatsApp}
               phone={phone}
             />
           </div>
@@ -419,7 +439,7 @@ export function PropertyDetail({ property, onBack, onWhatsApp, standalone }: Pro
           </div>
         </div>
         <WhatsAppButton
-          onClick={() => onWhatsApp(property)}
+          onClick={() => handleDirectWhatsApp(property)}
           size="lg"
           variant="solid"
           borderRadius={12}
@@ -478,5 +498,13 @@ export function PropertyDetail({ property, onBack, onWhatsApp, standalone }: Pro
         }
       `}</style>
     </div>
+  );
+}
+
+export function PropertyDetail(props: Props) {
+  return (
+    <QueryProvider>
+      <PropertyDetailInner {...props} />
+    </QueryProvider>
   );
 }

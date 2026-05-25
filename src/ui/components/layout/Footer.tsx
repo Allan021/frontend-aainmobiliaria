@@ -13,7 +13,7 @@ export function Footer({ onWhatsApp }: FooterProps) {
           <div>
             <div className="flex items-center gap-3.5 mb-5">
               <div className="w-14 h-14 bg-obsidian-950 rounded-lg overflow-hidden flex">
-                <img src="/logo-mark.webp" alt="" className="w-14 h-14 object-cover" style={{ mixBlendMode: 'screen' }} />
+                <img src="/logo-mark.webp" alt="" width={56} height={56} className="w-14 h-14 object-cover" style={{ mixBlendMode: 'screen' }} />
               </div>
               <div>
                 <div className="text-xl font-bold text-gold-300 tracking-tight leading-tight">A&A Inmobiliaria</div>
