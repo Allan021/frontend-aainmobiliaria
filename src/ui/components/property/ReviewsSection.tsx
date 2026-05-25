@@ -1,42 +1,10 @@
-import { useRef, useEffect } from 'react';
-
-/* ── Reveal hook ────────────────────────────────── */
-function useReveal(ref: React.RefObject<Element | null>) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        import('animejs').then(mod => {
-          const animate = (mod as any).animate;
-          const stagger = (mod as any).stagger;
-          if (!animate) return;
-          const children = el.querySelectorAll('.review-card');
-          animate(children, {
-            opacity: [0, 1],
-            y: [30, 0],
-            duration: 700,
-            ease: 'outExpo',
-            delay: stagger(100, { start: 200 }),
-          });
-          const heading = el.querySelector('.reviews-heading');
-          if (heading) animate(heading, { opacity: [0, 1], y: [20, 0], duration: 600, ease: 'outExpo' });
-        });
-        observer.unobserve(el);
-      },
-      { threshold: 0.1 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-}
+import { useRef, useEffect, useState } from 'react';
 
 const reviews = [
   {
     name: 'Carlos Mejía',
     location: 'El Progreso, Yoro',
-    text: 'Excelente servicio. Me ayudaron a encontrar el lote perfecto para mi familia. Todo el proceso de escrituración fue transparente y rápido.',
+    text: 'Excelente servicio. Me ayudaron a encontrar el lote perfecto para mi familia. Verificaron toda la documentación legal y la escrituración fue transparente y sin sorpresas.',
     rating: 5,
     date: 'Hace 2 semanas',
     initials: 'CM',
@@ -45,7 +13,7 @@ const reviews = [
   {
     name: 'María Elena Torres',
     location: 'San Pedro Sula',
-    text: 'El financiamiento a la medida fue lo que me convenció. Prima accesible y cuotas que se ajustan a mi presupuesto. 100% recomendados.',
+    text: 'Me impresionó el acompañamiento legal. Revisaron cada documento en el Instituto de la Propiedad, me explicaron todo el proceso y las cuotas se ajustan a mi presupuesto. 100% recomendados.',
     rating: 5,
     date: 'Hace 1 mes',
     initials: 'MT',
@@ -54,7 +22,7 @@ const reviews = [
   {
     name: 'José Hernández',
     location: 'La Ceiba, Atlántida',
-    text: 'Profesionales y honestos. Me acompañaron desde la primera visita hasta la firma. Sin sorpresas, todo claro desde el primer día.',
+    text: 'Profesionales y honestos. Me acompañaron con asesoría legal desde la primera visita hasta la firma de escritura pública. Todos los documentos en regla, todo claro desde el primer día.',
     rating: 5,
     date: 'Hace 3 semanas',
     initials: 'JH',
@@ -72,13 +40,61 @@ function StarIcon({ filled }: { filled: boolean }) {
 
 export function ReviewsSection() {
   const sectionRef = useRef<HTMLElement>(null!);
-  useReveal(sectionRef);
+  const statsContainerRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  const animatedRef = useRef(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Counter animation with anime.js
+  useEffect(() => {
+    if (!visible || animatedRef.current || !statsContainerRef.current) return;
+    animatedRef.current = true;
+
+    import('animejs').then(mod => {
+      const animate = (mod as any).animate;
+      if (!animate) return;
+
+      const numEls = statsContainerRef.current!.querySelectorAll('.review-stat-num');
+      numEls.forEach((el: Element, idx: number) => {
+        const htmlEl = el as HTMLElement;
+        const target = parseFloat(htmlEl.dataset.target || '0');
+        const suffix = htmlEl.dataset.suffix || '';
+        const isDecimal = htmlEl.dataset.decimal === 'true';
+        const obj = { val: 0 };
+
+        animate(obj, {
+          val: target,
+          duration: 1600,
+          ease: 'outExpo',
+          delay: 600 + idx * 150,
+          onUpdate: () => {
+            htmlEl.textContent = (isDecimal ? obj.val.toFixed(1) : Math.round(obj.val).toString()) + suffix;
+          },
+        });
+      });
+    });
+  }, [visible]);
 
   return (
     <section
       ref={sectionRef}
       style={{
-        padding: 'clamp(3.5rem, 8vw, 6rem) 1.5rem',
+        padding: 'clamp(3.5rem, 8vw, 5rem) 1.5rem',
         background: '#111113',
         position: 'relative',
         overflow: 'hidden',
@@ -94,7 +110,11 @@ export function ReviewsSection() {
 
       <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Heading */}
-        <div className="reviews-heading" style={{ opacity: 0, textAlign: 'center', marginBottom: 'clamp(2rem, 5vw, 3.5rem)' }}>
+        <div style={{
+          textAlign: 'center', marginBottom: 'clamp(2rem, 5vw, 3rem)',
+          opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'opacity 0.6s ease, transform 0.6s ease',
+        }}>
           <div style={{
             fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.18em',
             textTransform: 'uppercase', color: '#D4B254', marginBottom: '0.75rem',
@@ -112,7 +132,7 @@ export function ReviewsSection() {
             fontSize: '0.9375rem', color: '#6B6459', lineHeight: 1.65,
             maxWidth: 480, margin: '0 auto',
           }}>
-            Más de 200 familias han confiado en nosotros para encontrar su propiedad ideal.
+            Más de 200 familias han confiado en nosotros para encontrar su propiedad ideal con todos los documentos en regla.
           </p>
         </div>
 
@@ -125,14 +145,14 @@ export function ReviewsSection() {
           {reviews.map((review, i) => (
             <div
               key={i}
-              className="review-card"
               style={{
-                opacity: 0,
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(30px)',
+                transition: `opacity 0.6s ease ${i * 0.12}s, transform 0.6s ease ${i * 0.12}s`,
                 background: 'rgba(255,255,255,0.03)',
                 border: '1px solid rgba(255,255,255,0.06)',
                 borderRadius: 20,
                 padding: 'clamp(1.25rem, 3vw, 1.75rem)',
-                transition: 'all 0.3s cubic-bezier(0.22,1,0.36,1)',
                 cursor: 'default',
                 position: 'relative',
                 overflow: 'hidden',
@@ -156,7 +176,7 @@ export function ReviewsSection() {
                 fontSize: '3rem', lineHeight: 1, color: 'rgba(212,178,84,0.08)',
                 fontWeight: 900, fontFamily: 'Georgia, serif',
               }}>
-                "
+                &ldquo;
               </div>
 
               {/* Stars */}
@@ -172,7 +192,7 @@ export function ReviewsSection() {
                 color: '#C9C2B1', margin: '0 0 1.5rem',
                 fontStyle: 'italic',
               }}>
-                "{review.text}"
+                &ldquo;{review.text}&rdquo;
               </p>
 
               {/* Reviewer */}
@@ -202,19 +222,30 @@ export function ReviewsSection() {
         </div>
 
         {/* Bottom trust stat */}
-        <div style={{
-          marginTop: 'clamp(2rem, 5vw, 3rem)',
-          display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2.5rem',
-          flexWrap: 'wrap',
-        }}>
+        <div
+          ref={statsContainerRef}
+          style={{
+            marginTop: 'clamp(2rem, 5vw, 3rem)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2.5rem',
+            flexWrap: 'wrap',
+            opacity: visible ? 1 : 0,
+            transition: 'opacity 0.6s ease 0.4s',
+          }}
+        >
           {[
-            { value: '4.9', label: 'Calificación' },
-            { value: '200+', label: 'Familias' },
-            { value: '50+', label: 'Propiedades' },
+            { target: 4.9, suffix: '', label: 'Calificación', decimal: true },
+            { target: 200, suffix: '+', label: 'Familias', decimal: false },
+            { target: 50, suffix: '+', label: 'Propiedades', decimal: false },
           ].map(stat => (
             <div key={stat.label} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#D4B254', letterSpacing: '-0.02em' }}>
-                {stat.value}
+              <div
+                className="review-stat-num"
+                data-target={stat.target}
+                data-suffix={stat.suffix}
+                data-decimal={stat.decimal ? 'true' : 'false'}
+                style={{ fontSize: '1.5rem', fontWeight: 800, color: '#D4B254', letterSpacing: '-0.02em' }}
+              >
+                0{stat.suffix}
               </div>
               <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#6B6459', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 2 }}>
                 {stat.label}

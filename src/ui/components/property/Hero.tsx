@@ -10,7 +10,7 @@ interface Props {
 
 const STATS = [
   {
-    num: '50+', label: 'Propiedades activas',
+    num: '50+', numTarget: 50, suffix: '+', label: 'Propiedades activas',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -19,7 +19,7 @@ const STATS = [
     ),
   },
   {
-    num: '200+', label: 'Clientes satisfechos',
+    num: '200+', numTarget: 200, suffix: '+', label: 'Clientes satisfechos',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -30,7 +30,7 @@ const STATS = [
     ),
   },
   {
-    num: '8 años', label: 'De experiencia',
+    num: '8 años', numTarget: 8, suffix: ' años', label: 'De experiencia',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -41,7 +41,7 @@ const STATS = [
     ),
   },
   {
-    num: '4.9★', label: 'Valoración promedio',
+    num: '4.9★', numTarget: 4.9, suffix: '★', label: 'Valoración promedio',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -275,6 +275,26 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
           ease: 'outQuad',
           delay: stagger(80, { start: 850 }),
         });
+
+        // Counter animation for stat numbers
+        const numEls = statsRef.current.querySelectorAll('.stat-num');
+        numEls.forEach((el: Element, idx: number) => {
+          const htmlEl = el as HTMLElement;
+          const target = parseFloat(htmlEl.dataset.target || '0');
+          const suffix = htmlEl.dataset.suffix || '';
+          const isDecimal = target % 1 !== 0;
+          const obj = { val: 0 };
+
+          animate(obj, {
+            val: target,
+            duration: 1400,
+            ease: 'outExpo',
+            delay: 1100 + idx * 120,
+            onUpdate: () => {
+              htmlEl.textContent = (isDecimal ? obj.val.toFixed(1) : Math.round(obj.val).toString()) + suffix;
+            },
+          });
+        });
       }
     });
   }, []);
@@ -400,8 +420,13 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
               <div style={{ color: 'rgba(212,178,84,0.65)' }}>
                 {s.icon}
               </div>
-              <div style={{ fontSize: '1.625rem', fontWeight: 800, color: '#D4B254', lineHeight: 1, fontFeatureSettings: "'tnum' 1" }}>
-                {s.num}
+              <div
+                className="stat-num"
+                data-target={s.numTarget}
+                data-suffix={s.suffix}
+                style={{ fontSize: '1.625rem', fontWeight: 800, color: '#D4B254', lineHeight: 1, fontFeatureSettings: "'tnum' 1" }}
+              >
+                0{s.suffix}
               </div>
               <div style={{ fontSize: '0.6875rem', color: '#9A9383', fontWeight: 500, letterSpacing: '0.04em' }}>
                 {s.label}

@@ -304,13 +304,12 @@ export function FeaturedSection(props: { onOpen?: (p: Property) => void; onWhats
 /* ── Trust band ─────────────────────────────────────────────── */
 export function TrustBand({ ref: _ref }: { ref?: React.Ref<HTMLElement> }) {
   const sectionRef = useRef<HTMLElement>(null!);
-  useReveal(sectionRef);
 
   const items = [
     {
       num: '01',
       title: 'Escrituración verificada',
-      body: 'Revisamos cada propiedad en el Instituto de la Propiedad antes de publicarla.',
+      body: 'Revisamos cada propiedad en el Instituto de la Propiedad antes de publicarla. Todos los documentos en regla.',
     },
     {
       num: '02',
@@ -319,16 +318,16 @@ export function TrustBand({ ref: _ref }: { ref?: React.Ref<HTMLElement> }) {
     },
     {
       num: '03',
-      title: 'Acompañamiento completo',
-      body: 'Le acompañamos desde la primera visita hasta la firma de escritura.',
+      title: 'Acompañamiento legal completo',
+      body: 'Le acompañamos con asesoría legal desde la primera visita hasta la firma de escritura pública.',
     },
   ];
 
   return (
-    <section ref={sectionRef} style={{ padding: '5rem 1.5rem', background: '#111113', color: '#FAF8F3' }}>
+    <section ref={sectionRef} style={{ padding: 'clamp(3rem, 6vw, 5rem) 1.5rem', background: '#111113', color: '#FAF8F3' }}>
       <div className="tb-inner">
-        {/* Left: heading — sticks while right list scrolls past on desktop */}
-        <div className="reveal-child tb-left" style={{ opacity: 0 }}>
+        {/* Left: heading */}
+        <div className="tb-left">
           <h2 style={{ fontSize: 'clamp(26px, 3vw, 44px)', fontWeight: 800, letterSpacing: '-0.03em', color: '#FAF8F3', lineHeight: 1.1, margin: '0 0 1.25rem' }}>
             Una compra sin sorpresas, con el rigor que merece su patrimonio.
           </h2>
@@ -342,9 +341,7 @@ export function TrustBand({ ref: _ref }: { ref?: React.Ref<HTMLElement> }) {
           {items.map((item, i) => (
             <div
               key={i}
-              className="reveal-child"
               style={{
-                opacity: 0,
                 display: 'flex',
                 gap: '1.75rem',
                 alignItems: 'flex-start',
@@ -372,9 +369,6 @@ export function TrustBand({ ref: _ref }: { ref?: React.Ref<HTMLElement> }) {
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }} />
         </div>
       </div>
-
-
-
     </section>
   );
 }
