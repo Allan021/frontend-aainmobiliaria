@@ -261,27 +261,17 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
 
   return (
     <section style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      {/* Background */}
-      <div style={{ position: 'absolute', inset: 0 }}>
-        <img
-          src="/montana.jpg"
-          alt="Propiedades en Honduras"
-          width={1920}
-          height={1080}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }}
-          loading="eager"
-        />
-        {/* Gradient — stronger at bottom for WCAG contrast on text */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(170deg, rgba(10,10,11,0.18) 0%, rgba(10,10,11,0.50) 35%, rgba(10,10,11,0.88) 75%, rgba(10,10,11,0.97) 100%)',
-        }} />
-        {/* Edge vignette */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'radial-gradient(ellipse 90% 80% at 50% 50%, transparent 30%, rgba(10,10,11,0.50) 100%)',
-        }} />
-      </div>
+      {/* Pure CSS background — zero network requests, lightweight, premium look */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: `
+          radial-gradient(circle at 50% -20%, rgba(212, 178, 84, 0.15) 0%, transparent 70%),
+          radial-gradient(circle at 10% 40%, rgba(37, 211, 102, 0.04) 0%, transparent 50%),
+          radial-gradient(circle at 90% 80%, rgba(212, 178, 84, 0.06) 0%, transparent 60%),
+          linear-gradient(180deg, #111113 0%, #0A0A0B 100%)
+        `,
+      }} />
 
       {/* Main content */}
       <div style={{

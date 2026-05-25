@@ -16,6 +16,13 @@ const NAV_ITEMS = [
   { to: 'about', label: 'Nosotros' },
 ];
 
+const NAV_URLS: Record<string, string> = {
+  home: '/',
+  catalog: '/propiedades',
+  lotificaciones: '/lotificaciones',
+  about: '/nosotros',
+};
+
 export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', toggleTheme }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -91,7 +98,11 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
         >
           {/* Brand */}
           <a
-            onClick={() => navigate('home')}
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('home');
+            }}
             style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', textDecoration: 'none', flexShrink: 0 }}
           >
             <div style={{
@@ -121,7 +132,11 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
               return (
                 <a
                   key={i}
-                  onClick={() => navigate(item.to)}
+                  href={NAV_URLS[item.to] || '#'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(item.to);
+                  }}
                   style={{
                     fontSize: '0.875rem',
                     fontWeight: active ? 600 : 500,
@@ -300,7 +315,11 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
                 return (
                   <a
                     key={i}
-                    onClick={() => navigate(item.to)}
+                    href={NAV_URLS[item.to] || '#'}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate(item.to);
+                    }}
                     style={{
                       fontSize: '1rem', fontWeight: active ? 700 : 500,
                       color: active ? (isDark ? '#FAF8F3' : '#111113') : isDark ? '#9A9383' : '#5A5A63',

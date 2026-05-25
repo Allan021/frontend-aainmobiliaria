@@ -44,7 +44,7 @@ export function Footer({ onWhatsApp }: FooterProps) {
         </div>
 
         <div className="pt-8 border-t border-obsidian-700 flex flex-wrap justify-between items-center gap-4">
-          <div className="text-xs text-obsidian-500">© 2025 A&A Inmobiliaria · El Progreso, Yoro, Honduras</div>
+          <div className="text-xs text-bone-400">© 2025 A&A Inmobiliaria · El Progreso, Yoro, Honduras</div>
           <div className="flex gap-2">
             <Button variant="gold" size="sm" iconEl={<WhatsAppIcon size={14} />} onClick={onWhatsApp}>WhatsApp</Button>
             <Button variant="darkOutline" size="sm" onClick={() => window.location.href = '/login'}>Iniciar sesión</Button>

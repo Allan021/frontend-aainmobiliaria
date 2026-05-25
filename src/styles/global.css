@@ -102,8 +102,8 @@ body {
   --main-surface: #FFFFFF;
   --main-border: #E6E0D2;
   --main-text: #111113;
-  --main-text-muted: #5A5A63;
-  --main-text-dim: #9A9383;
+  --main-text-muted: #36363D;
+  --main-text-dim: #5A5A63;
   --main-topbar-bg: #FAF8F3;
   --main-card-bg: #FFFFFF;
 
@@ -134,7 +134,7 @@ body {
   --main-border: #26262B;
   --main-text: #FAF8F3;
   --main-text-muted: #C9C2B1;
-  --main-text-dim: #5A5A63;
+  --main-text-dim: #9A9383;
   --main-topbar-bg: #111113;
   --main-card-bg: #1A1A1D;
 
