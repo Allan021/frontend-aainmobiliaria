@@ -165,7 +165,7 @@ function SearchBar({ onSearch }: { onSearch: (f: { dep?: string; pay?: string; t
           <FieldLabel icon={PIN_ICON} label="Departamento" />
           <SelectField options={depOptions} value={dep} onChange={setDep} placeholder="Todos los departamentos" theme="light" fontSize="0.875rem" />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: divider }}>
+        <div className="hero-filter-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: divider }}>
           <div style={{ padding: '0.875rem 1.25rem', borderRight: divider }}>
             <FieldLabel icon={CARD_ICON} label="Tipo de pago" />
             <SelectField options={PAY_OPTIONS} value={pay} onChange={setPay} placeholder="Cualquier tipo" theme="light" fontSize="0.875rem" />
@@ -289,7 +289,7 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         textAlign: 'center', padding: '8rem 1.5rem 5rem',
-      }}>
+      }} className="hero-content">
         <div ref={contentRef} style={{ width: '100%', maxWidth: 800, margin: '0 auto' }}>
 
           {/* Eyebrow badge */}
@@ -366,25 +366,30 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
           onClick={onWhatsApp}
           style={{
             marginTop: '1.5rem',
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            color: 'rgba(200,194,177,0.70)', fontSize: '0.875rem', fontWeight: 500,
-            background: 'transparent', border: '1px solid rgba(200,194,177,0.18)', cursor: 'pointer',
-            padding: '0.5rem 1.125rem', borderRadius: 999, fontFamily: 'inherit',
-            transition: 'color 0.2s, border-color 0.2s, background 0.2s',
-            backdropFilter: 'blur(6px)',
+            display: 'inline-flex', alignItems: 'center', gap: 10,
+            color: 'rgba(250,248,243,0.85)', fontSize: '0.875rem', fontWeight: 500,
+            background: 'rgba(37,211,102,0.10)',
+            border: '1px solid rgba(37,211,102,0.35)', cursor: 'pointer',
+            padding: '0.625rem 1.375rem', borderRadius: 999, fontFamily: 'inherit',
+            transition: 'color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s',
+            backdropFilter: 'blur(8px)',
+            whiteSpace: 'nowrap',
+            boxShadow: '0 0 0 0 rgba(37,211,102,0)',
           }}
           onMouseEnter={e => {
             e.currentTarget.style.color = '#FAF8F3';
-            e.currentTarget.style.borderColor = 'rgba(200,194,177,0.40)';
-            e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+            e.currentTarget.style.borderColor = 'rgba(37,211,102,0.60)';
+            e.currentTarget.style.background = 'rgba(37,211,102,0.16)';
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(37,211,102,0.18)';
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.color = 'rgba(200,194,177,0.70)';
-            e.currentTarget.style.borderColor = 'rgba(200,194,177,0.18)';
-            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = 'rgba(250,248,243,0.85)';
+            e.currentTarget.style.borderColor = 'rgba(37,211,102,0.35)';
+            e.currentTarget.style.background = 'rgba(37,211,102,0.10)';
+            e.currentTarget.style.boxShadow = '0 0 0 0 rgba(37,211,102,0)';
           }}
         >
-          <WhatsAppIcon size={15} />
+          <WhatsAppIcon size={18} />
           <span>O contáctenos por WhatsApp</span>
         </button>
 
@@ -425,13 +430,40 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
           0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(212,178,84,0.7); }
           50% { opacity: 0.4; box-shadow: 0 0 20px rgba(212,178,84,0.9); }
         }
-@media (prefers-reduced-motion: reduce) {
+        @media (prefers-reduced-motion: reduce) {
           .ha, .hs { opacity: 1 !important; transform: none !important; }
           [style*="aa-pulse"], [style*="aa-scroll"] { animation: none !important; }
         }
+
+        /* ── Tablet ───────────────────────────────────────── */
+        @media (max-width: 768px) {
+          .hero-content { padding: 7rem 1.5rem 4.5rem !important; }
+        }
+
+        /* ── Mobile ──────────────────────────────────────── */
         @media (max-width: 640px) {
           .hero-search-desktop { display: none !important; }
           .hero-search-mobile { display: flex !important; }
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.75rem !important; }
+          .hero-content { padding: 6.5rem 1.25rem 4rem !important; }
+        }
+
+        /* ── Narrow mobile ────────────────────────────────── */
+        @media (max-width: 430px) {
+          .hero-content { padding: 5.75rem 1rem 3.5rem !important; }
+          .hero-filter-row {
+            grid-template-columns: 1fr !important;
+          }
+          .hero-filter-row > div:first-child {
+            border-right: none !important;
+            border-bottom: 1px solid #EDE7D9 !important;
+          }
+          .stats-grid { gap: 0.5rem !important; padding: 1.25rem 1rem !important; }
+        }
+
+        /* ── XS screens ───────────────────────────────────── */
+        @media (max-width: 360px) {
+          .hero-content { padding: 5rem 0.875rem 3rem !important; }
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
       `}</style>
