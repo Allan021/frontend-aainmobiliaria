@@ -256,11 +256,16 @@ function CatalogAdminView({ onNew, onEdit, onToggleSidebar, isOpen, m }: {
         p.municipio?.toLowerCase().includes(search.toLowerCase()))
     : rawProperties;
 
+  const nonLotCount = rawProperties.length;
+  const availableNonLot = rawProperties.filter((p: any) => p.status === 'disponible').length;
+  const apartadoNonLot = rawProperties.filter((p: any) => p.status === 'apartado').length;
+  const vendidoNonLot = rawProperties.filter((p: any) => p.status === 'vendido').length;
+
   const statusTabs = [
-    { label: `Todas · ${stats?.total || 0}`, value: undefined },
-    { label: `Disponibles · ${stats?.disponible || 0}`, value: 'disponible' },
-    { label: `Apartadas · ${stats?.apartado || 0}`, value: 'apartado' },
-    { label: `Vendidas · ${stats?.vendido || 0}`, value: 'vendido' },
+    { label: `Todas · ${nonLotCount}`, value: undefined },
+    { label: `Disponibles · ${availableNonLot}`, value: 'disponible' },
+    { label: `Apartadas · ${apartadoNonLot}`, value: 'apartado' },
+    { label: `Vendidas · ${vendidoNonLot}`, value: 'vendido' },
   ];
 
   const tabStyle = (active: boolean) => ({

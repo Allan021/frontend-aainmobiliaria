@@ -162,8 +162,28 @@ export function ListingsTable({ properties, onEdit, m }: Props) {
 
                   {/* Title */}
                   <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, fontWeight: 600, maxWidth: 220 }}>
-                    <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {r.title}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0 }}>
+                        {r.title}
+                      </div>
+                      <a
+                        href={`/propiedad/${r.id}`}
+                        target="_blank"
+                        rel="noopener"
+                        onClick={e => e.stopPropagation()}
+                        title="Ver en web"
+                        style={{
+                          color: m?.mainTextDim || '#9A9383', flexShrink: 0,
+                          display: 'flex', alignItems: 'center',
+                          opacity: 0.5, transition: 'opacity 0.15s',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                        onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                      </a>
                     </div>
                     {r.municipio && (
                       <div style={{ fontSize: '0.6875rem', color: m?.mainTextDim || '#9A9383', marginTop: '2px' }}>

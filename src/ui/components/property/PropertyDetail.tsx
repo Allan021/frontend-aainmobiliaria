@@ -142,26 +142,27 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: standalone ? '1rem clamp(1rem, 4vw, 2.5rem) 0' : '1.25rem clamp(1rem, 4vw, 2.5rem) 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
           {/* Breadcrumb */}
-          <nav style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <nav aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
             {[
-              { label: 'Inicio', onClick: onBack },
-              { label: 'Propiedades', onClick: onBack },
+              { label: 'Inicio', href: '/' },
+              { label: 'Propiedades', href: '/propiedades' },
               { label: property.departamento },
               { label: property.title.slice(0, 28) + (property.title.length > 28 ? '…' : '') },
             ].map((item, i, arr) => (
               <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 {i > 0 && <span style={{ color: 'var(--main-text-dim, #C9C2B1)', fontSize: '0.8125rem' }}>/</span>}
-                {item.onClick ? (
-                  <button
-                    onClick={item.onClick}
+                {(item as any).href ? (
+                  <a
+                    href={(item as any).href}
                     style={{
-                      background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                      fontSize: '0.8125rem', color: 'var(--main-text-dim, #9A9383)', fontWeight: 500, padding: 0,
-                      textDecoration: 'underline', textUnderlineOffset: 2,
+                      fontSize: '0.8125rem', color: 'var(--main-text-dim, #9A9383)', fontWeight: 500,
+                      textDecoration: 'none', transition: 'color 0.15s',
                     }}
+                    onMouseEnter={e => (e.currentTarget.style.color = 'var(--main-text, #111113)')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--main-text-dim, #9A9383)')}
                   >
                     {item.label}
-                  </button>
+                  </a>
                 ) : (
                   <span style={{
                     fontSize: '0.8125rem',

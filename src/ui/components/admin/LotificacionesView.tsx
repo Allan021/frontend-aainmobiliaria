@@ -135,6 +135,17 @@ export function LotificacionesView({ onNew, onEdit, onToggleSidebar, isOpen = fa
                         {formatPrice(lot.price, lot.currency || 'L')}
                       </div>
                       <div style={{ display: 'flex', gap: '6px' }}>
+                        <button onClick={e => { e.stopPropagation(); window.open(`/propiedad/${lot.id}`, '_blank'); }} style={{
+                          padding: '5px 12px', borderRadius: '0.375rem', fontSize: '11px', fontWeight: 600,
+                          background: m.mainSurface, border: `1px solid ${m.mainBorder}`,
+                          color: m.mainTextMuted, cursor: 'pointer', fontFamily: 'inherit',
+                          display: 'flex', alignItems: 'center', gap: 4,
+                        }} title="Ver en web">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+                          </svg>
+                          Web
+                        </button>
                         <button onClick={e => { e.stopPropagation(); onEdit(lot); }} style={{
                           padding: '5px 12px', borderRadius: '0.375rem', fontSize: '11px', fontWeight: 600,
                           background: m.mainSurface, border: `1px solid ${m.mainBorder}`,

@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { optimizeCloudinaryUrl, cloudinarySrcSet } from '../../../../core/utils/cloudinaryUtils';
 
 interface PhotoGridProps {
@@ -6,169 +6,172 @@ interface PhotoGridProps {
   onImageClick: (idx: number) => void;
 }
 
-const pillBtnStyle: CSSProperties = {
-  position: 'absolute',
-  bottom: 12,
-  right: 12,
-  background: 'rgba(17,17,19,0.75)',
-  backdropFilter: 'blur(8px)',
-  border: '1px solid rgba(255,255,255,0.15)',
-  borderRadius: 999,
-  padding: '0.4rem 0.875rem',
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-  fontSize: '0.8125rem',
-  fontWeight: 600,
-  color: '#FAF8F3',
-  zIndex: 10,
-};
+/* ── Mobile Slider ──────────────────────────── */
+function MobileSlider({ images, onImageClick }: PhotoGridProps) {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+  const touchDeltaX = useRef(0);
 
-export function PhotoGrid({ images, onImageClick }: PhotoGridProps) {
+  const goTo = (idx: number) => {
+    setCurrentSlide(idx);
+    sliderRef.current?.scrollTo({ left: idx * sliderRef.current.offsetWidth, behavior: 'smooth' });
+  };
+
+  const handleScroll = () => {
+    if (!sliderRef.current) return;
+    const scrollLeft = sliderRef.current.scrollLeft;
+    const width = sliderRef.current.offsetWidth;
+    const newIdx = Math.round(scrollLeft / width);
+    if (newIdx !== currentSlide && newIdx >= 0 && newIdx < images.length) {
+      setCurrentSlide(newIdx);
+    }
+  };
+
+  return (
+    <div className="photo-mobile-slider">
+      <div
+        ref={sliderRef}
+        className="photo-mobile-slider__track"
+        onScroll={handleScroll}
+      >
+        {images.map((img, i) => (
+          <div key={i} className="photo-mobile-slider__slide" onClick={() => onImageClick(i)}>
+            <img
+              src={optimizeCloudinaryUrl(img.url, 768)}
+              srcSet={cloudinarySrcSet(img.url, 768)}
+              sizes="100vw"
+              alt={img.title || ''}
+              width={768}
+              height={432}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              decoding="async"
+              draggable={false}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Counter badge */}
+      <div className="photo-mobile-slider__counter">
+        {currentSlide + 1} / {images.length}
+      </div>
+
+      {/* Dots */}
+      {images.length > 1 && images.length <= 10 && (
+        <div className="photo-mobile-slider__dots">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              className={`photo-mobile-slider__dot ${i === currentSlide ? 'photo-mobile-slider__dot--active' : ''}`}
+              onClick={() => goTo(i)}
+              aria-label={`Ir a imagen ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Desktop Grid (Airbnb-style) ─────────────── */
+function DesktopGrid({ images, onImageClick }: PhotoGridProps) {
   const main = images[0];
   const rest = images.slice(1, 5);
   const total = images.length;
 
-  if (!main) return null;
-
-  if (images.length === 1) {
-    return (
-      <div style={{ position: 'relative', overflow: 'hidden', background: '#111113' }} className="photo-grid-wrap">
+  return (
+    <div className="photo-desktop-grid">
+      {/* Main large image — left half */}
+      <div
+        className="photo-desktop-grid__main"
+        onClick={() => onImageClick(0)}
+      >
         <img
-          src={optimizeCloudinaryUrl(main.url, 768)}
-          srcSet={cloudinarySrcSet(main.url, 768)}
-          sizes="100vw"
+          src={optimizeCloudinaryUrl(main.url, 800)}
+          srcSet={cloudinarySrcSet(main.url, 800)}
+          sizes="50vw"
           alt={main.title || ''}
-          width={768}
-          height={432}
+          width={800}
+          height={600}
           loading="eager"
           decoding="async"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer', aspectRatio: '16/9' }}
-          onClick={() => onImageClick(0)}
+          draggable={false}
         />
-        <button
-          onClick={() => onImageClick(0)}
-          style={pillBtnStyle}
-        >
-          1 / 1 foto
-        </button>
+        <div className="photo-desktop-grid__overlay" />
       </div>
-    );
-  }
+
+      {/* Right 2×2 grid */}
+      <div className="photo-desktop-grid__side">
+        {[0, 1, 2, 3].map(i => {
+          const img = rest[i];
+          const isTopRight = i === 1;
+          const isBottomRight = i === 3;
+          if (!img) return (
+            <div
+              key={i}
+              className="photo-desktop-grid__cell"
+              style={{
+                background: 'var(--main-bg, #1A1A1D)',
+                borderRadius: isTopRight ? '0 12px 0 0' : isBottomRight ? '0 0 12px 0' : 0,
+              }}
+            />
+          );
+          return (
+            <div
+              key={i}
+              className="photo-desktop-grid__cell"
+              onClick={() => onImageClick(i + 1)}
+              style={{
+                borderRadius: isTopRight ? '0 12px 0 0' : isBottomRight ? '0 0 12px 0' : 0,
+              }}
+            >
+              <img
+                src={optimizeCloudinaryUrl(img.url, 400)}
+                srcSet={cloudinarySrcSet(img.url, 400)}
+                sizes="25vw"
+                alt={img.title || ''}
+                width={400}
+                height={300}
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+              />
+              <div className="photo-desktop-grid__overlay" />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* "Ver todas" pill */}
+      <button
+        onClick={() => onImageClick(0)}
+        className="photo-desktop-grid__view-all"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        Ver las {total} fotos
+      </button>
+    </div>
+  );
+}
+
+/* ── PhotoGrid Export ────────────────────────── */
+export function PhotoGrid({ images, onImageClick }: PhotoGridProps) {
+  if (!images.length) return null;
 
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--main-surface, #111113)' }} className="photo-grid-wrap">
-      {/* Mobile: show only first image — LCP candidate */}
-      <div className="photo-mobile-only" style={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}>
-        <img
-          src={optimizeCloudinaryUrl(main.url, 768)}
-          srcSet={cloudinarySrcSet(main.url, 768)}
-          sizes="100vw"
-          alt={main.title || ''}
-          width={768}
-          height={432}
-          loading="eager"
-          decoding="async"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
-          onClick={() => onImageClick(0)}
-        />
-        <button onClick={() => onImageClick(0)} style={pillBtnStyle}>
-          1 / {total} fotos
-        </button>
+    <div className="photo-grid-wrap">
+      {/* Mobile: slider */}
+      <div className="photo-mobile-only">
+        <MobileSlider images={images} onImageClick={onImageClick} />
       </div>
-
       {/* Desktop: Airbnb grid */}
-      <div
-        className="photo-desktop-only"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 3,
-          height: '60vh',
-        }}
-      >
-        {/* Main large — rounded left */}
-        <div
-          style={{
-            overflow: 'hidden',
-            borderRadius: '12px 0 0 12px',
-            cursor: 'pointer',
-          }}
-          onClick={() => onImageClick(0)}
-        >
-          <img
-            src={optimizeCloudinaryUrl(main.url, 800)}
-            srcSet={cloudinarySrcSet(main.url, 800)}
-            sizes="50vw"
-            alt={main.title || ''}
-            width={800}
-            height={600}
-            loading="eager"
-            decoding="async"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
-            onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.04)')}
-            onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
-          />
-        </div>
-
-        {/* Right 2×2 */}
-        <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
-          {[0, 1, 2, 3].map(i => {
-            const img = rest[i];
-            const isBottomRight = i === 3;
-            if (!img) return <div key={i} style={{ background: 'var(--main-bg, #1A1A1D)', borderRadius: isBottomRight ? '0 0 12px 0' : 0 }} />;
-            return (
-              <div
-                key={i}
-                style={{
-                  overflow: 'hidden',
-                  borderRadius: isBottomRight ? '0 0 12px 0' : 0,
-                  cursor: 'pointer',
-                }}
-                onClick={() => onImageClick(i + 1)}
-              >
-                <img
-                  src={optimizeCloudinaryUrl(img.url, 400)}
-                  srcSet={cloudinarySrcSet(img.url, 400)}
-                  sizes="25vw"
-                  alt={img.title || ''}
-                  width={400}
-                  height={300}
-                  loading="lazy"
-                  decoding="async"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
-                  onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.06)')}
-                  onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
-                />
-              </div>
-            );
-          })}
-        </div>
-
-        {/* "Ver todas" pill */}
-        <button
-          onClick={() => onImageClick(0)}
-          style={{
-            position: 'absolute', bottom: 16, right: 16,
-            background: 'var(--main-surface, rgba(255,255,255,0.95))',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid var(--main-border, rgba(17,17,19,0.15))',
-            borderRadius: 10,
-            padding: '0.5rem 1rem', cursor: 'pointer', fontFamily: 'inherit',
-            fontSize: '0.8125rem', fontWeight: 600, color: 'var(--main-text, #111113)',
-            display: 'flex', alignItems: 'center', gap: 8,
-            boxShadow: '0 2px 12px rgba(0,0,0,0.12)',
-            transition: 'transform 0.15s, box-shadow 0.15s',
-            zIndex: 10,
-          }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.18)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.12)'; }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-            <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-          </svg>
-          Ver todas las {total} fotos
-        </button>
+      <div className="photo-desktop-only">
+        <DesktopGrid images={images} onImageClick={onImageClick} />
       </div>
     </div>
   );
