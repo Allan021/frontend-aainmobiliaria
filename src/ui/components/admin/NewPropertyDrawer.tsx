@@ -658,6 +658,51 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                   onFocus={e => e.target.style.borderColor = '#D4B254'}
                   onBlur={e => e.target.style.borderColor = border}
                 />
+
+                {/* Magic Link button */}
+                {property?.id ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const magicLink = `\n\n🔗 Ver propiedad: https://www.aabienes.com/propiedad/${property.id}`;
+                      const current = form.facebook_description;
+                      // Don't add if already present
+                      if (current.includes(`/propiedad/${property.id}`)) return;
+                      set('facebook_description', current.trimEnd() + magicLink);
+                    }}
+                    style={{
+                      marginTop: 6, padding: '0.4rem 0.75rem',
+                      background: form.facebook_description.includes(`/propiedad/${property.id}`)
+                        ? 'var(--main-bg, #F0EDE4)' : 'linear-gradient(135deg, #D4B254 0%, #8C6F1C 100%)',
+                      color: form.facebook_description.includes(`/propiedad/${property.id}`)
+                        ? 'var(--main-text-dim, #9A9383)' : '#fff',
+                      border: 'none', borderRadius: 8,
+                      fontSize: '0.75rem', fontWeight: 600,
+                      fontFamily: 'inherit', cursor: 'pointer',
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                    </svg>
+                    {form.facebook_description.includes(`/propiedad/${property.id}`)
+                      ? '✓ Enlace adjuntado'
+                      : 'Adjuntar enlace de la propiedad'}
+                  </button>
+                ) : (
+                  <div style={{
+                    marginTop: 6, fontSize: '0.6875rem',
+                    color: 'var(--main-text-dim, #9A9383)',
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                    El enlace estará disponible después de guardar
+                  </div>
+                )}
               </div>
             </div>
           </div>
