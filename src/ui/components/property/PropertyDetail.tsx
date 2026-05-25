@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import type { CSSProperties } from 'react';
 import { formatPrice, type Property } from '../../../core/domain/entities/types';
 import { WhatsAppButton } from '../shared/WhatsAppButton';
 import { useCreateLead } from '../../hooks/useLeads';
@@ -18,8 +17,8 @@ import { LeadCaptureModal } from './detail/LeadCaptureModal';
 
 interface Props {
   property: Property;
-  onBack: () => void;
-  onWhatsApp: (p: Property) => void;
+  onBack?: () => void;
+  onWhatsApp?: (p: Property) => void;
   standalone?: boolean;
 }
 

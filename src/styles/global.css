@@ -1181,7 +1181,7 @@ body {
 
 @media (min-width: 1024px) {
   .detail-grid {
-    grid-template-columns: 1.55fr 1fr !important;
+    grid-template-columns: 1fr 380px !important;
   }
 }
 
@@ -1795,20 +1795,6 @@ body {
   }
 }
 
-/* =========================================================
-   PROPERTY DETAIL — Responsive layout
-   ========================================================= */
-
-@media (min-width: 1024px) {
-  .detail-grid {
-    grid-template-columns: 1fr 380px !important;
-  }
-}
-
-.sticky-cta-bar { display: none; }
-@media (max-width: 1023px) {
-  .sticky-cta-bar { display: flex !important; }
-}
 
 /* =========================================================
    MISC ANIMATIONS

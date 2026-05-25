@@ -63,15 +63,6 @@ const jsonLd = {
   <PropertyDetail
     client:load
     property={property}
-    onBack={() => {
-      if (typeof window !== 'undefined') {
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          window.location.href = '/propiedades';
-        }
-      }
-    }}
     standalone
   />
   <Footer />
