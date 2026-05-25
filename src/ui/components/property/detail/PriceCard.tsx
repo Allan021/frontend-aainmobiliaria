@@ -1,6 +1,5 @@
 import type { RefObject } from 'react';
 import { formatPrice, type Property } from '../../../../core/domain/entities/types';
-import { WhatsAppButton } from '../../shared/WhatsAppButton';
 import { WhatsAppIcon } from '../../shared/Icon';
 
 interface PriceCardProps {
@@ -66,14 +65,38 @@ export function PriceCard({ property, priceCardRef, onWhatsApp, phone }: PriceCa
 
         {/* CTAs */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <WhatsAppButton
-            onClick={onWhatsApp}
-            size="xl"
-            variant="solid"
-            fullWidth
-            borderRadius={12}
-            label="Consultar por WhatsApp"
-          />
+          {/* WhatsApp CTA — native button to avoid hydration issues */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onWhatsApp();
+            }}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              width: '100%', padding: '1rem 1.5rem',
+              background: '#25D366', border: 'none', borderRadius: 12,
+              color: '#fff', fontSize: '1rem', fontWeight: 700,
+              fontFamily: 'inherit', cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)',
+              transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+              boxSizing: 'border-box',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = '#22c35a';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.45)';
+              e.currentTarget.style.transform = 'translateY(-1px) scale(1.03)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = '#25D366';
+              e.currentTarget.style.boxShadow = '0 4px 14px rgba(37, 211, 102, 0.3)';
+              e.currentTarget.style.transform = 'translateY(0) scale(1)';
+            }}
+          >
+            <WhatsAppIcon size={20} color="#fff" />
+            <span>Consultar por WhatsApp</span>
+          </button>
 
           <a
             href={`tel:${phone.replace(/-/g, '')}`}
