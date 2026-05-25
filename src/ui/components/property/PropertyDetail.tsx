@@ -14,6 +14,7 @@ import { PropertyMap } from './detail/PropertyMap';
 import { FAQSection } from './detail/FAQSection';
 import { ShareBar } from './detail/ShareBar';
 import { PriceCard } from './detail/PriceCard';
+import { LeadCaptureModal } from './detail/LeadCaptureModal';
 
 interface Props {
   property: Property;
@@ -49,22 +50,31 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
   const [gallery, setGallery] = useState<{ open: boolean; idx: number }>({ open: false, idx: 0 });
   const [descExpanded, setDescExpanded] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [leadModalOpen, setLeadModalOpen] = useState(false);
 
   const createLead = useCreateLead();
 
-  const handleDirectWhatsApp = (p?: Property) => {
-    const targetProperty = p || property;
+  /** Opens the lead capture modal instead of going straight to WhatsApp */
+  const handleWhatsAppClick = () => {
+    setLeadModalOpen(true);
+  };
+
+  /** Called when user submits name + email in the lead capture modal */
+  const handleLeadSubmit = ({ name, email }: { name: string; email: string }) => {
+    setLeadModalOpen(false);
+
+    // Save lead with real user data
     createLead.mutate({
-      name: 'Interesado Web',
-      email: 'anonimo@aabienes.com',
-      property_id: targetProperty.id,
-      property_title: targetProperty.title,
+      name,
+      email: email || "",
+      property_id: property.id,
+      property_title: property.title,
     });
 
+    // Open WhatsApp with personalized message
     const phone = '50499383699';
-    const propertyUrl = `https://www.aabienes.com/propiedad/${targetProperty.id}`;
-    const text = `Hola A&A Inmobiliaria, estoy interesado en la propiedad: "${targetProperty.title}" (${propertyUrl}).`;
-
+    const propertyUrl = `https://www.aabienes.com/propiedad/${property.id}`;
+    const text = `Hola A&A Inmobiliaria, soy ${name}. Estoy interesado en la propiedad: "${property.title}" (${propertyUrl}). Me gustaría recibir más información.`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -410,8 +420,8 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
             <PriceCard
               property={property}
               priceCardRef={priceCardRef}
-              onWhatsApp={handleDirectWhatsApp}
-              phone={phone}
+              onWhatsApp={handleWhatsAppClick}
+              phone="9938-3699"
             />
           </div>
 
@@ -439,7 +449,7 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
           </div>
         </div>
         <WhatsAppButton
-          onClick={() => handleDirectWhatsApp(property)}
+          onClick={handleWhatsAppClick}
           size="lg"
           variant="solid"
           borderRadius={12}
@@ -456,6 +466,14 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
           onClose={() => setGallery({ open: false, idx: 0 })}
         />
       )}
+
+      {/* Lead capture modal */}
+      <LeadCaptureModal
+        open={leadModalOpen}
+        propertyTitle={property.title}
+        onSubmit={handleLeadSubmit}
+        onClose={() => setLeadModalOpen(false)}
+      />
 
 
 

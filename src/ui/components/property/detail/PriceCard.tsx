@@ -6,7 +6,7 @@ import { WhatsAppIcon } from '../../shared/Icon';
 interface PriceCardProps {
   property: Property;
   priceCardRef: RefObject<HTMLDivElement | null>;
-  onWhatsApp: (p: Property) => void;
+  onWhatsApp: () => void;
   phone: string;
 }
 
@@ -67,7 +67,7 @@ export function PriceCard({ property, priceCardRef, onWhatsApp, phone }: PriceCa
         {/* CTAs */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <WhatsAppButton
-            onClick={() => onWhatsApp(property)}
+            onClick={onWhatsApp}
             size="xl"
             variant="solid"
             fullWidth
