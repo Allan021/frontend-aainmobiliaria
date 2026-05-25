@@ -129,7 +129,7 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
     <div style={{ background: 'var(--main-bg, #FAF8F3)', minHeight: '100vh', color: 'var(--main-text, #111113)' }}>
 
       {/* Breadcrumb + share row */}
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: standalone ? 'clamp(5.5rem, 8vw, 7rem) clamp(1rem, 4vw, 2.5rem) 0' : '1.25rem clamp(1rem, 4vw, 2.5rem) 0' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: standalone ? '1rem clamp(1rem, 4vw, 2.5rem) 0' : '1.25rem clamp(1rem, 4vw, 2.5rem) 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
           {/* Breadcrumb */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
