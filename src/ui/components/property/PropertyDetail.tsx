@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { formatPrice, type Property } from '../../../core/domain/entities/types';
 import { WhatsAppIcon } from '../shared/Icon';
+import { WhatsAppButton } from '../shared/WhatsAppButton';
 
 interface Props {
   property: Property;
@@ -974,23 +975,14 @@ export function PropertyDetail({ property, onBack, onWhatsApp, standalone }: Pro
 
                 {/* CTAs */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <button
+                  <WhatsAppButton
                     onClick={() => onWhatsApp(property)}
-                    style={{
-                      width: '100%', padding: '1rem',
-                      background: '#25D366', border: 'none', borderRadius: 12,
-                      color: '#fff', fontSize: '1rem', fontWeight: 700,
-                      cursor: 'pointer', fontFamily: 'inherit',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                      boxShadow: '0 4px 16px rgba(37,211,102,0.3)',
-                      transition: 'background 0.2s, transform 0.15s',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background = '#1DB954'; e.currentTarget.style.transform = 'scale(1.02)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = '#25D366'; e.currentTarget.style.transform = 'scale(1)'; }}
-                  >
-                    <WhatsAppIcon size={20} />
-                    Consultar por WhatsApp
-                  </button>
+                    size="xl"
+                    variant="solid"
+                    fullWidth
+                    borderRadius={12}
+                    label="Consultar por WhatsApp"
+                  />
 
                   <a
                     href={`tel:${phone.replace(/-/g, '')}`}
@@ -1124,20 +1116,14 @@ export function PropertyDetail({ property, onBack, onWhatsApp, standalone }: Pro
             {formatPrice(property.discount_price ?? property.price, property.currency)}
           </div>
         </div>
-        <button
+        <WhatsAppButton
           onClick={() => onWhatsApp(property)}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            padding: '0.75rem 1.25rem', borderRadius: 12,
-            background: '#25D366', border: 'none',
-            color: '#fff', fontSize: '0.9375rem', fontWeight: 700,
-            cursor: 'pointer', fontFamily: 'inherit',
-            boxShadow: '0 4px 14px rgba(37,211,102,0.3)',
-          }}
-        >
-          <WhatsAppIcon size={18} />
-          Consultar
-        </button>
+          size="lg"
+          variant="solid"
+          borderRadius={12}
+          label="Consultar"
+          style={{ padding: '0.75rem 1.25rem' }}
+        />
       </div>
 
       {/* Gallery lightbox */}

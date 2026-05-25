@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { WhatsAppIcon } from '../shared/Icon';
+import { WhatsAppButton } from '../shared/WhatsAppButton';
 import { useHondurasData } from '../../hooks/useHondurasData';
 import { SelectField } from '../shared/SelectField';
 
@@ -362,36 +362,12 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
         </div>
 
         {/* WhatsApp link */}
-        <button
+        <WhatsAppButton
           onClick={onWhatsApp}
-          style={{
-            marginTop: '1.5rem',
-            display: 'inline-flex', alignItems: 'center', gap: 10,
-            color: 'rgba(250,248,243,0.85)', fontSize: '0.875rem', fontWeight: 500,
-            background: 'rgba(37,211,102,0.10)',
-            border: '1px solid rgba(37,211,102,0.35)', cursor: 'pointer',
-            padding: '0.625rem 1.375rem', borderRadius: 999, fontFamily: 'inherit',
-            transition: 'color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s',
-            backdropFilter: 'blur(8px)',
-            whiteSpace: 'nowrap',
-            boxShadow: '0 0 0 0 rgba(37,211,102,0)',
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.color = '#FAF8F3';
-            e.currentTarget.style.borderColor = 'rgba(37,211,102,0.60)';
-            e.currentTarget.style.background = 'rgba(37,211,102,0.16)';
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(37,211,102,0.18)';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.color = 'rgba(250,248,243,0.85)';
-            e.currentTarget.style.borderColor = 'rgba(37,211,102,0.35)';
-            e.currentTarget.style.background = 'rgba(37,211,102,0.10)';
-            e.currentTarget.style.boxShadow = '0 0 0 0 rgba(37,211,102,0)';
-          }}
-        >
-          <WhatsAppIcon size={18} />
-          <span>O contáctenos por WhatsApp</span>
-        </button>
+          size="md"
+          label="O contáctenos por WhatsApp"
+          style={{ marginTop: '1.5rem', padding: '0.625rem 1.375rem' }}
+        />
 
       </div>
 

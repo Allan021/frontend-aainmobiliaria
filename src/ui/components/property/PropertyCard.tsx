@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { formatPrice, type Property } from '../../../core/domain/entities/types';
-import { WhatsAppIcon } from '../shared/Icon';
+import { WhatsAppButton } from '../shared/WhatsAppButton';
 
 interface PropertyCardProps {
   property: Property;
@@ -248,30 +248,11 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
             )}
           </div>
 
-          <button
+          <WhatsAppButton
             onClick={e => { e.stopPropagation(); onWhatsApp(property); }}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '0.55rem 1rem', borderRadius: '9999px',
-              background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-              border: 'none', cursor: 'pointer',
-              color: '#fff', fontSize: '0.75rem', fontWeight: 700,
-              fontFamily: 'inherit',
-              transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-              boxShadow: '0 4px 12px rgba(37, 211, 102, 0.2)',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = 'translateY(-1px) scale(1.04)';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(37, 211, 102, 0.35)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = 'translateY(0) scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 211, 102, 0.2)';
-            }}
-          >
-            <WhatsAppIcon size={13} />
-            WhatsApp
-          </button>
+            size="sm"
+            label="WhatsApp"
+          />
         </div>
       </div>
     </article>

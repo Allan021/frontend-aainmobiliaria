@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { WhatsAppIcon } from '../shared/Icon';
+import { WhatsAppButton } from '../shared/WhatsAppButton';
 
 interface HeaderProps {
   currentRoute: string;
@@ -232,31 +232,11 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
             >
               Iniciar sesión
             </a>
-            <button
+            <WhatsAppButton
               onClick={onWhatsApp}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                padding: '0.625rem 1.25rem', borderRadius: '9999px',
-                background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-                border: 'none', cursor: 'pointer',
-                color: '#fff', fontSize: '0.875rem', fontWeight: 700,
-                fontFamily: 'inherit',
-                transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)',
-                whiteSpace: 'nowrap',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.transform = 'translateY(-1px) scale(1.04)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.45)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = '0 4px 14px rgba(37, 211, 102, 0.3)';
-              }}
-            >
-              <WhatsAppIcon size={15} />
-              WhatsApp
-            </button>
+              size="md"
+              label="WhatsApp"
+            />
           </div>
 
           {/* Mobile hamburger */}
@@ -398,30 +378,12 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
                 </button>
               )}
 
-              <button
+              <WhatsAppButton
                 onClick={onWhatsApp}
-                style={{
-                  width: '100%', padding: '0.875rem 1.25rem',
-                  background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-                  border: 'none', borderRadius: '9999px',
-                  color: '#fff', fontSize: '0.9375rem', fontWeight: 700,
-                  cursor: 'pointer', fontFamily: 'inherit',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)',
-                  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.45)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(37, 211, 102, 0.3)';
-                }}
-              >
-                <WhatsAppIcon size={17} />
-                Contactar por WhatsApp
-              </button>
+                size="lg"
+                label="Contactar por WhatsApp"
+                style={{ padding: '0.875rem 1.75rem' }}
+              />
               <a
                 href="/login"
                 style={{
