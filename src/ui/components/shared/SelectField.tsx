@@ -92,7 +92,8 @@ export function SelectField({
 
   return (
     <>
-      <style>{`@keyframes sfIn{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}.sf-panel{animation:sfIn .17s ease-out}`}</style>
+
+
 
       {/* Trigger */}
       <div

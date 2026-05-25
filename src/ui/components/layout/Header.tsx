@@ -441,26 +441,8 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
       {/* Spacer for non-home pages */}
       {!isHome && <div style={{ height: 80 }} />}
 
-      <style>{`
-        @media (min-width: 768px) {
-          .header-hamburger { display: none !important; }
-          .header-nav-desktop { display: flex !important; }
-          .header-ctas-desktop { display: flex !important; }
-        }
-        @media (max-width: 767px) {
-          .header-nav-desktop { display: none !important; }
-          .header-ctas-desktop { display: none !important; }
-          .header-hamburger { display: flex !important; }
-        }
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideUp {
-          from { opacity: 1; transform: translateY(0); }
-          to { opacity: 0; transform: translateY(-10px); }
-        }
-      `}</style>
+
+
     </>
   );
 }

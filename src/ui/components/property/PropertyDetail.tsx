@@ -457,46 +457,8 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
         />
       )}
 
-      <style>{`
-        @media (min-width: 1024px) {
-          .detail-grid {
-            grid-template-columns: 1.55fr 1fr !important;
-          }
-        }
-        @media (max-width: 1023px) {
-          .sticky-cta-bar {
-            display: flex !important;
-          }
-        }
-        @media (max-width: 767px) {
-          .photo-mobile-only { display: block !important; }
-          .photo-desktop-only { display: none !important; }
-        }
-        @media (min-width: 768px) {
-          .photo-mobile-only { display: none !important; }
-          .photo-desktop-only { display: grid !important; }
-        }
-        @media (max-width: 640px) {
-          .detail-highlights-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .quick-stats-strip {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-          }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
-        .faq-content {
-          transition: max-height 0.3s ease, opacity 0.3s ease;
-        }
-      `}</style>
+
+
     </div>
   );
 }

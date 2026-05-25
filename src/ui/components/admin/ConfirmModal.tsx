@@ -39,7 +39,8 @@ export function ConfirmModal({ title, message, confirmLabel = 'Eliminar', onConf
 
   return (
     <>
-      <style>{`@keyframes cmSlideIn{from{opacity:0;transform:scale(.95) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
+
+
       <div
         onClick={loading ? undefined : onCancel}
         style={{

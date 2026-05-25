@@ -155,12 +155,8 @@ export function WhatsAppFAB({ onClick }: { onClick?: () => void }) {
         </span>
       </button>
 
-      <style>{`
-        @keyframes fab-pulse {
-          0% { transform: scale(1); opacity: 0.6; }
-          100% { transform: scale(2); opacity: 0; }
-        }
-      `}</style>
+
+
     </div>
   );
 }
@@ -291,12 +287,8 @@ function FeaturedSectionInner({ onOpen, onWhatsApp, onExplore }: { onOpen?: (p: 
         </div>
       </div>
 
-      <style>{`
-        @keyframes shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `}</style>
+
+
     </section>
   );
 }
@@ -381,26 +373,8 @@ export function TrustBand({ ref: _ref }: { ref?: React.Ref<HTMLElement> }) {
         </div>
       </div>
 
-      <style>{`
-        .tb-inner {
-          max-width: 1280px;
-          margin: 0 auto;
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 2.5rem;
-        }
-        @media (min-width: 768px) {
-          .tb-inner {
-            grid-template-columns: 1fr 1fr;
-            gap: 5rem;
-            align-items: start;
-          }
-          .tb-left {
-            position: sticky;
-            top: 5rem;
-          }
-        }
-      `}</style>
+
+
     </section>
   );
 }

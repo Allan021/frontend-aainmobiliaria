@@ -1152,3 +1152,179 @@ body {
     font-size: 1.5rem;
   }
 }
+
+/* =========================================================
+   HEADER — Responsive (moved from Header.tsx to avoid
+   React hydration mismatch with Astro SSR)
+   ========================================================= */
+
+@media (min-width: 768px) {
+  .header-hamburger { display: none !important; }
+  .header-nav-desktop { display: flex !important; }
+  .header-ctas-desktop { display: flex !important; }
+}
+
+@media (max-width: 767px) {
+  .header-nav-desktop { display: none !important; }
+  .header-ctas-desktop { display: none !important; }
+  .header-hamburger { display: flex !important; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================
+   PROPERTY DETAIL — Responsive (moved from PropertyDetail.tsx)
+   ========================================================= */
+
+@media (min-width: 1024px) {
+  .detail-grid {
+    grid-template-columns: 1.55fr 1fr !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .sticky-cta-bar {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .photo-mobile-only { display: block !important; }
+  .photo-desktop-only { display: none !important; }
+}
+
+@media (min-width: 768px) {
+  .photo-mobile-only { display: none !important; }
+  .photo-desktop-only { display: grid !important; }
+}
+
+@media (max-width: 640px) {
+  .detail-highlights-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .quick-stats-strip {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.faq-content {
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+/* =========================================================
+   WHATSAPP FAB — pulse animation (moved from WebsiteApp.tsx)
+   ========================================================= */
+
+@keyframes fab-pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+/* =========================================================
+   FEATURED SECTION — shimmer (moved from WebsiteApp.tsx)
+   ========================================================= */
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =========================================================
+   TRUST BAR — responsive grid (moved from WebsiteApp.tsx)
+   ========================================================= */
+
+.tb-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .tb-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+  .tb-left {
+    position: sticky;
+    top: 5rem;
+  }
+}
+
+/* =========================================================
+   HERO — responsive + animations (moved from Hero.tsx)
+   ========================================================= */
+
+@keyframes aa-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(212,178,84,0.7); }
+  50% { opacity: 0.4; box-shadow: 0 0 20px rgba(212,178,84,0.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ha, .hs { opacity: 1 !important; transform: none !important; }
+  [style*="aa-pulse"], [style*="aa-scroll"] { animation: none !important; }
+}
+
+@media (max-width: 768px) {
+  .hero-content { padding: 7rem 1.5rem 4.5rem !important; }
+}
+
+@media (max-width: 640px) {
+  .hero-search-desktop { display: none !important; }
+  .hero-search-mobile { display: flex !important; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.75rem !important; }
+  .hero-content { padding: 6.5rem 1.25rem 4rem !important; }
+}
+
+@media (max-width: 430px) {
+  .hero-content { padding: 5.75rem 1rem 3.5rem !important; }
+  .hero-filter-row {
+    grid-template-columns: 1fr !important;
+  }
+  .hero-filter-row > div:first-child {
+    border-right: none !important;
+    border-bottom: 1px solid #EDE7D9 !important;
+  }
+  .stats-grid { gap: 0.5rem !important; padding: 1.25rem 1rem !important; }
+}
+
+@media (max-width: 360px) {
+  .hero-content { padding: 5rem 0.875rem 3rem !important; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* =========================================================
+   SELECT FIELD — dropdown animation (moved from SelectField.tsx)
+   ========================================================= */
+
+@keyframes sfIn {
+  from { opacity: 0; transform: translateY(-5px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.sf-panel { animation: sfIn .17s ease-out; }
+
+/* =========================================================
+   CONFIRM MODAL — slide-in animation (moved from ConfirmModal.tsx)
+   ========================================================= */
+
+@keyframes cmSlideIn {
+  from { opacity: 0; transform: scale(.95) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}

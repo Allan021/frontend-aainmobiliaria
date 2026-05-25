@@ -411,48 +411,8 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
         </div>
       </div>
 
-      <style>{`
-        @keyframes aa-pulse {
-          0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(212,178,84,0.7); }
-          50% { opacity: 0.4; box-shadow: 0 0 20px rgba(212,178,84,0.9); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .ha, .hs { opacity: 1 !important; transform: none !important; }
-          [style*="aa-pulse"], [style*="aa-scroll"] { animation: none !important; }
-        }
 
-        /* ── Tablet ───────────────────────────────────────── */
-        @media (max-width: 768px) {
-          .hero-content { padding: 7rem 1.5rem 4.5rem !important; }
-        }
 
-        /* ── Mobile ──────────────────────────────────────── */
-        @media (max-width: 640px) {
-          .hero-search-desktop { display: none !important; }
-          .hero-search-mobile { display: flex !important; }
-          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.75rem !important; }
-          .hero-content { padding: 6.5rem 1.25rem 4rem !important; }
-        }
-
-        /* ── Narrow mobile ────────────────────────────────── */
-        @media (max-width: 430px) {
-          .hero-content { padding: 5.75rem 1rem 3.5rem !important; }
-          .hero-filter-row {
-            grid-template-columns: 1fr !important;
-          }
-          .hero-filter-row > div:first-child {
-            border-right: none !important;
-            border-bottom: 1px solid #EDE7D9 !important;
-          }
-          .stats-grid { gap: 0.5rem !important; padding: 1.25rem 1rem !important; }
-        }
-
-        /* ── XS screens ───────────────────────────────────── */
-        @media (max-width: 360px) {
-          .hero-content { padding: 5rem 0.875rem 3rem !important; }
-          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-      `}</style>
     </section>
   );
 }
