@@ -1,8 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import WebsiteApp from '../ui/components/property/WebsiteApp';
+import { Header } from '../ui/components/layout/Header';
+import { Footer } from '../ui/components/layout/Footer';
+import { Hero } from '../ui/components/property/Hero';
+import { FeaturedSection, TrustBand, CTASection, WhatsAppFAB } from '../ui/components/property/WebsiteApp';
+import { WhatsAppModal } from '../ui/components/property/WhatsAppModal';
 ---
 
 <BaseLayout title="A&A Inmobiliaria — Tu Propiedad. Nuestra Misión.">
-  <WebsiteApp client:load />
+  <Header client:load currentRoute="home" />
+  <Hero client:load />
+  <FeaturedSection client:visible />
+  <TrustBand />
+  <CTASection client:visible />
+  <Footer />
+  <WhatsAppFAB client:visible />
+  <WhatsAppModal client:load open={false} onClose={() => {}} />
 </BaseLayout>

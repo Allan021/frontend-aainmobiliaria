@@ -1,12 +1,24 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import WebsiteApp from '../ui/components/property/WebsiteApp';
+import { Header } from '../ui/components/layout/Header';
+import { Footer } from '../ui/components/layout/Footer';
+import { CatalogView, WhatsAppFAB } from '../ui/components/property/WebsiteApp';
+import { WhatsAppModal } from '../ui/components/property/WhatsAppModal';
+
+const dep = Astro.url.searchParams.get('dep') || undefined;
+const pay = Astro.url.searchParams.get('pay') || undefined;
+const type = Astro.url.searchParams.get('type') || undefined;
+const initialFilters = { dep, pay, type };
 ---
 
 <BaseLayout
   title="Propiedades en Honduras — A&A Inmobiliaria"
   description="Terrenos, lotes y casas verificadas en Honduras. Escrituradas y listas. A&A Inmobiliaria, El Progreso, Yoro."
-  canonical="https://aainmobiliaria.hn/propiedades"
+  canonical="https://www.aabienes.com/propiedades"
 >
-  <WebsiteApp client:load />
+  <Header client:load currentRoute="catalog" />
+  <CatalogView client:load initialFilters={initialFilters} />
+  <Footer />
+  <WhatsAppFAB client:visible />
+  <WhatsAppModal client:load open={false} onClose={() => {}} />
 </BaseLayout>

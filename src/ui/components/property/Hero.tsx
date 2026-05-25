@@ -4,8 +4,8 @@ import { useHondurasData } from '../../hooks/useHondurasData';
 import { SelectField } from '../shared/SelectField';
 
 interface Props {
-  onWhatsApp: () => void;
-  onExplore: (filters?: { dep?: string; pay?: string; type?: string }) => void;
+  onWhatsApp?: () => void;
+  onExplore?: (filters?: { dep?: string; pay?: string; type?: string }) => void;
 }
 
 const STATS = [
@@ -205,6 +205,26 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
   const searchRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
 
+  const handleWhatsApp = () => {
+    if (onWhatsApp) {
+      onWhatsApp();
+    } else {
+      window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: null } }));
+    }
+  };
+
+  const handleExplore = (filters?: { dep?: string; pay?: string; type?: string }) => {
+    if (onExplore) {
+      onExplore(filters);
+    } else {
+      const params = new URLSearchParams();
+      if (filters?.dep) params.set('dep', filters.dep);
+      if (filters?.pay) params.set('pay', filters.pay);
+      if (filters?.type) params.set('type', filters.type);
+      window.location.href = `/propiedades?${params.toString()}`;
+    }
+  };
+
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reducedMotion) {
@@ -348,12 +368,12 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
 
         {/* Search bar */}
         <div ref={searchRef} style={{ opacity: 0, width: '100%', display: 'flex', justifyContent: 'center', padding: '0 1rem' }}>
-          <SearchBar onSearch={(f) => onExplore(f)} />
+          <SearchBar onSearch={handleExplore} />
         </div>
 
         {/* WhatsApp link */}
         <WhatsAppButton
-          onClick={onWhatsApp}
+          onClick={handleWhatsApp}
           size="md"
           label="O contáctenos por WhatsApp"
           style={{ marginTop: '1.5rem', padding: '0.625rem 1.375rem' }}

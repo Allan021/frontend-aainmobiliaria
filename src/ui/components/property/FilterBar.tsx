@@ -69,32 +69,45 @@ function CategoryChip({
     <button
       onClick={onClick}
       style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-        padding: '0.75rem 1rem', minWidth: 80,
-        background: 'transparent', border: 'none', cursor: 'pointer',
-        color: active ? '#111113' : '#9A9383',
-        position: 'relative',
-        transition: 'color 0.2s',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        padding: '0.5rem 1rem',
+        borderRadius: 999,
+        background: active ? 'var(--main-text, #111113)' : 'var(--main-card-bg, #fff)',
+        border: `1.5px solid ${active ? 'var(--main-text, #111113)' : 'var(--main-border, #E6E0D2)'}`,
+        color: active ? 'var(--main-bg, #FAF8F3)' : 'var(--main-text-dim, #5A5A63)',
+        cursor: 'pointer',
+        transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
         fontFamily: 'inherit',
+        fontSize: '0.8125rem',
+        fontWeight: active ? 700 : 500,
+        boxShadow: active ? '0 4px 12px rgba(17,17,19,0.08)' : 'none',
+        outline: 'none',
         flexShrink: 0,
       }}
-      onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = '#111113'; }}
-      onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = '#9A9383'; }}
+      onMouseEnter={e => {
+        if (!active) {
+          e.currentTarget.style.borderColor = 'var(--main-text, #111113)';
+          e.currentTarget.style.color = 'var(--main-text, #111113)';
+          e.currentTarget.style.background = 'var(--main-bg, #FAF8F3)';
+        }
+      }}
+      onMouseLeave={e => {
+        if (!active) {
+          e.currentTarget.style.borderColor = 'var(--main-border, #E6E0D2)';
+          e.currentTarget.style.color = 'var(--main-text-dim, #5A5A63)';
+          e.currentTarget.style.background = 'var(--main-card-bg, #fff)';
+        }
+      }}
     >
-      <div style={{ transition: 'transform 0.15s' }}>
+      <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, opacity: active ? 1 : 0.8 }}>
         {icon}
       </div>
-      <span style={{ fontSize: '0.6875rem', fontWeight: active ? 700 : 500, whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>
+      <span style={{ whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>
         {label}
       </span>
-      {/* Active underline */}
-      <div style={{
-        position: 'absolute', bottom: 0, left: '50%',
-        transform: `translateX(-50%) scaleX(${active ? 1 : 0})`,
-        width: 32, height: 2, background: '#111113', borderRadius: 1,
-        transition: 'transform 0.2s cubic-bezier(0.22,1,0.36,1)',
-        transformOrigin: 'center',
-      }} />
     </button>
   );
 }
@@ -129,13 +142,9 @@ export function FilterBar({ filters, setFilters }: FilterBarProps) {
     <div>
       {/* Category chips */}
       <div style={{
-        borderBottom: '1px solid #E6E0D2',
-        marginBottom: '1.25rem',
-        overflowX: 'auto',
-        msOverflowStyle: 'none',
-        scrollbarWidth: 'none',
+        marginBottom: '1.5rem',
       }}>
-        <div style={{ display: 'flex', gap: 0 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {TYPE_FILTERS.map(f => (
             <CategoryChip
               key={f.key}
@@ -152,8 +161,8 @@ export function FilterBar({ filters, setFilters }: FilterBarProps) {
       <div style={{ display: 'flex', gap: '0.875rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{
           minWidth: 220, padding: '0.5rem 0.875rem',
-          borderRadius: 10, border: `1.5px solid ${filters.dep ? '#111113' : '#E6E0D2'}`,
-          background: '#fff', transition: 'border-color 0.15s',
+          borderRadius: 10, border: `1.5px solid ${filters.dep ? 'var(--main-text, #111113)' : 'var(--main-border, #E6E0D2)'}`,
+          background: 'var(--main-card-bg, #fff)', transition: 'border-color 0.15s',
         }}>
           <SelectField
             options={depOptions}

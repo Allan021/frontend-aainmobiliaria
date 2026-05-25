@@ -35,10 +35,18 @@ function usePublicTheme() {
 }
 
 /* ── WhatsApp FAB ───────────────────────────────────────────── */
-function WhatsAppFAB({ onClick }: { onClick: () => void }) {
+export function WhatsAppFAB({ onClick }: { onClick?: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const fabRef = useRef<HTMLButtonElement>(null);
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: null } }));
+    }
+  };
 
   // Show tooltip after 4s on first visit
   useEffect(() => {
@@ -97,7 +105,7 @@ function WhatsAppFAB({ onClick }: { onClick: () => void }) {
       {/* FAB */}
       <button
         ref={fabRef}
-        onClick={onClick}
+        onClick={handleClick}
         onMouseEnter={() => setExpanded(true)}
         onMouseLeave={() => setExpanded(false)}
         aria-label="Contactar por WhatsApp"
@@ -212,11 +220,26 @@ function useReveal(ref: React.RefObject<Element | null>) {
 }
 
 /* ── Featured section ───────────────────────────────────────── */
-function FeaturedSection({ onOpen, onWhatsApp, onExplore }: { onOpen: (p: Property) => void; onWhatsApp: (p: Property) => void; onExplore: () => void }) {
+function FeaturedSectionInner({ onOpen, onWhatsApp, onExplore }: { onOpen?: (p: Property) => void; onWhatsApp?: (p: Property) => void; onExplore?: () => void }) {
   const { data } = useProperties({ limit: 3 });
   const properties = data?.data || [];
   const gridRef = useRef<HTMLDivElement>(null!);
   const titleRef = useRef<HTMLDivElement>(null!);
+
+  const handleOpen = (p: Property) => {
+    if (onOpen) onOpen(p);
+    else window.location.href = `/propiedad/${p.id}`;
+  };
+
+  const handleWhatsApp = (p: Property) => {
+    if (onWhatsApp) onWhatsApp(p);
+    else window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: p } }));
+  };
+
+  const handleExplore = () => {
+    if (onExplore) onExplore();
+    else window.location.href = '/propiedades';
+  };
 
   useReveal(titleRef);
   useStaggerCards(gridRef, [properties.length]);
@@ -229,7 +252,7 @@ function FeaturedSection({ onOpen, onWhatsApp, onExplore }: { onOpen: (p: Proper
             Seleccionadas esta semana, escrituradas y listas.
           </h2>
           <button
-            onClick={onExplore}
+            onClick={handleExplore}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               padding: '0.75rem 1.25rem', borderRadius: 999,
@@ -252,7 +275,7 @@ function FeaturedSection({ onOpen, onWhatsApp, onExplore }: { onOpen: (p: Proper
         <div ref={gridRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
           {properties.map((p, i) => (
             <div key={p.id} className="prop-card">
-              <PropertyCard property={p} onOpen={onOpen} onWhatsApp={onWhatsApp} animDelay={i * 65} />
+              <PropertyCard property={p} onOpen={handleOpen} onWhatsApp={handleWhatsApp} animDelay={i * 65} />
             </div>
           ))}
           {properties.length === 0 && [1, 2, 3].map(i => (
@@ -278,8 +301,16 @@ function FeaturedSection({ onOpen, onWhatsApp, onExplore }: { onOpen: (p: Proper
   );
 }
 
+export function FeaturedSection(props: { onOpen?: (p: Property) => void; onWhatsApp?: (p: Property) => void; onExplore?: () => void }) {
+  return (
+    <QueryProvider>
+      <FeaturedSectionInner {...props} />
+    </QueryProvider>
+  );
+}
+
 /* ── Trust band ─────────────────────────────────────────────── */
-function TrustBand({ ref: _ref }: { ref?: React.Ref<HTMLElement> }) {
+export function TrustBand({ ref: _ref }: { ref?: React.Ref<HTMLElement> }) {
   const sectionRef = useRef<HTMLElement>(null!);
   useReveal(sectionRef);
 
@@ -375,9 +406,14 @@ function TrustBand({ ref: _ref }: { ref?: React.Ref<HTMLElement> }) {
 }
 
 /* ── CTA section ────────────────────────────────────────────── */
-function CTASection({ onWhatsApp }: { onWhatsApp: () => void }) {
+export function CTASection({ onWhatsApp }: { onWhatsApp?: () => void }) {
   const ref = useRef<HTMLElement>(null!);
   useReveal(ref);
+
+  const handleWhatsApp = () => {
+    if (onWhatsApp) onWhatsApp();
+    else window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: null } }));
+  };
 
   return (
     <section ref={ref} style={{ padding: '5rem 1.5rem', background: '#FAF8F3' }}>
@@ -405,7 +441,7 @@ function CTASection({ onWhatsApp }: { onWhatsApp: () => void }) {
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <WhatsAppButton
-              onClick={onWhatsApp}
+              onClick={handleWhatsApp}
               size="xl"
               label="Contactar por WhatsApp"
               style={{ padding: '0.875rem 1.75rem' }}
@@ -435,17 +471,27 @@ function CTASection({ onWhatsApp }: { onWhatsApp: () => void }) {
 }
 
 /* ── Catalog view ───────────────────────────────────────────── */
-function CatalogView({
+function CatalogViewInner({
   initialFilters,
   onOpen,
   onWhatsApp,
 }: {
   initialFilters?: { dep?: string; pay?: string; type?: string };
-  onOpen: (p: Property) => void;
-  onWhatsApp: (p: Property) => void;
+  onOpen?: (p: Property) => void;
+  onWhatsApp?: (p: Property) => void;
 }) {
   const [filters, setFilters] = useState<{ dep?: string; pay?: string; type?: string }>(initialFilters || {});
   const { data, isLoading } = useProperties({ dep: filters.dep, pay: filters.pay });
+
+  const handleOpen = (p: Property) => {
+    if (onOpen) onOpen(p);
+    else window.location.href = `/propiedad/${p.id}`;
+  };
+
+  const handleWhatsApp = (p: Property) => {
+    if (onWhatsApp) onWhatsApp(p);
+    else window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: p } }));
+  };
   const rawProperties = data?.data || [];
   const properties = filters.type
     ? rawProperties.filter((p: any) => p.property_type === filters.type)
@@ -488,7 +534,7 @@ function CatalogView({
         <div ref={gridRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
           {properties.map(p => (
             <div key={p.id} className="prop-card">
-              <PropertyCard property={p} onOpen={onOpen} onWhatsApp={onWhatsApp} />
+              <PropertyCard property={p} onOpen={handleOpen} onWhatsApp={handleWhatsApp} />
             </div>
           ))}
           {!isLoading && properties.length === 0 && (
@@ -513,8 +559,20 @@ function CatalogView({
   );
 }
 
+export function CatalogView(props: {
+  initialFilters?: { dep?: string; pay?: string; type?: string };
+  onOpen?: (p: Property) => void;
+  onWhatsApp?: (p: Property) => void;
+}) {
+  return (
+    <QueryProvider>
+      <CatalogViewInner {...props} />
+    </QueryProvider>
+  );
+}
+
 /* ── About page ─────────────────────────────────────────────── */
-function AboutPage() {
+export function AboutPage() {
   const heroRef = useRef<HTMLDivElement>(null!);
   const processRef = useRef<HTMLElement>(null!);
   useReveal(heroRef);

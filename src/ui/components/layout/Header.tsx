@@ -3,8 +3,8 @@ import { WhatsAppButton } from '../shared/WhatsAppButton';
 
 interface HeaderProps {
   currentRoute: string;
-  onNavigate: (route: string) => void;
-  onWhatsApp: () => void;
+  onNavigate?: (route: string) => void;
+  onWhatsApp?: () => void;
   theme?: 'light' | 'dark';
   toggleTheme?: () => void;
 }
@@ -47,9 +47,20 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
     }
   };
 
-  const navigate = (to: string) => {
-    onNavigate(to);
+  const navigate = (to: string, e: React.MouseEvent) => {
+    if (onNavigate) {
+      e.preventDefault();
+      onNavigate(to);
+    }
     setMenuOpen(false);
+  };
+
+  const handleWhatsApp = () => {
+    if (onWhatsApp) {
+      onWhatsApp();
+    } else {
+      window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: null } }));
+    }
   };
 
   const isHome = currentRoute === 'home';
@@ -100,8 +111,7 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
           <a
             href="/"
             onClick={(e) => {
-              e.preventDefault();
-              navigate('home');
+              navigate('home', e);
             }}
             style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', textDecoration: 'none', flexShrink: 0 }}
           >
@@ -134,8 +144,7 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
                   key={i}
                   href={NAV_URLS[item.to] || '#'}
                   onClick={(e) => {
-                    e.preventDefault();
-                    navigate(item.to);
+                    navigate(item.to, e);
                   }}
                   style={{
                     fontSize: '0.875rem',
@@ -248,7 +257,7 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
               Iniciar sesión
             </a>
             <WhatsAppButton
-              onClick={onWhatsApp}
+              onClick={handleWhatsApp}
               size="md"
               label="WhatsApp"
             />
@@ -317,8 +326,7 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
                     key={i}
                     href={NAV_URLS[item.to] || '#'}
                     onClick={(e) => {
-                      e.preventDefault();
-                      navigate(item.to);
+                      navigate(item.to, e);
                     }}
                     style={{
                       fontSize: '1rem', fontWeight: active ? 700 : 500,
@@ -398,7 +406,7 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
               )}
 
               <WhatsAppButton
-                onClick={onWhatsApp}
+                onClick={handleWhatsApp}
                 size="lg"
                 label="Contactar por WhatsApp"
                 style={{ padding: '0.875rem 1.75rem' }}

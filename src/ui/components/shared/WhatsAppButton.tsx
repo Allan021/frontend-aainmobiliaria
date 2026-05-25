@@ -9,6 +9,7 @@ export interface WhatsAppButtonProps {
   variant?: 'solid' | 'outline' | 'glass';
   fullWidth?: boolean;
   borderRadius?: string | number;
+  disabled?: boolean;
   style?: CSSProperties;
   className?: string;
 }
@@ -20,6 +21,7 @@ export function WhatsAppButton({
   variant = 'solid',
   fullWidth = false,
   borderRadius = '9999px',
+  disabled = false,
   style,
   className,
 }: WhatsAppButtonProps) {
@@ -43,7 +45,7 @@ export function WhatsAppButton({
     padding,
     borderRadius,
     border: 'none',
-    cursor: 'pointer',
+    cursor: disabled ? 'not-allowed' : 'pointer',
     color: '#fff',
     fontSize,
     fontWeight: 700,
@@ -53,6 +55,8 @@ export function WhatsAppButton({
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
     outline: 'none',
+    opacity: disabled ? 0.45 : 1,
+    pointerEvents: disabled ? 'none' : 'auto',
   };
 
   // Variant styles

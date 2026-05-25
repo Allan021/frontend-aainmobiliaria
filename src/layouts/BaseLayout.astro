@@ -21,6 +21,7 @@ const {
 
 const resolvedOgTitle = ogTitle || title;
 const resolvedOgDescription = ogDescription || description;
+const resolvedOgImage = ogImage || 'https://www.aabienes.com/banner-web.jpg';
 ---
 
 <!doctype html>
@@ -40,13 +41,14 @@ const resolvedOgDescription = ogDescription || description;
     <meta property="og:site_name" content="A&A Inmobiliaria" />
     <meta property="og:title" content={resolvedOgTitle} />
     <meta property="og:description" content={resolvedOgDescription} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:image" content={resolvedOgImage} />
+    {canonical && <meta property="og:url" content={canonical} />}
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={resolvedOgTitle} />
     <meta name="twitter:description" content={resolvedOgDescription} />
-    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <meta name="twitter:image" content={resolvedOgImage} />
 
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>

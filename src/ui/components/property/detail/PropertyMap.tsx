@@ -1,0 +1,59 @@
+const DEPT_COORDS: Record<string, { lat: number; lng: number }> = {
+  'Yoro':                { lat: 15.3992, lng: -87.8028 },
+  'Cortés':              { lat: 15.4997, lng: -88.0249 },
+  'Cortes':              { lat: 15.4997, lng: -88.0249 },
+  'Francisco Morazán':   { lat: 14.0818, lng: -87.2068 },
+  'Francisco Morazan':   { lat: 14.0818, lng: -87.2068 },
+  'Atlántida':           { lat: 15.7636, lng: -86.7844 },
+  'Atlantida':           { lat: 15.7636, lng: -86.7844 },
+  'Comayagua':           { lat: 14.4516, lng: -87.6222 },
+  'Choluteca':           { lat: 13.3005, lng: -87.1934 },
+  'El Paraíso':          { lat: 13.8592, lng: -86.5944 },
+  'Olancho':             { lat: 14.8000, lng: -86.1000 },
+  'Santa Bárbara':       { lat: 14.9186, lng: -88.2301 },
+  'Colón':               { lat: 15.9000, lng: -85.5000 },
+};
+
+function getMapUrl(departamento: string): string {
+  const coords = DEPT_COORDS[departamento] || { lat: 15.3992, lng: -87.8028 };
+  const { lat, lng } = coords;
+  const margin = 0.05;
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - margin}%2C${lat - margin}%2C${lng + margin}%2C${lat + margin}&layer=mapnik&marker=${lat}%2C${lng}`;
+}
+
+interface PropertyMapProps {
+  departamento: string;
+  municipio: string;
+}
+
+export function PropertyMap({ departamento, municipio }: PropertyMapProps) {
+  const mapUrl = getMapUrl(departamento);
+
+  return (
+    <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid var(--main-border, #E6E0D2)', position: 'relative' }}>
+      <iframe
+        src={mapUrl}
+        width="100%"
+        height="400"
+        style={{ border: 'none', display: 'block' }}
+        loading="lazy"
+        title={`Ubicación: ${municipio}, ${departamento}`}
+        sandbox="allow-scripts allow-same-origin"
+      />
+      <div style={{
+        position: 'absolute', bottom: 12, left: 12,
+        background: 'rgba(17,17,19,0.85)', backdropFilter: 'blur(8px)',
+        borderRadius: 10, padding: '0.5rem 0.75rem',
+        display: 'flex', alignItems: 'center', gap: 6,
+      }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4B254" strokeWidth="2.5" strokeLinecap="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FAF8F3' }}>
+          {municipio}, {departamento}
+        </span>
+      </div>
+    </div>
+  );
+}
