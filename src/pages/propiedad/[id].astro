@@ -4,7 +4,6 @@ import { Header } from '../../ui/components/layout/Header';
 import { Footer } from '../../ui/components/layout/Footer';
 import { PropertyDetail } from '../../ui/components/property/PropertyDetail';
 import { WhatsAppModal } from '../../ui/components/property/WhatsAppModal';
-import { WhatsAppFAB } from '../../ui/components/property/WebsiteApp';
 import { serverFetch } from '../../infrastructure/api/client';
 import type { Property, PaginatedResponse } from '../../core/domain/entities/types';
 
@@ -66,6 +65,5 @@ const jsonLd = {
     standalone
   />
   <Footer />
-  <WhatsAppFAB client:visible />
   <WhatsAppModal client:visible open={false} onClose={() => {}} />
 </BaseLayout>

@@ -77,7 +77,7 @@ export function WhatsAppFAB({ onClick }: { onClick?: () => void }) {
   }, []);
 
   return (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 500, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 500, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, pointerEvents: 'none' }}>
       {/* Tooltip bubble */}
       <div style={{
         background: '#fff',
@@ -122,6 +122,7 @@ export function WhatsAppFAB({ onClick }: { onClick?: () => void }) {
           overflow: 'hidden',
           opacity: 0, // will be animated in
           scale: '0',
+          pointerEvents: 'auto',
         }}
         onFocus={() => setExpanded(true)}
         onBlur={() => setExpanded(false)}
