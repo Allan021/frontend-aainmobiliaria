@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { CSSProperties, MouseEvent } from 'react';
 import { WhatsAppIcon } from './Icon';
 
-export interface WhatsAppButtonProps {
+export interface WhatsAppButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label?: string;
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -24,6 +24,7 @@ export function WhatsAppButton({
   disabled = false,
   style,
   className,
+  ...rest
 }: WhatsAppButtonProps) {
   const [hovered, setHovered] = useState(false);
 
@@ -103,6 +104,7 @@ export function WhatsAppButton({
       onMouseLeave={() => setHovered(false)}
       style={finalStyle}
       className={className}
+      {...rest}
     >
       <WhatsAppIcon size={iconSize} color={iconColor} />
       <span>{label}</span>

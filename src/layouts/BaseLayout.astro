@@ -28,6 +28,12 @@ const resolvedOgImage = ogImage || 'https://www.aabienes.com/banner-web.jpg';
 <html lang="es">
   <head>
     <meta charset="utf-8" />
+    <script is:inline>
+      (function() {
+        const theme = localStorage.getItem('aa_pub_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
     <link rel="icon" type="image/webp" href="/logo-mark.webp" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />

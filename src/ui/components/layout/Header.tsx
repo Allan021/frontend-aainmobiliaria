@@ -23,11 +23,35 @@ const NAV_URLS: Record<string, string> = {
   about: '/nosotros',
 };
 
-export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', toggleTheme }: HeaderProps) {
+export function Header({ currentRoute, onNavigate, onWhatsApp, theme: propTheme, toggleTheme: propToggleTheme }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnimating, setMenuAnimating] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    if (propTheme) {
+      setTheme(propTheme);
+    } else {
+      const stored = typeof window !== 'undefined'
+        ? (localStorage.getItem('aa_pub_theme') as 'light' | 'dark') || 'light'
+        : 'light';
+      setTheme(stored);
+      document.documentElement.setAttribute('data-theme', stored);
+    }
+  }, [propTheme]);
+
+  const handleToggleTheme = () => {
+    const next = theme === 'light' ? 'dark' : 'light';
+    setTheme(next);
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('aa_pub_theme', next);
+    if (propToggleTheme) {
+      propToggleTheme();
+    }
+  };
 
   const isDark = theme === 'dark';
 
@@ -186,57 +210,55 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
           {/* Desktop CTAs */}
           <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }} className="header-ctas-desktop">
             {/* Dark mode toggle */}
-            {toggleTheme && (
-              <button
-                onClick={toggleTheme}
-                aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-                title={isDark ? 'Modo claro' : 'Modo oscuro'}
-                style={{
-                  width: 36, height: 36, borderRadius: 9,
-                  background: transparent
-                    ? 'rgba(255,255,255,0.08)'
-                    : isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
-                  border: `1px solid ${transparent
-                    ? 'rgba(255,255,255,0.12)'
-                    : isDark ? 'rgba(38,38,43,0.8)' : '#E6E0D2'}`,
-                  color: transparent ? 'rgba(250,248,243,0.75)' : isDark ? '#9A9383' : '#5A5A63',
-                  cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  transition: 'all 0.2s',
-                  flexShrink: 0,
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = '#D4B254';
-                  e.currentTarget.style.color = '#D4B254';
-                  e.currentTarget.style.background = 'rgba(212,178,84,0.08)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = transparent
-                    ? 'rgba(255,255,255,0.12)'
-                    : isDark ? 'rgba(38,38,43,0.8)' : '#E6E0D2';
-                  e.currentTarget.style.color = transparent
-                    ? 'rgba(250,248,243,0.75)'
-                    : isDark ? '#9A9383' : '#5A5A63';
-                  e.currentTarget.style.background = transparent
-                    ? 'rgba(255,255,255,0.08)'
-                    : isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
-                }}
-              >
-                {isDark ? (
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="5" />
-                    <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                    <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                  </svg>
-                ) : (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                  </svg>
-                )}
-              </button>
-            )}
+            <button
+              onClick={handleToggleTheme}
+              aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              title={isDark ? 'Modo claro' : 'Modo oscuro'}
+              style={{
+                width: 36, height: 36, borderRadius: 9,
+                background: transparent
+                  ? 'rgba(255,255,255,0.08)'
+                  : isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                border: `1px solid ${transparent
+                  ? 'rgba(255,255,255,0.12)'
+                  : isDark ? 'rgba(38,38,43,0.8)' : '#E6E0D2'}`,
+                color: transparent ? 'rgba(250,248,243,0.75)' : isDark ? '#9A9383' : '#5A5A63',
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'all 0.2s',
+                flexShrink: 0,
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = '#D4B254';
+                e.currentTarget.style.color = '#D4B254';
+                e.currentTarget.style.background = 'rgba(212,178,84,0.08)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = transparent
+                  ? 'rgba(255,255,255,0.12)'
+                  : isDark ? 'rgba(38,38,43,0.8)' : '#E6E0D2';
+                e.currentTarget.style.color = transparent
+                  ? 'rgba(250,248,243,0.75)'
+                  : isDark ? '#9A9383' : '#5A5A63';
+                e.currentTarget.style.background = transparent
+                  ? 'rgba(255,255,255,0.08)'
+                  : isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
+              }}
+            >
+              {isDark ? (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
 
             {/* Divider */}
             <div style={{
@@ -276,42 +298,40 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
           {/* Mobile: theme toggle + hamburger */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }} className="header-hamburger">
             {/* Sun / Moon toggle */}
-            {toggleTheme && (
-              <button
-                onClick={toggleTheme}
-                aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-                style={{
-                  width: 38, height: 38, borderRadius: 9,
-                  background: hamburgerBg,
-                  border: `1px solid ${hamburgerBorder}`,
-                  cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  padding: 0, flexShrink: 0,
-                  transition: 'all 0.3s cubic-bezier(0.22,1,0.36,1)',
-                  color: isDark ? '#D4B254' : hamburgerBar,
-                }}
-              >
-                <div style={{
-                  transition: 'transform 0.4s cubic-bezier(0.22,1,0.36,1)',
-                  transform: isDark ? 'rotate(180deg)' : 'rotate(0deg)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {isDark ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <circle cx="12" cy="12" r="5" />
-                      <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
-                      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                      <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
-                      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                    </svg>
-                  ) : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                    </svg>
-                  )}
-                </div>
-              </button>
-            )}
+            <button
+              onClick={handleToggleTheme}
+              aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              style={{
+                width: 38, height: 38, borderRadius: 9,
+                background: hamburgerBg,
+                border: `1px solid ${hamburgerBorder}`,
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: 0, flexShrink: 0,
+                transition: 'all 0.3s cubic-bezier(0.22,1,0.36,1)',
+                color: isDark ? '#D4B254' : hamburgerBar,
+              }}
+            >
+              <div style={{
+                transition: 'transform 0.4s cubic-bezier(0.22,1,0.36,1)',
+                transform: isDark ? 'rotate(180deg)' : 'rotate(0deg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {isDark ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                  </svg>
+                )}
+              </div>
+            </button>
 
             {/* Hamburger */}
             <button
@@ -400,60 +420,58 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme = 'light', 
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: '0.875rem', borderTop: `1px solid ${isDark ? '#1A1A1D' : '#E6E0D2'}` }}>
               {/* Dark mode row */}
-              {toggleTheme && (
-                <button
-                  onClick={toggleTheme}
-                  style={{
-                    width: '100%', padding: '0.75rem 1rem',
-                    background: isDark ? 'rgba(212,178,84,0.06)' : '#F3EFE6',
-                    border: `1px solid ${isDark ? 'rgba(212,178,84,0.15)' : '#E6E0D2'}`,
-                    borderRadius: 12,
-                    cursor: 'pointer', fontFamily: 'inherit',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: 8,
-                      background: isDark ? 'rgba(212,178,84,0.12)' : 'rgba(0,0,0,0.05)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: isDark ? '#D4B254' : '#5A5A63',
-                    }}>
-                      {isDark ? (
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                          <circle cx="12" cy="12" r="5" />
-                          <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
-                          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                          <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
-                        </svg>
-                      ) : (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                        </svg>
-                      )}
-                    </div>
-                    <span style={{ fontSize: '0.9375rem', fontWeight: 600, color: isDark ? '#C9C2B1' : '#111113' }}>
-                      {isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-                    </span>
-                  </div>
-                  {/* Toggle pill */}
+              <button
+                onClick={handleToggleTheme}
+                style={{
+                  width: '100%', padding: '0.75rem 1rem',
+                  background: isDark ? 'rgba(212,178,84,0.06)' : '#F3EFE6',
+                  border: `1px solid ${isDark ? 'rgba(212,178,84,0.15)' : '#E6E0D2'}`,
+                  borderRadius: 12,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{
-                    width: 46, height: 26, borderRadius: 13,
-                    background: isDark ? '#D4B254' : '#C9C2B1',
-                    position: 'relative', transition: 'background 0.3s',
-                    flexShrink: 0,
+                    width: 32, height: 32, borderRadius: 8,
+                    background: isDark ? 'rgba(212,178,84,0.12)' : 'rgba(0,0,0,0.05)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: isDark ? '#D4B254' : '#5A5A63',
                   }}>
-                    <div style={{
-                      position: 'absolute', top: 3,
-                      left: isDark ? 23 : 3,
-                      width: 20, height: 20, borderRadius: '50%',
-                      background: '#fff',
-                      boxShadow: '0 1px 5px rgba(0,0,0,0.25)',
-                      transition: 'left 0.3s cubic-bezier(0.22,1,0.36,1)',
-                    }} />
+                    {isDark ? (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+                      </svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                      </svg>
+                    )}
                   </div>
-                </button>
-              )}
+                  <span style={{ fontSize: '0.9375rem', fontWeight: 600, color: isDark ? '#C9C2B1' : '#111113' }}>
+                    {isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                  </span>
+                </div>
+                {/* Toggle pill */}
+                <div style={{
+                  width: 46, height: 26, borderRadius: 13,
+                  background: isDark ? '#D4B254' : '#C9C2B1',
+                  position: 'relative', transition: 'background 0.3s',
+                  flexShrink: 0,
+                }}>
+                  <div style={{
+                    position: 'absolute', top: 3,
+                    left: isDark ? 23 : 3,
+                    width: 20, height: 20, borderRadius: '50%',
+                    background: '#fff',
+                    boxShadow: '0 1px 5px rgba(0,0,0,0.25)',
+                    transition: 'left 0.3s cubic-bezier(0.22,1,0.36,1)',
+                  }} />
+                </div>
+              </button>
 
               <WhatsAppButton
                 onClick={handleWhatsApp}
