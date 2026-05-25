@@ -65,14 +65,10 @@ export function PriceCard({ property, priceCardRef, onWhatsApp, phone }: PriceCa
 
         {/* CTAs */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {/* WhatsApp CTA — native button to avoid hydration issues */}
+          {/* WhatsApp CTA — uses data-action for native event delegation */}
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onWhatsApp();
-            }}
+            data-action="open-lead-modal"
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
               width: '100%', padding: '1rem 1.5rem',
@@ -82,6 +78,7 @@ export function PriceCard({ property, priceCardRef, onWhatsApp, phone }: PriceCa
               boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)',
               transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
               boxSizing: 'border-box',
+              WebkitTapHighlightColor: 'transparent',
             }}
             onMouseEnter={e => {
               e.currentTarget.style.background = '#22c35a';

@@ -83,11 +83,35 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
   const highlightsRef = useRef<HTMLDivElement>(null!);
   const priceCardRef = useRef<HTMLDivElement>(null);
   const photoGridRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useReveal(descRef);
   useReveal(specsRef);
   useReveal(mapRef);
   useReveal(highlightsRef);
+
+  // ★ NATIVE event delegation — works even if React hydration fails
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handler = (e: Event) => {
+      const target = (e.target as HTMLElement).closest('[data-action="open-lead-modal"]');
+      if (target) {
+        e.preventDefault();
+        e.stopPropagation();
+        setLeadModalOpen(true);
+      }
+    };
+
+    container.addEventListener('click', handler, true);
+    container.addEventListener('touchend', handler, true);
+
+    return () => {
+      container.removeEventListener('click', handler, true);
+      container.removeEventListener('touchend', handler, true);
+    };
+  }, []);
 
   // Entrance animation on mount
   useEffect(() => {
@@ -134,7 +158,7 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
     : property.description;
 
   return (
-    <div style={{ background: 'var(--main-bg, #FAF8F3)', minHeight: '100vh', color: 'var(--main-text, #111113)' }}>
+    <div ref={containerRef} style={{ background: 'var(--main-bg, #FAF8F3)', minHeight: '100vh', color: 'var(--main-text, #111113)' }}>
 
       {/* Breadcrumb + share row */}
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: standalone ? '1rem clamp(1rem, 4vw, 2.5rem) 0' : '1.25rem clamp(1rem, 4vw, 2.5rem) 0' }}>
@@ -449,11 +473,7 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
         </div>
         <button
           type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleWhatsAppClick();
-          }}
+          data-action="open-lead-modal"
           style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             padding: '0.75rem 1.25rem',
@@ -462,6 +482,7 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
             fontFamily: 'inherit', cursor: 'pointer',
             boxShadow: '0 4px 14px rgba(37,211,102,0.3)',
             whiteSpace: 'nowrap',
+            WebkitTapHighlightColor: 'transparent',
           }}
         >
           <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff">
