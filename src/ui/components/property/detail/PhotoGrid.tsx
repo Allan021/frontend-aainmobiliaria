@@ -36,7 +36,11 @@ function MobileSlider({ images, onImageClick }: PhotoGridProps) {
         onScroll={handleScroll}
       >
         {images.map((img, i) => (
-          <div key={i} className="photo-mobile-slider__slide" onClick={() => onImageClick(i)}>
+          <div key={i} className="photo-mobile-slider__slide" onClick={() => onImageClick(i)} style={{ position: 'relative', overflow: 'hidden' }}>
+            <div
+              className="photo-grid__blur-bg"
+              style={{ backgroundImage: `url(${optimizeCloudinaryUrl(img.url, 160)})` }}
+            />
             <img
               src={optimizeCloudinaryUrl(img.url, 768)}
               srcSet={cloudinarySrcSet(img.url, 768)}
@@ -47,7 +51,7 @@ function MobileSlider({ images, onImageClick }: PhotoGridProps) {
               loading={i === 0 ? 'eager' : 'lazy'}
               decoding="async"
               draggable={false}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', zIndex: 1 }}
             />
           </div>
         ))}
@@ -88,6 +92,10 @@ function DesktopGrid({ images, onImageClick }: PhotoGridProps) {
         className="photo-desktop-grid__main"
         onClick={() => onImageClick(0)}
       >
+        <div
+          className="photo-grid__blur-bg"
+          style={{ backgroundImage: `url(${optimizeCloudinaryUrl(main.url, 160)})` }}
+        />
         <img
           src={optimizeCloudinaryUrl(main.url, 800)}
           srcSet={cloudinarySrcSet(main.url, 800)}
@@ -127,6 +135,10 @@ function DesktopGrid({ images, onImageClick }: PhotoGridProps) {
                 borderRadius: isTopRight ? '0 12px 0 0' : isBottomRight ? '0 0 12px 0' : 0,
               }}
             >
+              <div
+                className="photo-grid__blur-bg"
+                style={{ backgroundImage: `url(${optimizeCloudinaryUrl(img.url, 160)})` }}
+              />
               <img
                 src={optimizeCloudinaryUrl(img.url, 400)}
                 srcSet={cloudinarySrcSet(img.url, 400)}

@@ -1353,11 +1353,16 @@ body {
   height: 100%;
   scroll-snap-align: start;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  background: #111113;
 }
 .photo-mobile-slider__slide img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
 }
 
 .photo-mobile-slider__counter {
@@ -1419,12 +1424,15 @@ body {
   overflow: hidden;
   border-radius: 16px 0 0 16px;
   cursor: pointer;
+  background: #111113;
 }
 .photo-desktop-grid__main img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+  position: relative;
+  z-index: 1;
 }
 .photo-desktop-grid__main:hover img { transform: scale(1.03); }
 
@@ -1438,14 +1446,28 @@ body {
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  background: #111113;
 }
 .photo-desktop-grid__cell img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+  position: relative;
+  z-index: 1;
 }
 .photo-desktop-grid__cell:hover img { transform: scale(1.06); }
+
+/* Blurred background helper */
+.photo-grid__blur-bg {
+  position: absolute;
+  inset: -10px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(0.45);
+  z-index: 0;
+  pointer-events: none;
+}
 
 .photo-desktop-grid__overlay {
   position: absolute;
