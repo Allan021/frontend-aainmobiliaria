@@ -15,7 +15,10 @@ export function QuickStats({ property }: QuickStatsProps) {
       </svg>
     ),
     label: 'Área',
-    value: `${property.area_varas} varas²`,
+    value: [
+      property.area_varas ? `${property.area_varas} v²` : '',
+      property.area_m2 ? `${property.area_m2} m²` : ''
+    ].filter(Boolean).join(' · ') || 'N/A',
   });
 
   if (property.dimensions) {

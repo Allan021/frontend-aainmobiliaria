@@ -33,7 +33,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
   const [tab, setTab] = useState<'propiedad' | 'lote' | 'lotificacion'>('propiedad');
   const [form, setForm] = useState({
     title: '', departamento: 'Yoro', dep_code: 'YO', municipio: 'El Progreso',
-    area_varas: '', price: '', discount_price: '', financing: true, contado: true,
+    area_varas: '', area_m2: '', price: '', discount_price: '', financing: true, contado: true,
     financing_prima: '20', prima_es_fija: false, prima_monto: '',
     plazo_anios: '10', financing_tasa_anual: '12',
     precio_financiado: '',
@@ -81,7 +81,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
 
   useEffect(() => {
     if (property) {
-      setTab(property.property_type === 'lotificadora' ? 'lotificacion' : (property.type === 'Lote' ? 'lote' : 'propiedad'));
+      setTab(property.property_type === 'lotificadora' ? 'lotificacion' : (property.type === 'Terreno' ? 'lote' : 'propiedad'));
       const plazoMeses = property.financing_plazo_meses || 120;
       setForm({
         title: property.title || '',
@@ -89,6 +89,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         dep_code: property.dep_code || 'YO',
         municipio: property.municipio || 'El Progreso',
         area_varas: property.area_varas || '',
+        area_m2: property.area_m2 || '',
         price: String(property.price || ''),
         discount_price: property.discount_price ? String(property.discount_price) : '',
         financing: property.financing ?? true,
@@ -120,7 +121,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
       setTab('propiedad');
       setForm({
         title: '', departamento: 'Yoro', dep_code: 'YO', municipio: 'El Progreso',
-        area_varas: '', price: '', discount_price: '', financing: true, contado: true,
+        area_varas: '', area_m2: '', price: '', discount_price: '', financing: true, contado: true,
         financing_prima: '20', prima_es_fija: false, prima_monto: '',
         plazo_anios: '10', financing_tasa_anual: '12',
         precio_financiado: '',
@@ -138,6 +139,32 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
   if (!open) return null;
 
   const set = (key: string, value: string | boolean) => setForm({ ...form, [key]: value });
+
+  const handleDimensionsChange = (val: string) => {
+    const regex = /([0-9.]+)\s*[xX*]\s*([0-9.]+)/;
+    const match = val.match(regex);
+    let calculatedM2 = form.area_m2;
+    let calculatedVaras = form.area_varas;
+
+    if (match) {
+      const w = parseFloat(match[1]);
+      const h = parseFloat(match[2]);
+      if (!isNaN(w) && !isNaN(h)) {
+        const m2 = w * h;
+        // In Honduras, 1 m2 is approx 1.43028 varas2
+        const varas = m2 * 1.43028;
+        calculatedM2 = String(parseFloat(m2.toFixed(2)));
+        calculatedVaras = String(Math.round(varas));
+      }
+    }
+    
+    setForm(prev => ({
+      ...prev,
+      dimensions: val,
+      area_m2: calculatedM2,
+      area_varas: calculatedVaras
+    }));
+  };
 
   // ── Theme-aware style helpers ─────────────────────────────
   const bg = isDark ? '#111113' : '#FAF8F3';
@@ -220,7 +247,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
     setUploadStep(null);
 
     try {
-      const backendType = tab === 'lote' ? 'Lote' : tab === 'lotificacion' ? 'Lote' : 'Terreno';
+      const backendType = tab === 'propiedad' ? 'Propiedad' : 'Terreno';
       const propertyType = tab === 'lotificacion' ? 'lotificadora' : 'independiente';
       const paymentMethods: string[] = [];
       if (form.contado) paymentMethods.push('contado');
@@ -238,6 +265,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         dep_code: form.dep_code,
         municipio: form.municipio,
         area_varas: form.area_varas,
+        area_m2: form.area_m2,
         dimensions: form.dimensions,
         total_lots: Number(form.total_lots) || 1,
         available_lots: Number(form.available_lots) || 1,
@@ -408,7 +436,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
                 <span style={labelStyle}>Área (varas²)</span>
                 <input style={inputStyle} value={form.area_varas} onChange={e => set('area_varas', e.target.value)}
@@ -416,22 +444,31 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                   onBlur={e => e.target.style.borderColor = border}
                 />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                <div>
-                  <span style={labelStyle}>Precio (L)</span>
-                  <input style={inputStyle} value={form.price} onChange={e => set('price', e.target.value)}
-                    onFocus={e => e.target.style.borderColor = '#D4B254'}
-                    onBlur={e => e.target.style.borderColor = border}
-                  />
-                </div>
-                <div>
-                  <span style={labelStyle}>Descuento (L)</span>
-                  <input style={inputStyle} value={form.discount_price} onChange={e => set('discount_price', e.target.value)}
-                    placeholder="Opcional"
-                    onFocus={e => e.target.style.borderColor = '#D4B254'}
-                    onBlur={e => e.target.style.borderColor = border}
-                  />
-                </div>
+              <div>
+                <span style={labelStyle}>Área (m²)</span>
+                <input style={inputStyle} value={form.area_m2} onChange={e => set('area_m2', e.target.value)}
+                  placeholder="Autocalculado"
+                  onFocus={e => e.target.style.borderColor = '#D4B254'}
+                  onBlur={e => e.target.style.borderColor = border}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <span style={labelStyle}>Precio (L)</span>
+                <input style={inputStyle} value={form.price} onChange={e => set('price', e.target.value)}
+                  onFocus={e => e.target.style.borderColor = '#D4B254'}
+                  onBlur={e => e.target.style.borderColor = border}
+                />
+              </div>
+              <div>
+                <span style={labelStyle}>Descuento (L)</span>
+                <input style={inputStyle} value={form.discount_price} onChange={e => set('discount_price', e.target.value)}
+                  placeholder="Opcional"
+                  onFocus={e => e.target.style.borderColor = '#D4B254'}
+                  onBlur={e => e.target.style.borderColor = border}
+                />
               </div>
             </div>
 
@@ -441,7 +478,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
               <div style={{ display: 'grid', gridTemplateColumns: tab === 'lotificacion' ? '1fr 1fr' : '1fr', gap: '12px' }}>
                 <div>
                   <span style={labelStyle}>Dimensiones Ej: "14x18m"</span>
-                  <input style={inputStyle} value={form.dimensions} onChange={e => set('dimensions', e.target.value)}
+                  <input style={inputStyle} value={form.dimensions} onChange={e => handleDimensionsChange(e.target.value)}
                     onFocus={e => e.target.style.borderColor = '#D4B254'}
                     onBlur={e => e.target.style.borderColor = border}
                   />

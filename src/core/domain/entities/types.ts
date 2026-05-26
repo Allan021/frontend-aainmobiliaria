@@ -1,7 +1,7 @@
 export interface Property {
   id: string;
   title: string;
-  type: 'Terreno' | 'Lote' | 'Casa' | 'Comercial';
+  type: 'Terreno' | 'Lote' | 'Casa' | 'Comercial' | 'Propiedad';
   property_type?: 'independiente' | 'lotificadora';
   total_lots?: number;
   available_lots?: number;

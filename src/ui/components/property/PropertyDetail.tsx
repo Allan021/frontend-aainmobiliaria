@@ -349,7 +349,10 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
                 gap: 8,
               }}>
                 {[
-                  { label: 'Área', value: `${property.area_varas} · ${property.area_m2}` },
+                  { label: 'Área', value: [
+                    property.area_varas ? `${property.area_varas} v²` : '',
+                    property.area_m2 ? `${property.area_m2} m²` : ''
+                  ].filter(Boolean).join(' · ') || 'N/A' },
                   ...(property.dimensions ? [{ label: 'Dimensiones', value: property.dimensions }] : []),
                   { label: 'Tipo', value: property.type },
                   { label: 'Municipio', value: property.municipio },

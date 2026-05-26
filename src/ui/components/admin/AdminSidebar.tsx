@@ -257,7 +257,6 @@ export function AdminSidebar({
           borderRight: `1px solid ${t.sidebarBorder}`,
           display: 'flex', flexDirection: 'column', flexShrink: 0,
           transition: 'background 0.3s ease, border-color 0.3s ease',
-          zIndex: 40,
         }}
       >
         {/* Brand header */}
