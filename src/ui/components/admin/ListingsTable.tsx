@@ -29,211 +29,151 @@ interface Props {
   m?: M;
 }
 
-function ActionMenu({ property, onEdit, m }: { property: Property; onEdit?: (p: Property) => void; m?: M }) {
-  const [open, setOpen] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
+export function ListingsTable({ properties, onEdit, m }: Props) {
+  const [confirmDelete, setConfirmDelete] = useState<Property | null>(null);
   const deleteProperty = useDeleteProperty();
 
   const handleDelete = async () => {
-    await deleteProperty.mutateAsync(property.id);
-    setDeleting(false);
+    if (!confirmDelete) return;
+    await deleteProperty.mutateAsync(confirmDelete.id);
+    setConfirmDelete(null);
   };
 
+  const themeM = m || {
+    mainBg: '#FAF8F3', mainSurface: '#FFFFFF', mainBorder: '#E6E0D2',
+    mainText: '#111113', mainTextMuted: '#5A5A63', mainTextDim: '#9A9383',
+    mainCardBg: '#FFFFFF', mainTopbarBg: '#FAF8F3',
+  };
+
+  if (properties.length === 0) {
+    return (
+      <div style={{
+        background: themeM.mainCardBg, borderRadius: '1rem', border: `1px solid ${themeM.mainBorder}`,
+        padding: '4rem', textAlign: 'center', color: themeM.mainTextDim, fontSize: '0.875rem'
+      }}>
+        Sin propiedades registradas.
+      </div>
+    );
+  }
+
   return (
-    <div style={{ position: 'relative' }}>
-      <button
-        onClick={(e) => { e.stopPropagation(); setOpen(o => !o); }}
-        style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          color: deleting ? '#D4B254' : (m?.mainTextDim || '#9A9383'),
-          fontSize: '1.25rem', fontWeight: 700, padding: '4px 8px',
-          borderRadius: '0.375rem', lineHeight: 1,
-        }}
-      >{deleting ? '…' : '···'}</button>
+    <div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+        {properties.map((p) => {
+          const thumb = p.images?.[0]?.url;
+          const sc = statusColors[p.status] || statusColors.borrador;
+          const typeLabel = p.type || 'Propiedad';
+          const paymentLabel = p.financing ? 'Financiado' : 'Contado';
 
-      {open && (
-        <>
-          <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
-          <div style={{
-            position: 'absolute', right: 0, top: 'calc(100% + 4px)',
-            background: m?.mainCardBg || '#FFFFFF',
-            border: `1px solid ${m?.mainBorder || '#E6E0D2'}`,
-            borderRadius: '0.625rem', padding: '0.375rem',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 50,
-            minWidth: '156px',
-          }}>
-            <button onClick={() => { onEdit?.(property); setOpen(false); }} style={{
-              display: 'block', width: '100%', padding: '0.5rem 0.75rem',
-              background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: '0.8125rem', fontWeight: 500, textAlign: 'left',
-              color: m?.mainText || '#111113', borderRadius: '0.375rem',
-              fontFamily: 'inherit',
-            }}>Editar</button>
-            <button onClick={() => { window.open(`/propiedad/${property.id}`, '_blank'); setOpen(false); }} style={{
-              display: 'block', width: '100%', padding: '0.5rem 0.75rem',
-              background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: '0.8125rem', fontWeight: 500, textAlign: 'left',
-              color: m?.mainText || '#111113', borderRadius: '0.375rem',
-              fontFamily: 'inherit',
-            }}>Ver en sitio</button>
-            <div style={{ height: 1, background: m?.mainBorder || '#E6E0D2', margin: '3px 0' }} />
-            <button onClick={() => { setOpen(false); setConfirmOpen(true); }} style={{
-              display: 'block', width: '100%', padding: '0.5rem 0.75rem',
-              background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: '0.8125rem', fontWeight: 500, textAlign: 'left',
-              color: '#8C3A2E', borderRadius: '0.375rem',
-              fontFamily: 'inherit',
-            }}>Eliminar</button>
-          </div>
-        </>
-      )}
+          return (
+            <div key={p.id}
+              onClick={() => onEdit?.(p)}
+              style={{
+                background: themeM.mainCardBg, border: `1px solid ${themeM.mainBorder}`, borderRadius: '1rem',
+                overflow: 'hidden', cursor: 'pointer', transition: 'all 0.2s',
+                display: 'flex', flexDirection: 'column', height: '100%',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = '#D4B254')}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = themeM.mainBorder)}
+            >
+              {/* Thumbnail */}
+              <div style={{ height: '160px', background: themeM.mainBorder, position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+                {thumb ? (
+                  <img src={thumb} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '3rem' }}>🏗️</div>
+                )}
+                
+                {/* Badges on Thumbnail */}
+                <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '4px' }}>
+                  <span style={{
+                    padding: '3px 8px', borderRadius: '4px', fontSize: '0.625rem', fontWeight: 700,
+                    letterSpacing: '0.05em', textTransform: 'uppercase',
+                    background: 'rgba(17,17,19,0.65)', color: '#FAF8F3', backdropFilter: 'blur(4px)'
+                  }}>
+                    {typeLabel}
+                  </span>
+                  <span style={{
+                    padding: '3px 8px', borderRadius: '4px', fontSize: '0.625rem', fontWeight: 700,
+                    letterSpacing: '0.05em', textTransform: 'uppercase',
+                    background: p.financing ? 'rgba(184,134,46,0.85)' : 'rgba(74,124,89,0.85)', color: '#FAF8F3', backdropFilter: 'blur(4px)'
+                  }}>
+                    {paymentLabel}
+                  </span>
+                </div>
 
-      {confirmOpen && (
+                <span style={{
+                  position: 'absolute', top: '10px', right: '10px',
+                  padding: '3px 10px', borderRadius: '999px',
+                  fontSize: '0.6875rem', fontWeight: 600,
+                  background: sc.bg, color: sc.text, backdropFilter: 'blur(4px)'
+                }}>
+                  {statusLabels[p.status] || p.status}
+                </span>
+              </div>
+
+              {/* Content */}
+              <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <div style={{ fontSize: '1rem', fontWeight: 700, color: themeM.mainText, marginBottom: '4px', lineBreak: 'anywhere' }}>
+                  {p.title}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: themeM.mainTextDim, marginBottom: '1.25rem' }}>
+                  📍 {p.municipio || 'N/A'}, {p.departamento || p.dep_code || 'N/A'}
+                </div>
+
+                {/* Bottom space spacer to push buttons down */}
+                <div style={{ flex: 1 }} />
+
+                {/* Price and Actions */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <div style={{ fontSize: '1.125rem', fontWeight: 800, color: themeM.mainText }}>
+                    {formatPrice(p.price, p.currency || 'L')}
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button onClick={e => { e.stopPropagation(); window.open(`/propiedad/${p.id}`, '_blank'); }} style={{
+                      padding: '5px 12px', borderRadius: '0.375rem', fontSize: '11px', fontWeight: 600,
+                      background: themeM.mainSurface, border: `1px solid ${themeM.mainBorder}`,
+                      color: themeM.mainTextMuted, cursor: 'pointer', fontFamily: 'inherit',
+                      display: 'flex', alignItems: 'center', gap: 4,
+                    }} title="Ver en web">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+                      </svg>
+                      Web
+                    </button>
+                    <button onClick={e => { e.stopPropagation(); onEdit?.(p); }} style={{
+                      padding: '5px 12px', borderRadius: '0.375rem', fontSize: '11px', fontWeight: 600,
+                      background: themeM.mainSurface, border: `1px solid ${themeM.mainBorder}`,
+                      color: themeM.mainTextMuted, cursor: 'pointer', fontFamily: 'inherit',
+                    }}>Editar</button>
+                    <button onClick={e => { e.stopPropagation(); setConfirmDelete(p); }} style={{
+                      padding: '5px', borderRadius: '0.375rem', fontSize: '11px', fontWeight: 600,
+                      background: 'none', border: `1px solid rgba(140,58,46,0.2)`,
+                      color: '#8C3A2E', cursor: 'pointer', fontFamily: 'inherit',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }} title="Eliminar propiedad">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                        <path d="M10 11v6M14 11v6" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {confirmDelete && (
         <ConfirmModal
-          title={`¿Eliminar "${property.title}"?`}
+          title={`¿Eliminar "${confirmDelete.title}"?`}
           message="Si fue publicada en Facebook, también se eliminará ese post. Esta acción no se puede deshacer."
           onConfirm={handleDelete}
-          onCancel={() => setConfirmOpen(false)}
-          m={m}
+          onCancel={() => setConfirmDelete(null)}
+          m={themeM}
         />
       )}
-    </div>
-  );
-}
-
-export function ListingsTable({ properties, onEdit, m }: Props) {
-  const border = `1px solid ${m?.mainBorder || '#E6E0D2'}`;
-  const thStyle: React.CSSProperties = {
-    padding: '0.75rem 1rem', fontSize: '0.625rem', fontWeight: 600,
-    letterSpacing: '0.14em', textTransform: 'uppercase', color: '#D4B254',
-    borderBottom: border, textAlign: 'left', whiteSpace: 'nowrap',
-  };
-  const tdStyle: React.CSSProperties = {
-    padding: '0.875rem 1rem', fontSize: '0.8125rem',
-    color: m?.mainText || '#111113', borderBottom: border,
-  };
-
-  return (
-    <div style={{
-      background: m?.mainCardBg || '#FFFFFF', borderRadius: '0.875rem',
-      border, overflow: 'hidden',
-      transition: 'background 0.3s ease, border-color 0.3s ease',
-    }}>
-      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
-          <thead>
-            <tr style={{ background: m?.mainCardBg || '#FFFFFF' }}>
-              <th style={{ ...thStyle, width: 48, paddingRight: 0 }}></th>
-              <th style={thStyle}>Propiedad</th>
-              <th style={thStyle}>Depto.</th>
-              <th style={{ ...thStyle, textAlign: 'right' }}>Precio</th>
-              <th style={thStyle}>Pago</th>
-              <th style={thStyle}>Estado</th>
-              <th style={{ ...thStyle, textAlign: 'right', width: 48 }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {properties.map((r, idx) => {
-              const thumb = r.images?.[0]?.url;
-              const sc = statusColors[r.status] || statusColors.borrador;
-              const isLast = idx === properties.length - 1;
-              return (
-                <tr key={r.id}
-                  onClick={() => onEdit?.(r)}
-                  style={{ cursor: 'pointer', transition: 'background 0.12s' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = m?.mainSurface === m?.mainCardBg ? (m?.mainBorder ? 'rgba(212,178,84,0.04)' : '#F9F6EE') : 'rgba(212,178,84,0.04)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                >
-                  {/* Thumbnail */}
-                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, paddingRight: 0, width: 48, verticalAlign: 'middle' }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: '0.375rem', overflow: 'hidden',
-                      background: m?.mainBorder || '#E6E0D2', flexShrink: 0,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      {thumb ? (
-                        <img src={thumb} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <span style={{ fontSize: '1rem' }}>🏗️</span>
-                      )}
-                    </div>
-                  </td>
-
-                  {/* Title */}
-                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, fontWeight: 600, maxWidth: 220 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0 }}>
-                        {r.title}
-                      </div>
-                      <a
-                        href={`/propiedad/${r.id}`}
-                        target="_blank"
-                        rel="noopener"
-                        onClick={e => e.stopPropagation()}
-                        title="Ver en web"
-                        style={{
-                          color: m?.mainTextDim || '#9A9383', flexShrink: 0,
-                          display: 'flex', alignItems: 'center',
-                          opacity: 0.5, transition: 'opacity 0.15s',
-                        }}
-                        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-                        onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                      </a>
-                    </div>
-                    {r.municipio && (
-                      <div style={{ fontSize: '0.6875rem', color: m?.mainTextDim || '#9A9383', marginTop: '2px' }}>
-                        {r.municipio}
-                      </div>
-                    )}
-                  </td>
-
-                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, color: m?.mainTextMuted || '#5A5A63' }}>
-                    {r.dep_code}
-                  </td>
-
-                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, textAlign: 'right', fontWeight: 600, fontFeatureSettings: "'tnum' 1", whiteSpace: 'nowrap' }}>
-                    {formatPrice(r.price, r.currency)}
-                  </td>
-
-                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, color: m?.mainTextMuted || '#5A5A63' }}>
-                    {r.financing ? 'Financiado' : 'Contado'}
-                  </td>
-
-                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border }}>
-                    <span style={{
-                      display: 'inline-flex', alignItems: 'center',
-                      padding: '3px 10px', borderRadius: '999px',
-                      fontSize: '0.6875rem', fontWeight: 600,
-                      background: sc.bg, color: sc.text,
-                    }}>
-                      {statusLabels[r.status] || r.status}
-                    </span>
-                  </td>
-
-                  <td style={{ ...tdStyle, borderBottom: isLast ? 'none' : border, textAlign: 'right' }}
-                    onClick={e => e.stopPropagation()}>
-                    <ActionMenu property={r} onEdit={onEdit} m={m} />
-                  </td>
-                </tr>
-              );
-            })}
-
-            {properties.length === 0 && (
-              <tr>
-                <td colSpan={7} style={{
-                  padding: '3rem', textAlign: 'center',
-                  color: m?.mainTextDim || '#9A9383', fontSize: '0.875rem',
-                }}>Sin propiedades</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }

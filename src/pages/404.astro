@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Header } from '../ui/components/layout/Header';
+import { Footer } from '../ui/components/layout/Footer';
+import { PropertyDetailFallback } from '../ui/components/property/PropertyDetailFallback';
+import { WhatsAppModal } from '../ui/components/property/WhatsAppModal';
+---
+
+<BaseLayout title="Cargando propiedad... — A&A Inmobiliaria">
+  <div id="not-found-ui">
+    <Header client:load currentRoute="" />
+    <div style="max-width: 600px; margin: 8rem auto; text-align: center; padding: 0 1.5rem; font-family: sans-serif;">
+      <h1 style="font-size: 5rem; font-weight: 800; color: #111113; margin: 0; letter-spacing: -0.04em;">404</h1>
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: #36363D; margin: 1rem 0 2rem; letter-spacing: -0.02em;">Página no encontrada</h2>
+      <p style="color: #6B6459; line-height: 1.6; margin-bottom: 2.5rem;">
+        Lo sentimos, la página que buscas no existe o ha sido movida.
+      </p>
+      <a href="/" style="display: inline-block; background: #D4B254; color: #111113; padding: 0.75rem 1.75rem; border-radius: 999px; text-decoration: none; font-weight: 600; transition: background 0.2s;">
+        Volver al inicio
+      </a>
+    </div>
+    <Footer />
+  </div>
+
+  <div id="dynamic-detail-ui" style="display: none;">
+    <Header client:load currentRoute="catalog" />
+    <PropertyDetailFallback client:only="react" />
+    <Footer />
+    <WhatsAppModal client:visible open={false} onClose={() => {}} />
+  </div>
+
+  <script is:inline>
+    (function() {
+      const path = window.location.pathname;
+      const match = path.match(/^\/propiedad\/([a-zA-Z0-9-]+)\/?$/);
+      if (match) {
+        document.getElementById('not-found-ui').style.display = 'none';
+        document.getElementById('dynamic-detail-ui').style.display = 'block';
+      } else {
+        // If not a property page, update the title to standard 404
+        document.title = 'Página no encontrada — A&A Inmobiliaria';
+      }
+    })();
+  </script>
+</BaseLayout>
