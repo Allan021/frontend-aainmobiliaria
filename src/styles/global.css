@@ -1361,7 +1361,8 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
 }
 
@@ -1431,7 +1432,8 @@ body {
   height: 100%;
   object-fit: contain;
   transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
 }
 .photo-desktop-grid__main:hover img { transform: scale(1.03); }
@@ -1453,7 +1455,8 @@ body {
   height: 100%;
   object-fit: contain;
   transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
 }
 .photo-desktop-grid__cell:hover img { transform: scale(1.06); }

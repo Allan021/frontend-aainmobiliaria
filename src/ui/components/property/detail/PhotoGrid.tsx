@@ -51,7 +51,7 @@ function MobileSlider({ images, onImageClick }: PhotoGridProps) {
               loading={i === 0 ? 'eager' : 'lazy'}
               decoding="async"
               draggable={false}
-              style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', zIndex: 1 }}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', zIndex: 1 }}
             />
           </div>
         ))}
