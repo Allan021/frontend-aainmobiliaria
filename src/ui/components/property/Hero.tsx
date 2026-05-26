@@ -6,6 +6,7 @@ import { SelectField } from '../shared/SelectField';
 interface Props {
   onWhatsApp?: () => void;
   onExplore?: (filters?: { dep?: string; pay?: string; type?: string }) => void;
+  theme?: 'light' | 'dark';
 }
 
 const STATS = [
@@ -97,7 +98,7 @@ const TYPE_OPTIONS = [
   { value: 'casa', label: 'Casa' },
 ];
 
-function SearchBar({ onSearch }: { onSearch: (f: { dep?: string; pay?: string; type?: string }) => void }) {
+function SearchBar({ onSearch, theme = 'light' }: { onSearch: (f: { dep?: string; pay?: string; type?: string }) => void; theme?: 'light' | 'dark' }) {
   const [dep, setDep] = useState('');
   const [pay, setPay] = useState('');
   const [type, setType] = useState('');
@@ -122,15 +123,15 @@ function SearchBar({ onSearch }: { onSearch: (f: { dep?: string; pay?: string; t
       }}>
         <div style={{ flex: 1.2, padding: '0.9rem 1.4rem', borderRight: divider, minWidth: 0 }}>
           <FieldLabel icon={PIN_ICON} label="Departamento" />
-          <SelectField options={depOptions} value={dep} onChange={setDep} placeholder="Todos los departamentos" theme="light" fontSize="0.9375rem" />
+          <SelectField options={depOptions} value={dep} onChange={setDep} placeholder="Todos los departamentos" theme={theme} fontSize="0.9375rem" />
         </div>
         <div style={{ flex: 1, padding: '0.9rem 1.4rem', borderRight: divider, minWidth: 0 }}>
           <FieldLabel icon={CARD_ICON} label="Tipo de pago" />
-          <SelectField options={PAY_OPTIONS} value={pay} onChange={setPay} placeholder="Cualquier modalidad" theme="light" fontSize="0.9375rem" />
+          <SelectField options={PAY_OPTIONS} value={pay} onChange={setPay} placeholder="Cualquier modalidad" theme={theme} fontSize="0.9375rem" />
         </div>
         <div style={{ flex: 1, padding: '0.9rem 1.4rem', borderRight: divider, minWidth: 0 }}>
           <FieldLabel icon={HOME_ICON} label="Propiedad" />
-          <SelectField options={TYPE_OPTIONS} value={type} onChange={setType} placeholder="Todo tipo" theme="light" fontSize="0.9375rem" />
+          <SelectField options={TYPE_OPTIONS} value={type} onChange={setType} placeholder="Todo tipo" theme={theme} fontSize="0.9375rem" />
         </div>
         <div style={{ padding: '0.5rem', display: 'flex', alignItems: 'center' }}>
           <button
@@ -163,16 +164,16 @@ function SearchBar({ onSearch }: { onSearch: (f: { dep?: string; pay?: string; t
       }}>
         <div style={{ padding: '0.875rem 1.25rem', borderBottom: divider }}>
           <FieldLabel icon={PIN_ICON} label="Departamento" />
-          <SelectField options={depOptions} value={dep} onChange={setDep} placeholder="Todos los departamentos" theme="light" fontSize="0.875rem" />
+          <SelectField options={depOptions} value={dep} onChange={setDep} placeholder="Todos los departamentos" theme={theme} fontSize="0.875rem" />
         </div>
         <div className="hero-filter-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: divider }}>
           <div style={{ padding: '0.875rem 1.25rem', borderRight: divider }}>
             <FieldLabel icon={CARD_ICON} label="Tipo de pago" />
-            <SelectField options={PAY_OPTIONS} value={pay} onChange={setPay} placeholder="Cualquier tipo" theme="light" fontSize="0.875rem" />
+            <SelectField options={PAY_OPTIONS} value={pay} onChange={setPay} placeholder="Cualquier tipo" theme={theme} fontSize="0.875rem" />
           </div>
           <div style={{ padding: '0.875rem 1.25rem' }}>
             <FieldLabel icon={HOME_ICON} label="Propiedad" />
-            <SelectField options={TYPE_OPTIONS} value={type} onChange={setType} placeholder="Todo tipo" theme="light" fontSize="0.875rem" />
+            <SelectField options={TYPE_OPTIONS} value={type} onChange={setType} placeholder="Todo tipo" theme={theme} fontSize="0.875rem" />
           </div>
         </div>
         <div style={{ padding: '0.75rem 1.25rem' }}>
@@ -200,7 +201,7 @@ function SearchBar({ onSearch }: { onSearch: (f: { dep?: string; pay?: string; t
   );
 }
 
-export function Hero({ onWhatsApp, onExplore }: Props) {
+export function Hero({ onWhatsApp, onExplore, theme = 'light' }: Props) {
   const contentRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
@@ -388,7 +389,7 @@ export function Hero({ onWhatsApp, onExplore }: Props) {
 
         {/* Search bar */}
         <div ref={searchRef} style={{ opacity: 0, width: '100%', display: 'flex', justifyContent: 'center', padding: '0 1rem' }}>
-          <SearchBar onSearch={handleExplore} />
+          <SearchBar onSearch={handleExplore} theme={theme} />
         </div>
 
         {/* WhatsApp link */}

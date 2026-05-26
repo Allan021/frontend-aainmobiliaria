@@ -4,4 +4,6 @@ export interface AuthPort {
   login(email: string, password: string): Promise<AuthResponse>;
   register(email: string, password: string, name: string): Promise<AuthResponse>;
   me(): Promise<User>;
+  listUsers(): Promise<User[]>;
+  createTeamMember(email: string, password: string, name: string): Promise<User>;
 }

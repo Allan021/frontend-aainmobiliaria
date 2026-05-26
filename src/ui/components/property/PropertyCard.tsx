@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { formatPrice, type Property } from '../../../core/domain/entities/types';
+import { formatPrice, cleanTitle, type Property } from '../../../core/domain/entities/types';
 import { WhatsAppButton } from '../shared/WhatsAppButton';
 import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
 
@@ -217,7 +217,7 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
           display: '-webkit-box', WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical', overflow: 'hidden',
         }}>
-          {property.title}
+          {cleanTitle(property.title)}
         </h3>
 
         {/* Area */}

@@ -6,6 +6,7 @@ import { useCreateLead } from '../../hooks/useLeads';
 import { formatPrice, type Property } from '../../../core/domain/entities/types';
 import { QueryProvider } from '../../providers/QueryProvider';
 import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
+import { useSettings } from '../../hooks/useSettings';
 
 interface Props {
   open: boolean;
@@ -20,6 +21,7 @@ function WhatsAppModalInner({ open: propOpen, onClose: propOnClose, property: pr
   const [stage, setStage] = useState<'form' | 'success'>('form');
   const [focusedField, setFocusedField] = useState<'name' | 'email' | null>(null);
   const createLead = useCreateLead();
+  const { data: settings } = useSettings();
 
   useEffect(() => {
     setIsOpen(propOpen);
@@ -64,7 +66,7 @@ function WhatsAppModalInner({ open: propOpen, onClose: propOnClose, property: pr
       property_title: activeProperty?.title,
     });
 
-    const phone = '50499383699';
+    const phone = settings?.whatsapp_phone || '50499383699';
     const propertyUrl = activeProperty ? `https://www.aabienes.com/propiedad/${activeProperty.id}` : '';
     const text = activeProperty
       ? `Hola A&A Inmobiliaria, estoy interesado en la propiedad: "${activeProperty.title}" (${propertyUrl}). Mi nombre es ${form.name}.`

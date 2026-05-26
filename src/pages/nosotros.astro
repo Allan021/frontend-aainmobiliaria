@@ -12,7 +12,7 @@ import { WhatsAppModal } from '../ui/components/property/WhatsAppModal';
   canonical="https://www.aabienes.com/nosotros"
 >
   <Header client:load currentRoute="about" />
-  <AboutPage />
+  <AboutPage client:load />
   <Footer />
   <WhatsAppFAB client:visible />
   <WhatsAppModal client:load open={false} onClose={() => {}} />

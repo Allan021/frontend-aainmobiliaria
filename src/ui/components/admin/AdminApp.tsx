@@ -13,9 +13,11 @@ import { useLeads } from '../../hooks/useLeads';
 import { useSales } from '../../hooks/useSales';
 import { api } from '../../../infrastructure/api/client';
 import { LotificacionesView } from './LotificacionesView';
+import { useSettings, useUpdateSettings } from '../../hooks/useSettings';
+import { useUsers, useCreateTeamMember } from '../../hooks/useAuth';
 
 /* ── Hash routing ───────────────────────────────────── */
-const VALID_ROUTES = ['dashboard', 'catalog', 'leads', 'sales', 'financing'];
+const VALID_ROUTES = ['dashboard', 'catalog', 'leads', 'sales', 'financing', 'team', 'settings'];
 
 function getRouteFromHash(): string {
   if (typeof window === 'undefined') return 'dashboard';
@@ -384,6 +386,306 @@ function SalesView({ onToggleSidebar, isOpen, m }: { onToggleSidebar: () => void
   );
 }
 
+/* ── Settings View ──────────────────────────────────── */
+function SettingsView({ onToggleSidebar, isOpen, m }: {
+  onToggleSidebar: () => void; isOpen: boolean; m: ReturnType<typeof getMainTheme>;
+}) {
+  const { data: settings, isLoading } = useSettings();
+  const updateSettings = useUpdateSettings();
+  const [whatsappPhone, setWhatsappPhone] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    if (settings?.whatsapp_phone) {
+      setWhatsappPhone(settings.whatsapp_phone);
+    }
+  }, [settings]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuccess(false);
+    setErrorMsg('');
+
+    if (!whatsappPhone) {
+      setErrorMsg('El número de WhatsApp es requerido');
+      return;
+    }
+
+    updateSettings.mutate({ whatsapp_phone: whatsappPhone }, {
+      onSuccess: () => {
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
+      },
+      onError: (err: any) => {
+        setErrorMsg(err?.message || 'Error al guardar la configuración');
+      }
+    });
+  };
+
+  const cardStyle = {
+    background: m.mainCardBg, borderRadius: '0.875rem', border: `1px solid ${m.mainBorder}`,
+    padding: '2rem', maxWidth: '600px', width: '100%',
+    transition: 'background 0.3s ease, border-color 0.3s ease',
+  };
+
+  return (
+    <div>
+      <Topbar subtitle="Configuración general" title="Ajustes del Sitio" onToggleSidebar={onToggleSidebar} isOpen={isOpen} m={m} />
+      <div className="admin-content-area">
+        <div style={cardStyle}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: m.mainText, margin: '0 0 0.5rem 0' }}>
+                Contacto de WhatsApp
+              </h3>
+              <p style={{ fontSize: '0.8125rem', color: m.mainTextMuted, margin: 0, lineHeight: 1.4 }}>
+                Configura el número de teléfono que utilizarán los botones de contacto rápido y envío de información de toda la plataforma web.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: m.mainTextDim }}>
+                Número de Teléfono (con código de país)
+              </label>
+              <input
+                type="text"
+                value={whatsappPhone}
+                onChange={e => setWhatsappPhone(e.target.value)}
+                placeholder="50499383699"
+                disabled={isLoading}
+                style={{
+                  width: '100%', height: '40px', padding: '0 0.75rem', boxSizing: 'border-box',
+                  borderRadius: 8, border: `1px solid ${m.mainBorder}`,
+                  background: m.mainBg, color: m.mainText,
+                  fontSize: '0.875rem', fontFamily: 'inherit', outline: 'none',
+                }}
+              />
+              <span style={{ fontSize: '0.75rem', color: m.mainTextDim }}>
+                Ejemplo: <strong>50499383699</strong> (504 es el código de Honduras, seguido de los 8 dígitos).
+              </span>
+            </div>
+
+            {errorMsg && (
+              <div style={{ fontSize: '0.8125rem', color: '#E57373', fontWeight: 500 }}>
+                ⚠️ {errorMsg}
+              </div>
+            )}
+
+            {success && (
+              <div style={{ fontSize: '0.8125rem', color: '#81C784', fontWeight: 500 }}>
+                ✓ Ajustes guardados correctamente.
+              </div>
+            )}
+
+            <Button
+              variant="primary"
+              size="md"
+              type="submit"
+              disabled={updateSettings.isPending || isLoading}
+              style={{ alignSelf: 'flex-start' }}
+            >
+              {updateSettings.isPending ? 'Guardando…' : 'Guardar Ajustes'}
+            </Button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Team View ──────────────────────────────────────── */
+function TeamView({ onToggleSidebar, isOpen, m }: {
+  onToggleSidebar: () => void; isOpen: boolean; m: ReturnType<typeof getMainTheme>;
+}) {
+  const { data: users, isLoading: usersLoading } = useUsers();
+  const createTeamMember = useCreateTeamMember();
+  
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const [formOpen, setFormOpen] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuccessMsg('');
+    setErrorMsg('');
+
+    if (!name || !email || !password) {
+      setErrorMsg('Todos los campos son requeridos');
+      return;
+    }
+
+    createTeamMember.mutate({ name, email, password }, {
+      onSuccess: () => {
+        setSuccessMsg(`¡Miembro "${name}" agregado! Se le ha enviado un correo con sus credenciales.`);
+        setName('');
+        setEmail('');
+        setPassword('');
+        setFormOpen(false);
+        setTimeout(() => setSuccessMsg(''), 5000);
+      },
+      onError: (err: any) => {
+        setErrorMsg(err?.message || 'Error al agregar el miembro del equipo');
+      }
+    });
+  };
+
+  const cardStyle = {
+    background: m.mainCardBg, borderRadius: '0.875rem', border: `1px solid ${m.mainBorder}`,
+    transition: 'background 0.3s ease, border-color 0.3s ease',
+  };
+
+  return (
+    <div>
+      <Topbar
+        subtitle="Administración de personal"
+        title="Equipo de Trabajo"
+        action={
+          <Button variant="primary" size="md" onClick={() => setFormOpen(!formOpen)}>
+            {formOpen ? 'Cancelar' : '+ Agregar miembro'}
+          </Button>
+        }
+        onToggleSidebar={onToggleSidebar} isOpen={isOpen} m={m}
+      />
+      <div className="admin-content-area" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        
+        {successMsg && (
+          <div style={{ padding: '1rem', borderRadius: 8, background: 'rgba(74,124,89,0.12)', border: '1px solid rgba(74,124,89,0.2)', color: '#6EBF7B', fontSize: '0.875rem', fontWeight: 500 }}>
+            {successMsg}
+          </div>
+        )}
+
+        {/* Add team member form drawer/card */}
+        {formOpen && (
+          <div style={{ ...cardStyle, padding: '1.5rem', maxWidth: '600px' }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: m.mainText, margin: '0 0 1rem 0' }}>
+              Registrar nuevo miembro
+            </h3>
+            <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: m.mainTextMuted }}>Nombre completo</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Juan Pérez"
+                  style={{
+                    width: '100%', height: '36px', padding: '0 0.75rem', boxSizing: 'border-box',
+                    borderRadius: 6, border: `1px solid ${m.mainBorder}`,
+                    background: m.mainBg, color: m.mainText,
+                    fontSize: '0.8125rem', fontFamily: 'inherit', outline: 'none',
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: m.mainTextMuted }}>Correo electrónico</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="juan@aainmobiliaria.com"
+                  style={{
+                    width: '100%', height: '36px', padding: '0 0.75rem', boxSizing: 'border-box',
+                    borderRadius: 6, border: `1px solid ${m.mainBorder}`,
+                    background: m.mainBg, color: m.mainText,
+                    fontSize: '0.8125rem', fontFamily: 'inherit', outline: 'none',
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: m.mainTextMuted }}>Contraseña temporal</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  style={{
+                    width: '100%', height: '36px', padding: '0 0.75rem', boxSizing: 'border-box',
+                    borderRadius: 6, border: `1px solid ${m.mainBorder}`,
+                    background: m.mainBg, color: m.mainText,
+                    fontSize: '0.8125rem', fontFamily: 'inherit', outline: 'none',
+                  }}
+                />
+                <span style={{ fontSize: '0.6875rem', color: m.mainTextDim }}>
+                  Esta contraseña se le enviará en un correo de bienvenida automático al registrarse.
+                </span>
+              </div>
+
+              {errorMsg && (
+                <div style={{ fontSize: '0.8125rem', color: '#E57373', fontWeight: 500 }}>
+                  ⚠️ {errorMsg}
+                </div>
+              )}
+
+              <Button
+                variant="primary"
+                size="md"
+                type="submit"
+                disabled={createTeamMember.isPending}
+                style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}
+              >
+                {createTeamMember.isPending ? 'Agregando…' : 'Crear Cuenta'}
+              </Button>
+            </form>
+          </div>
+        )}
+
+        {/* Team list table */}
+        <div style={{ ...cardStyle, padding: '1.5rem', overflowX: 'auto' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: m.mainText, margin: '0 0 1rem 0' }}>
+            Miembros activos
+          </h3>
+          {usersLoading ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: m.mainTextDim, fontSize: '0.875rem' }}>
+              Cargando equipo…
+            </div>
+          ) : !users || users.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', color: m.mainTextDim, fontSize: '0.875rem' }}>
+              No hay usuarios en el equipo
+            </div>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '500px' }}>
+              <thead>
+                <tr style={{ borderBottom: `1px solid ${m.mainBorder}`, color: m.mainTextMuted, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>Nombre</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>Correo electrónico</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>Rol</th>
+                  <th style={{ padding: '0.75rem 0.5rem' }}>Fecha de Registro</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u.id} style={{ borderBottom: `1px solid ${m.mainBorder}`, fontSize: '0.8125rem', color: m.mainText }}>
+                    <td style={{ padding: '0.875rem 0.5rem', fontWeight: 600 }}>{u.name}</td>
+                    <td style={{ padding: '0.875rem 0.5rem', color: m.mainTextMuted }}>{u.email}</td>
+                    <td style={{ padding: '0.875rem 0.5rem' }}>
+                      <span style={{
+                        padding: '2px 8px', borderRadius: 4, background: 'rgba(212,178,84,0.12)', color: '#D4B254',
+                        fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.02em'
+                      }}>
+                        {u.role}
+                      </span>
+                    </td>
+                    <td style={{ padding: '0.875rem 0.5rem', color: m.mainTextDim }}>
+                      {u.created_at ? new Date(u.created_at).toLocaleDateString('es-HN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Admin Content ──────────────────────────────────── */
 function AdminContent() {
   const [route, setRoute] = useState(getRouteFromHash);
@@ -467,6 +769,8 @@ function AdminContent() {
             <div className="admin-content-area" style={{ color: m.mainTextDim }}>Esta sección estará disponible pronto.</div>
           </div>
         )}
+        {route === 'team' && <TeamView {...sharedProps} />}
+        {route === 'settings' && <SettingsView {...sharedProps} />}
       </main>
 
       <NewPropertyDrawer

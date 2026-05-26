@@ -5,6 +5,7 @@ import { SelectField } from '../shared/SelectField';
 interface FilterBarProps {
   filters: { dep?: string; pay?: string; type?: string };
   setFilters: (f: { dep?: string; pay?: string; type?: string }) => void;
+  theme?: 'light' | 'dark';
 }
 
 const TYPE_FILTERS = [
@@ -113,7 +114,7 @@ function CategoryChip({
 }
 
 
-export function FilterBar({ filters, setFilters }: FilterBarProps) {
+export function FilterBar({ filters, setFilters, theme = 'light' }: FilterBarProps) {
   const { departamentos } = useHondurasData();
   const [activeType, setActiveType] = useState<string>(() => {
     if (filters.pay === 'financing') return 'financing';
@@ -169,7 +170,7 @@ export function FilterBar({ filters, setFilters }: FilterBarProps) {
             value={filters.dep || ''}
             onChange={v => setFilters({ ...filters, dep: v || undefined })}
             placeholder="Todos los departamentos"
-            theme="light"
+            theme={theme}
             fontSize="0.8125rem"
             fontWeight={filters.dep ? 600 : 500}
           />

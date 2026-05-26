@@ -109,6 +109,7 @@ export interface User {
   email: string;
   name: string;
   role: string;
+  created_at?: string;
 }
 
 export interface AuthResponse {
@@ -162,3 +163,10 @@ export const DEPARTAMENTOS: Departamento[] = [
 export function formatPrice(n: number, currency = 'L'): string {
   return `${currency} ${n.toLocaleString('en-US')}`;
 }
+
+export function cleanTitle(title: string): string {
+  if (!title) return '';
+  const emojiRegex = /^[\s\p{Emoji_Presentation}\p{Extended_Pictographic}]+|[\s\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/gu;
+  return title.replace(emojiRegex, '').trim();
+}
+

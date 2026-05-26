@@ -14,4 +14,12 @@ export const authAdapter: AuthPort = {
   me() {
     return api.get<User>('/auth/me');
   },
+
+  listUsers() {
+    return api.get<User[]>('/auth/users');
+  },
+
+  createTeamMember(email: string, password: string, name: string) {
+    return api.post<User>('/auth/users', { email, password, name });
+  },
 };

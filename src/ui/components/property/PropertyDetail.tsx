@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { formatPrice, type Property } from '../../../core/domain/entities/types';
+import { formatPrice, cleanTitle, type Property } from '../../../core/domain/entities/types';
 import { useCreateLead } from '../../hooks/useLeads';
 import { QueryProvider } from '../../providers/QueryProvider';
+import { useSettings } from '../../hooks/useSettings';
 
 // Modular Subcomponents
 import { PhotoGrid } from './detail/PhotoGrid';
@@ -51,6 +52,7 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
   const [leadModalOpen, setLeadModalOpen] = useState(false);
 
   const createLead = useCreateLead();
+  const { data: settings } = useSettings();
 
   /** Opens the lead capture modal instead of going straight to WhatsApp */
   const handleWhatsAppClick = () => {
@@ -70,7 +72,7 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
     });
 
     // Open WhatsApp with personalized message
-    const phone = '50499383699';
+    const phone = settings?.whatsapp_phone || '50499383699';
     const propertyUrl = `https://www.aabienes.com/propiedad/${property.id}`;
     const text = `Hola A&A Inmobiliaria, soy ${name}. Estoy interesado en la propiedad: "${property.title}" (${propertyUrl}). Me gustaría recibir más información.`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
@@ -168,7 +170,7 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
               { label: 'Inicio', href: '/' },
               { label: 'Propiedades', href: '/propiedades' },
               { label: property.departamento },
-              { label: property.title.slice(0, 28) + (property.title.length > 28 ? '…' : '') },
+              { label: cleanTitle(property.title).slice(0, 28) + (cleanTitle(property.title).length > 28 ? '…' : '') },
             ].map((item, i, arr) => (
               <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 {i > 0 && <span style={{ color: 'var(--main-text-dim, #C9C2B1)', fontSize: '0.8125rem' }}>/</span>}
@@ -239,11 +241,11 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
           </div>
 
           <h1 style={{
-            fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700,
+            fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 700,
             color: 'var(--main-text, #111113)', letterSpacing: '-0.03em', lineHeight: 1.1,
             margin: '0 0 0.75rem',
           }}>
-            {property.title}
+            {cleanTitle(property.title)}
           </h1>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--main-text-muted, #5A5A63)', fontSize: '0.9375rem' }}>

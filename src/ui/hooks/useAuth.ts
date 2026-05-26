@@ -41,3 +41,21 @@ export function useLogout() {
     window.location.href = '/admin/login';
   };
 }
+
+export function useUsers() {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: () => authAdapter.listUsers(),
+  });
+}
+
+export function useCreateTeamMember() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ email, password, name }: { email: string; password: string; name: string }) =>
+      authAdapter.createTeamMember(email, password, name),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+}

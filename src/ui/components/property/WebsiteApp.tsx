@@ -10,6 +10,7 @@ import { WhatsAppModal } from './WhatsAppModal';
 import { WhatsAppButton } from '../shared/WhatsAppButton';
 import { useProperties } from '../../hooks/useProperties';
 import type { Property } from '../../../core/domain/entities/types';
+import { useSettings } from '../../hooks/useSettings';
 
 /* ── Public theme hook ──────────────────────────────────────── */
 function usePublicTheme() {
@@ -407,10 +408,12 @@ function CatalogViewInner({
   initialFilters,
   onOpen,
   onWhatsApp,
+  theme = 'light',
 }: {
   initialFilters?: { dep?: string; pay?: string; type?: string };
   onOpen?: (p: Property) => void;
   onWhatsApp?: (p: Property) => void;
+  theme?: 'light' | 'dark';
 }) {
   const [filters, setFilters] = useState<{ dep?: string; pay?: string; type?: string }>(initialFilters || {});
   const { data, isLoading } = useProperties({ dep: filters.dep, pay: filters.pay });
@@ -451,8 +454,8 @@ function CatalogViewInner({
         </div>
 
         {/* Filter bar */}
-        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E6E0D2', padding: '1.25rem 1.5rem', marginBottom: '2rem', boxShadow: '0 2px 8px rgba(17,17,19,0.04)' }}>
-          <FilterBar filters={filters} setFilters={setFilters} />
+        <div style={{ background: 'var(--main-card-bg, #fff)', borderRadius: 16, border: '1px solid var(--main-border, #E6E0D2)', padding: '1.25rem 1.5rem', marginBottom: '2rem', boxShadow: '0 2px 8px rgba(17,17,19,0.04)' }}>
+          <FilterBar filters={filters} setFilters={setFilters} theme={theme} />
         </div>
 
         {/* Count */}
@@ -495,6 +498,7 @@ export function CatalogView(props: {
   initialFilters?: { dep?: string; pay?: string; type?: string };
   onOpen?: (p: Property) => void;
   onWhatsApp?: (p: Property) => void;
+  theme?: 'light' | 'dark';
 }) {
   return (
     <QueryProvider>
@@ -504,11 +508,23 @@ export function CatalogView(props: {
 }
 
 /* ── About page ─────────────────────────────────────────────── */
-export function AboutPage() {
+function AboutPageInner() {
   const heroRef = useRef<HTMLDivElement>(null!);
   const processRef = useRef<HTMLElement>(null!);
   useReveal(heroRef);
   useReveal(processRef);
+
+  const { data: settings } = useSettings();
+  const rawPhone = settings?.whatsapp_phone || '50499383699';
+  const displayPhone = rawPhone.startsWith('504') && rawPhone.length === 11
+    ? `+504 ${rawPhone.slice(3, 7)}-${rawPhone.slice(7)}`
+    : rawPhone.length === 8
+      ? `+504 ${rawPhone.slice(0, 4)}-${rawPhone.slice(4)}`
+      : rawPhone.startsWith('+')
+        ? rawPhone
+        : `+${rawPhone}`;
+
+  const telLink = rawPhone.startsWith('+') ? rawPhone : `+${rawPhone}`;
 
   const steps = [
     {
@@ -540,12 +556,9 @@ export function AboutPage() {
         </p>
       </div>
 
-      {/* Process — dark section */}
-      <section ref={processRef} style={{ background: '#111113', padding: '5rem 1.5rem' }}>
-        <div style={{ maxWidth: 920, margin: '0 auto' }}>
-          <h2 className="reveal-child" style={{ opacity: 0, fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)', fontWeight: 700, color: '#FAF8F3', letterSpacing: '-0.025em', margin: '0 0 2.5rem' }}>
-            Cómo trabajamos
-          </h2>
+      {/* Process list */}
+      <section ref={processRef} style={{ borderTop: '1px solid #E6E0D2', borderBottom: '1px solid #E6E0D2', background: '#FFFFFF', opacity: 0 }}>
+        <div style={{ maxWidth: 920, margin: '0 auto', padding: '5rem 1.5rem' }}>
           {steps.map((item, i) => (
             <div key={i} className="reveal-child" style={{
               opacity: 0,
@@ -583,10 +596,10 @@ export function AboutPage() {
             <div style={{ fontSize: '0.625rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9A9383', marginBottom: '0.875rem' }}>
               Teléfono
             </div>
-            <a href="tel:99383699" style={{ display: 'block', fontSize: '1.0625rem', fontWeight: 600, color: '#111113', marginBottom: '0.25rem', textDecoration: 'none' }}>
-              +504 9938-3699
+            <a href={`tel:${telLink}`} style={{ display: 'block', fontSize: '1.0625rem', fontWeight: 600, color: 'var(--main-text, #111113)', marginBottom: '0.25rem', textDecoration: 'none' }}>
+              {displayPhone}
             </a>
-            <a href="https://wa.me/50499383699" target="_blank" rel="noopener" style={{ fontSize: '0.9375rem', color: '#D4B254', fontWeight: 600, textDecoration: 'none' }}>
+            <a href={`https://wa.me/${rawPhone}`} target="_blank" rel="noopener" style={{ fontSize: '0.9375rem', color: '#D4B254', fontWeight: 600, textDecoration: 'none' }}>
               Escribir por WhatsApp →
             </a>
           </div>
@@ -600,6 +613,14 @@ export function AboutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export function AboutPage() {
+  return (
+    <QueryProvider>
+      <AboutPageInner />
+    </QueryProvider>
   );
 }
 
@@ -685,7 +706,7 @@ function WebsiteContent() {
 
       {route === 'home' && (
         <>
-          <Hero onWhatsApp={() => openWA()} onExplore={handleExplore} />
+          <Hero onWhatsApp={() => openWA()} onExplore={handleExplore} theme={theme} />
           <FeaturedSection onOpen={openDetail} onWhatsApp={openWA} onExplore={() => handleExplore()} />
           <TrustBand />
           <CTASection onWhatsApp={() => openWA()} />
@@ -698,6 +719,7 @@ function WebsiteContent() {
           initialFilters={catalogFilters}
           onOpen={openDetail}
           onWhatsApp={openWA}
+          theme={theme}
         />
       )}
 

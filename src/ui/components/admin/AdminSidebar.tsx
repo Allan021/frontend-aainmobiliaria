@@ -8,6 +8,8 @@ const items = [
   { key: 'leads', label: 'Leads', icon: 'phone' as const },
   { key: 'sales', label: 'Ventas', icon: 'banknote' as const },
   { key: 'financing', label: 'Financiamiento', icon: 'shield' as const },
+  { key: 'team', label: 'Equipo', icon: 'users' as const },
+  { key: 'settings', label: 'Configuración', icon: 'settings' as const },
 ];
 
 interface Props {
