@@ -49,6 +49,7 @@ function MobileSlider({ images, onImageClick }: PhotoGridProps) {
               width={768}
               height={432}
               loading={i === 0 ? 'eager' : 'lazy'}
+              fetchPriority={i === 0 ? 'high' : 'auto'}
               decoding="async"
               draggable={false}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', zIndex: 1 }}
@@ -104,6 +105,7 @@ function DesktopGrid({ images, onImageClick }: PhotoGridProps) {
           width={800}
           height={600}
           loading="eager"
+          fetchPriority="high"
           decoding="async"
           draggable={false}
         />

@@ -7,10 +7,14 @@ interface FAQItemProps {
 
 function FAQItem({ question, answer }: FAQItemProps) {
   const [open, setOpen] = useState(false);
+  const panelId = `faq-panel-${question.toLowerCase().replace(/[^a-z0-9]/g, '-').slice(0, 30)}`;
+
   return (
     <div style={{ borderBottom: '1px solid var(--main-border, #E6E0D2)' }}>
       <button
         onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        aria-controls={panelId}
         style={{
           width: '100%', textAlign: 'left', background: 'none', border: 'none',
           padding: '1.125rem 0', cursor: 'pointer', fontFamily: 'inherit',
@@ -27,6 +31,7 @@ function FAQItem({ question, answer }: FAQItemProps) {
         </svg>
       </button>
       <div
+        id={panelId}
         className="faq-content"
         style={{
           maxHeight: open ? 300 : 0,

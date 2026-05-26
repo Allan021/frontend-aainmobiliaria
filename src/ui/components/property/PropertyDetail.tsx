@@ -461,6 +461,13 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
         data-action="open-lead-modal"
         role="button"
         tabIndex={0}
+        aria-label="Consultar sobre esta propiedad"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setLeadModalOpen(true);
+          }
+        }}
         style={{
           display: 'none',
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,

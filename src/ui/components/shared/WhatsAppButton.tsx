@@ -65,6 +65,7 @@ export function WhatsAppButton({
   if (variant === 'solid') {
     variantStyle = {
       background: hovered ? '#22c35a' : '#25D366',
+      color: '#052e16', // Deep dark green for high contrast accessibility (white on #25D366 contrast ratio is 1.6:1, this is >9:1)
       boxShadow: hovered
         ? '0 6px 20px rgba(37, 211, 102, 0.45)'
         : '0 4px 14px rgba(37, 211, 102, 0.3)',
@@ -95,7 +96,7 @@ export function WhatsAppButton({
     ...style,
   };
 
-  const iconColor = variant === 'outline' ? (hovered ? '#22c35a' : '#25D366') : '#fff';
+  const iconColor = variant === 'outline' ? (hovered ? '#22c35a' : '#25D366') : (variant === 'solid' ? '#052e16' : '#fff');
 
   return (
     <button

@@ -96,6 +96,7 @@ export function PropertyMap({ departamento, municipio, mapUrl = '' }: PropertyMa
           style={{ border: 'none', display: 'block' }}
           title={`Ubicación: ${municipio}, ${departamento}`}
           sandbox="allow-scripts allow-same-origin"
+          loading="lazy"
         />
       ) : (
         /* Placeholder while waiting to intersect */

@@ -187,11 +187,12 @@ export function GalleryModal({ images, startIdx, onClose }: GalleryModalProps) {
             key={i}
             data-active={i === idx ? 'true' : 'false'}
             onClick={() => goTo(i)}
+            aria-label={`Ver imagen de la galería número ${i + 1}`}
             className={`gallery-modal-thumb ${i === idx ? 'gallery-modal-thumb--active' : ''}`}
           >
             <img
               src={optimizeCloudinaryUrl(thumb.url, 160)}
-              alt=""
+              alt={`Miniatura de imagen número ${i + 1}`}
               loading="lazy"
               draggable={false}
             />
