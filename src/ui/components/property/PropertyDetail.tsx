@@ -209,6 +209,67 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
         />
       </div>
 
+      {/* Main Header Container (badges + title + location) */}
+      <div style={{ maxWidth: 1280, margin: '2rem auto 1.5rem', padding: '0 clamp(1rem, 4vw, 2.5rem)', boxSizing: 'border-box' }}>
+        <div ref={headerRef}>
+          {/* Badges */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: '0.875rem' }}>
+            {property.financing ? (
+              <span style={{ padding: '0.375rem 0.875rem', borderRadius: 999, background: '#D4B254', color: '#111113', fontSize: '0.75rem', fontWeight: 700 }}>
+                Financiamiento disponible
+              </span>
+            ) : (
+              <span style={{ padding: '0.375rem 0.875rem', borderRadius: 999, background: 'var(--main-text, #111113)', color: 'var(--main-bg, #FAF8F3)', fontSize: '0.75rem', fontWeight: 700 }}>
+                Solo contado
+              </span>
+            )}
+            {property.property_type === 'lotificadora' && (
+              <span style={{ padding: '0.375rem 0.875rem', borderRadius: 999, border: '1px solid #D4B254', color: '#8C6F1C', fontSize: '0.75rem', fontWeight: 700 }}>
+                {property.lotification_name || 'Lotificación'}
+              </span>
+            )}
+            <span style={{ padding: '0.375rem 0.875rem', borderRadius: 999, background: 'var(--main-bg, #F3EFE6)', color: 'var(--main-text-muted, #5A5A63)', fontSize: '0.75rem', fontWeight: 600 }}>
+              {property.type}
+            </span>
+            {property.property_type === 'lotificadora' && property.available_lots && (
+              <span style={{ padding: '0.375rem 0.875rem', borderRadius: 999, background: '#E6F4EA', color: '#137333', fontSize: '0.75rem', fontWeight: 700 }}>
+                {property.available_lots} lotes disponibles
+              </span>
+            )}
+          </div>
+
+          <h1 style={{
+            fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700,
+            color: 'var(--main-text, #111113)', letterSpacing: '-0.03em', lineHeight: 1.1,
+            margin: '0 0 0.75rem',
+          }}>
+            {property.title}
+          </h1>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--main-text-muted, #5A5A63)', fontSize: '0.9375rem' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4B254" strokeWidth="2" strokeLinecap="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            {property.municipio}, {property.departamento}, Honduras
+          </div>
+
+          {/* Apartado badge */}
+          {property.status === 'apartado' && (
+            <div style={{ marginTop: '0.875rem' }}>
+              <span style={{
+                padding: '0.4rem 0.875rem', borderRadius: 8,
+                background: 'var(--color-aa-warning-bg, #FFF3CD)', color: 'var(--color-aa-warning, #856404)',
+                border: '1px solid var(--color-aa-warning, #FFEAA7)', fontSize: '0.8125rem', fontWeight: 600,
+                display: 'inline-block',
+              }}>
+                Apartado — consulte disponibilidad
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Quick-stats strip */}
       <QuickStats property={property} />
 
@@ -218,66 +279,6 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
 
           {/* LEFT column */}
           <div style={{ minWidth: 0 }}>
-
-            {/* Header: badges + title + location */}
-            <div ref={headerRef} style={{ marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid var(--main-border, #E6E0D2)' }}>
-              {/* Badges */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: '1rem' }}>
-                {property.financing ? (
-                  <span style={{ padding: '0.375rem 0.875rem', borderRadius: 999, background: '#D4B254', color: '#111113', fontSize: '0.75rem', fontWeight: 700 }}>
-                    Financiamiento disponible
-                  </span>
-                ) : (
-                  <span style={{ padding: '0.375rem 0.875rem', borderRadius: 999, background: 'var(--main-text, #111113)', color: 'var(--main-bg, #FAF8F3)', fontSize: '0.75rem', fontWeight: 700 }}>
-                    Solo contado
-                  </span>
-                )}
-                {property.property_type === 'lotificadora' && (
-                  <span style={{ padding: '0.375rem 0.875rem', borderRadius: 999, border: '1px solid #D4B254', color: '#8C6F1C', fontSize: '0.75rem', fontWeight: 700 }}>
-                    {property.lotification_name || 'Lotificación'}
-                  </span>
-                )}
-                <span style={{ padding: '0.375rem 0.875rem', borderRadius: 999, background: 'var(--main-bg, #F3EFE6)', color: 'var(--main-text-muted, #5A5A63)', fontSize: '0.75rem', fontWeight: 600 }}>
-                  {property.type}
-                </span>
-              </div>
-
-              <h1 style={{
-                fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700,
-                color: 'var(--main-text, #111113)', letterSpacing: '-0.03em', lineHeight: 1.1,
-                margin: '0 0 0.75rem',
-              }}>
-                {property.title}
-              </h1>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--main-text-muted, #5A5A63)', fontSize: '0.9375rem' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4B254" strokeWidth="2" strokeLinecap="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                {property.municipio}, {property.departamento}, Honduras
-                {property.property_type === 'lotificadora' && property.available_lots && (
-                  <>
-                    <span style={{ color: 'var(--main-border, #E6E0D2)', margin: '0 4px' }}>·</span>
-                    <span style={{ color: 'var(--color-aa-success, #4A7C59)', fontWeight: 600 }}>{property.available_lots} lotes disponibles</span>
-                  </>
-                )}
-              </div>
-
-              {/* Apartado badge */}
-              {property.status === 'apartado' && (
-                <div style={{ marginTop: '0.875rem' }}>
-                  <span style={{
-                    padding: '0.4rem 0.875rem', borderRadius: 8,
-                    background: 'var(--color-aa-warning-bg, #FFF3CD)', color: 'var(--color-aa-warning, #856404)',
-                    border: '1px solid var(--color-aa-warning, #FFEAA7)', fontSize: '0.8125rem', fontWeight: 600,
-                    display: 'inline-block',
-                  }}>
-                    Apartado — consulte disponibilidad
-                  </span>
-                </div>
-              )}
-            </div>
 
             {/* Description */}
             <div ref={descRef} style={{ opacity: 0, marginBottom: '2.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid var(--main-border, #E6E0D2)' }}>
