@@ -497,9 +497,6 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
           data-action="open-lead-modal"
           size="md"
           borderRadius="12px"
-          style={{
-            boxShadow: '0 4px 14px rgba(37,211,102,0.3)',
-          }}
         />
       </div>
 

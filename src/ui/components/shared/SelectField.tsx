@@ -80,9 +80,10 @@ export function SelectField({
     ? options.filter(o => o.label.toLowerCase().includes(search.toLowerCase()))
     : options;
 
+  // bg-[#FFFFFF] literal: el override global [data-theme=dark] .bg-white no debe oscurecer este panel
   const panelCls = isDark
     ? 'bg-[#1A1A1D] border border-[#26262B] shadow-[0_24px_64px_rgba(0,0,0,0.5)]'
-    : 'bg-white border border-stone-200/90 shadow-[0_24px_64px_rgba(17,17,19,0.15)]';
+    : 'bg-[#FFFFFF] border border-stone-200/90 shadow-[0_24px_64px_rgba(17,17,19,0.15)]';
 
   const searchCls = isDark
     ? 'bg-[#111113] border-[#26262B] text-[#FAF8F3] placeholder:text-[#5A5A63] focus:border-[#D4B254]'

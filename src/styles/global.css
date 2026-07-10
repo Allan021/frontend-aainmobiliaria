@@ -1956,7 +1956,6 @@ body {
     font-family: inherit;
     font-size: 0.875rem;
     font-weight: 700;
-    box-shadow: 0 8px 24px rgba(10,40,29,0.4);
     cursor: pointer;
     align-items: center;
     gap: 8px;
@@ -2003,11 +2002,9 @@ body {
 .rs-btn--primary {
   background: var(--color-pine-600, #1F5B42);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(31, 91, 66, 0.28);
 }
 .rs-btn--primary:hover:not(:disabled) {
   background: var(--color-pine-700, #174834);
-  box-shadow: 0 6px 20px rgba(31, 91, 66, 0.38);
 }
 
 .rs-btn--secondary {

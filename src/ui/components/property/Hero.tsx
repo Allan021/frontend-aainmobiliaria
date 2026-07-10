@@ -140,11 +140,11 @@ function SearchBar({ onSearch, theme = 'light' }: { onSearch: (f: { dep?: string
               width: 54, height: 54, borderRadius: '50%',
               background: '#D4B254', border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'background 0.2s, transform 0.15s, box-shadow 0.2s',
-              flexShrink: 0, boxShadow: '0 4px 14px rgba(212,178,84,0.35)',
+              transition: 'background 0.2s, transform 0.15s',
+              flexShrink: 0,
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#B8962E'; e.currentTarget.style.transform = 'scale(1.06)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(212,178,84,0.5)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = '#D4B254'; e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(212,178,84,0.35)'; }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#B8962E'; e.currentTarget.style.transform = 'scale(1.06)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#D4B254'; e.currentTarget.style.transform = 'scale(1)'; }}
             aria-label="Buscar propiedades"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111113" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -184,7 +184,7 @@ function SearchBar({ onSearch, theme = 'light' }: { onSearch: (f: { dep?: string
               background: '#D4B254', border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
               fontFamily: 'inherit', fontSize: '0.9375rem', fontWeight: 700, color: '#111113',
-              boxShadow: '0 4px 14px rgba(212,178,84,0.35)', transition: 'background 0.2s, transform 0.15s',
+              transition: 'background 0.2s, transform 0.15s',
             }}
             onMouseEnter={e => { e.currentTarget.style.background = '#B8962E'; }}
             onMouseLeave={e => { e.currentTarget.style.background = '#D4B254'; }}

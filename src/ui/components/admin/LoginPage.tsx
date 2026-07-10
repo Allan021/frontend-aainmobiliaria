@@ -130,7 +130,6 @@ function TabSwitch({ active, onChange, isDark }: { active: 'login' | 'register';
           color: active === tab ? activeText : inactiveText,
           fontWeight: 600, fontSize: '0.8125rem', cursor: 'pointer',
           fontFamily: 'inherit', transition: 'all 0.2s',
-          boxShadow: active === tab ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
         }}>
           {tab === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
         </button>

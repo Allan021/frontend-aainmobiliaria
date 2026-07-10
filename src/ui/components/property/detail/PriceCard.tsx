@@ -74,19 +74,16 @@ export function PriceCard({ property, priceCardRef, onWhatsApp, phone }: PriceCa
               background: '#25D366', border: 'none', borderRadius: 12,
               color: '#fff', fontSize: '1rem', fontWeight: 700,
               fontFamily: 'inherit', cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)',
               transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
               boxSizing: 'border-box',
               WebkitTapHighlightColor: 'transparent',
             }}
             onMouseEnter={e => {
               e.currentTarget.style.background = '#22c35a';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.45)';
               e.currentTarget.style.transform = 'translateY(-1px) scale(1.03)';
             }}
             onMouseLeave={e => {
               e.currentTarget.style.background = '#25D366';
-              e.currentTarget.style.boxShadow = '0 4px 14px rgba(37, 211, 102, 0.3)';
               e.currentTarget.style.transform = 'translateY(0) scale(1)';
             }}
           >

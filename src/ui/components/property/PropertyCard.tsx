@@ -27,7 +27,6 @@ function HeartIcon({ saved, onClick }: { saved: boolean; onClick: (e: React.Mous
         border: '1px solid rgba(255,255,255,0.3)',
         cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
         transition: 'all 0.20s ease',
         zIndex: 2,
       }}

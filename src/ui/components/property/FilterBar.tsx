@@ -76,30 +76,29 @@ function CategoryChip({
         gap: 8,
         padding: '0.5rem 1rem',
         borderRadius: 999,
-        background: active ? 'var(--main-text, #111113)' : 'var(--main-card-bg, #fff)',
-        border: `1.5px solid ${active ? 'var(--main-text, #111113)' : 'var(--main-border, #E6E0D2)'}`,
-        color: active ? 'var(--main-bg, #FAF8F3)' : 'var(--main-text-dim, #5A5A63)',
+        background: active ? '#111113' : '#fff',
+        border: `1.5px solid ${active ? '#111113' : '#E6E0D2'}`,
+        color: active ? '#FAF8F3' : '#5A5A63',
         cursor: 'pointer',
         transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
         fontFamily: 'inherit',
         fontSize: '0.8125rem',
         fontWeight: active ? 700 : 500,
-        boxShadow: active ? '0 4px 12px rgba(17,17,19,0.08)' : 'none',
         outline: 'none',
         flexShrink: 0,
       }}
       onMouseEnter={e => {
         if (!active) {
-          e.currentTarget.style.borderColor = 'var(--main-text, #111113)';
-          e.currentTarget.style.color = 'var(--main-text, #111113)';
-          e.currentTarget.style.background = 'var(--main-bg, #FAF8F3)';
+          e.currentTarget.style.borderColor = '#111113';
+          e.currentTarget.style.color = '#111113';
+          e.currentTarget.style.background = '#FAF8F3';
         }
       }}
       onMouseLeave={e => {
         if (!active) {
-          e.currentTarget.style.borderColor = 'var(--main-border, #E6E0D2)';
-          e.currentTarget.style.color = 'var(--main-text-dim, #5A5A63)';
-          e.currentTarget.style.background = 'var(--main-card-bg, #fff)';
+          e.currentTarget.style.borderColor = '#E6E0D2';
+          e.currentTarget.style.color = '#5A5A63';
+          e.currentTarget.style.background = '#fff';
         }
       }}
     >
@@ -162,15 +161,15 @@ export function FilterBar({ filters, setFilters, theme = 'light' }: FilterBarPro
       <div style={{ display: 'flex', gap: '0.875rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{
           minWidth: 220, padding: '0.5rem 0.875rem',
-          borderRadius: 10, border: `1.5px solid ${filters.dep ? 'var(--main-text, #111113)' : 'var(--main-border, #E6E0D2)'}`,
-          background: 'var(--main-card-bg, #fff)', transition: 'border-color 0.15s',
+          borderRadius: 10, border: `1.5px solid ${filters.dep ? '#111113' : '#E6E0D2'}`,
+          background: '#fff', transition: 'border-color 0.15s',
         }}>
           <SelectField
             options={depOptions}
             value={filters.dep || ''}
             onChange={v => setFilters({ ...filters, dep: v || undefined })}
             placeholder="Todos los departamentos"
-            theme={theme}
+            theme="light"
             fontSize="0.8125rem"
             fontWeight={filters.dep ? 600 : 500}
           />

@@ -81,8 +81,7 @@ export function WhatsAppFAB({ onClick }: { onClick?: () => void }) {
           borderRadius: 999,
           background: '#25D366',
           border: 'none', cursor: 'pointer',
-          boxShadow: '0 6px 28px rgba(37,211,102,0.50), 0 2px 10px rgba(0,0,0,0.20)',
-          transition: 'padding 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s',
+          transition: 'padding 0.3s cubic-bezier(0.22,1,0.36,1)',
           overflow: 'hidden',
           opacity: 0, // will be animated in
           scale: '0',
@@ -454,8 +453,8 @@ function CatalogViewInner({
         </div>
 
         {/* Filter bar */}
-        <div style={{ background: 'var(--main-card-bg, #fff)', borderRadius: 16, border: '1px solid var(--main-border, #E6E0D2)', padding: '1.25rem 1.5rem', marginBottom: '2rem', boxShadow: '0 2px 8px rgba(17,17,19,0.04)' }}>
-          <FilterBar filters={filters} setFilters={setFilters} theme={theme} />
+        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E6E0D2', padding: '1.25rem 1.5rem', marginBottom: '2rem' }}>
+          <FilterBar filters={filters} setFilters={setFilters} theme="light" />
         </div>
 
         {/* Count */}

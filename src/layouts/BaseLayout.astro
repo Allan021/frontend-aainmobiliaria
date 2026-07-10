@@ -53,7 +53,9 @@ const orgJsonLd = {
     <meta charset="utf-8" />
     <script is:inline>
       (function() {
-        const theme = localStorage.getItem('aa_pub_theme') || 'light';
+        // Sitio público: siempre claro. Solo el admin conserva dark mode (aa_theme).
+        const isAdmin = location.pathname.startsWith('/admin');
+        const theme = isAdmin ? (localStorage.getItem('aa_theme') || 'light') : 'light';
         document.documentElement.setAttribute('data-theme', theme);
       })();
     </script>

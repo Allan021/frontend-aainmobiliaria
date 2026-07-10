@@ -66,9 +66,6 @@ export function WhatsAppButton({
     variantStyle = {
       background: hovered ? '#22c35a' : '#25D366',
       color: '#052e16', // Deep dark green for high contrast accessibility (white on #25D366 contrast ratio is 1.6:1, this is >9:1)
-      boxShadow: hovered
-        ? '0 6px 20px rgba(37, 211, 102, 0.45)'
-        : '0 4px 14px rgba(37, 211, 102, 0.3)',
       transform: hovered ? 'translateY(-1px) scale(1.03)' : 'translateY(0) scale(1)',
     };
   } else if (variant === 'outline') {
@@ -76,7 +73,6 @@ export function WhatsAppButton({
       background: hovered ? 'rgba(37, 211, 102, 0.08)' : 'transparent',
       border: '1.5px solid #25D366',
       color: '#25D366',
-      boxShadow: hovered ? '0 4px 12px rgba(37, 211, 102, 0.15)' : 'none',
       transform: hovered ? 'translateY(-1px) scale(1.02)' : 'translateY(0) scale(1)',
     };
   } else if (variant === 'glass') {
@@ -84,7 +80,6 @@ export function WhatsAppButton({
       background: hovered ? 'rgba(37, 211, 102, 0.16)' : 'rgba(37, 211, 102, 0.10)',
       border: '1px solid rgba(37, 211, 102, 0.35)',
       color: hovered ? '#FAF8F3' : 'rgba(250, 248, 243, 0.85)',
-      boxShadow: hovered ? '0 0 20px rgba(37, 211, 102, 0.18)' : 'none',
       backdropFilter: 'blur(8px)',
       transform: hovered ? 'translateY(-1px) scale(1.02)' : 'translateY(0) scale(1)',
     };
