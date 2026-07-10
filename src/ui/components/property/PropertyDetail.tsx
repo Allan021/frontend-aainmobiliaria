@@ -12,6 +12,7 @@ import { SpecItem } from './detail/SpecItem';
 import { PropertyMap } from './detail/PropertyMap';
 import { FAQSection } from './detail/FAQSection';
 import { PriceCard } from './detail/PriceCard';
+import { ScheduleVisit } from './detail/ScheduleVisit';
 import { LeadCaptureModal } from './detail/LeadCaptureModal';
 import { WhatsAppButton } from '../shared/WhatsAppButton';
 
@@ -441,14 +442,17 @@ function PropertyDetailInner({ property, onBack, onWhatsApp, standalone }: Props
 
           </div>
 
-          {/* RIGHT — sticky price card */}
+          {/* RIGHT — sticky price card + agendar visita */}
           <div style={{ position: 'relative' }}>
-            <PriceCard
-              property={property}
-              priceCardRef={priceCardRef}
-              onWhatsApp={handleWhatsAppClick}
-              phone="9938-3699"
-            />
+            <div style={{ position: 'sticky', top: 96, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <PriceCard
+                property={property}
+                priceCardRef={priceCardRef}
+                onWhatsApp={handleWhatsAppClick}
+                phone="9938-3699"
+              />
+              <ScheduleVisit propertyId={property.id} propertyTitle={property.title} />
+            </div>
           </div>
 
         </div>

@@ -11,15 +11,19 @@ interface HeaderProps {
 
 const NAV_ITEMS = [
   { to: 'home', label: 'Inicio' },
+  { to: 'buscar', label: 'Buscar' },
   { to: 'catalog', label: 'Propiedades' },
   { to: 'lotificaciones', label: 'Lotificaciones' },
+  { to: 'publicar', label: 'Publicar' },
   { to: 'about', label: 'Nosotros' },
 ];
 
 const NAV_URLS: Record<string, string> = {
   home: '/',
+  buscar: '/buscar',
   catalog: '/propiedades',
   lotificaciones: '/lotificaciones',
+  publicar: '/publicar',
   about: '/nosotros',
 };
 
@@ -30,6 +34,11 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme: propTheme,
   const menuRef = useRef<HTMLDivElement>(null);
 
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [logged, setLogged] = useState(false);
+
+  useEffect(() => {
+    setLogged(!!localStorage.getItem('aa_token'));
+  }, []);
 
   useEffect(() => {
     if (propTheme) {
@@ -267,8 +276,27 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme: propTheme,
               flexShrink: 0, marginLeft: 2, marginRight: 2,
             }} />
 
+            {logged && (
+              <a
+                href="/favoritos"
+                aria-label="Mis favoritos"
+                title="Mis favoritos"
+                style={{
+                  width: 36, height: 36, borderRadius: 9,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: transparent ? 'rgba(250,248,243,0.75)' : isDark ? '#9A9383' : '#5A5A63',
+                  textDecoration: 'none', transition: 'color 0.2s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#E53E3E'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = transparent ? 'rgba(250,248,243,0.75)' : isDark ? '#9A9383' : '#5A5A63'; }}
+              >
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+              </a>
+            )}
             <a
-              href="/login"
+              href={logged ? '/mis-propiedades' : '/acceder'}
               style={{
                 fontSize: '0.875rem', fontWeight: 500,
                 color: transparent ? 'rgba(250,248,243,0.75)' : isDark ? '#9A9383' : '#5A5A63',
@@ -286,7 +314,7 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme: propTheme,
                 (e.currentTarget as HTMLElement).style.background = 'transparent';
               }}
             >
-              Iniciar sesión
+              {logged ? 'Mi cuenta' : 'Iniciar sesión'}
             </a>
             <WhatsAppButton
               onClick={handleWhatsApp}
@@ -479,8 +507,22 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme: propTheme,
                 label="Contactar por WhatsApp"
                 style={{ padding: '0.875rem 1.75rem' }}
               />
+              {logged && (
+                <a
+                  href="/favoritos"
+                  style={{
+                    display: 'block', textAlign: 'center', padding: '0.875rem',
+                    border: `1px solid ${isDark ? '#26262B' : '#E6E0D2'}`, borderRadius: 12,
+                    color: isDark ? '#C9C2B1' : '#111113', fontSize: '0.9375rem', fontWeight: 500,
+                    textDecoration: 'none',
+                    background: isDark ? 'rgba(255,255,255,0.03)' : 'transparent',
+                  }}
+                >
+                  Mis favoritos
+                </a>
+              )}
               <a
-                href="/login"
+                href={logged ? '/mis-propiedades' : '/acceder'}
                 style={{
                   display: 'block', textAlign: 'center', padding: '0.875rem',
                   border: `1px solid ${isDark ? '#26262B' : '#E6E0D2'}`, borderRadius: 12,
@@ -489,7 +531,7 @@ export function Header({ currentRoute, onNavigate, onWhatsApp, theme: propTheme,
                   background: isDark ? 'rgba(255,255,255,0.03)' : 'transparent',
                 }}
               >
-                Iniciar sesión
+                {logged ? 'Mi cuenta' : 'Iniciar sesión'}
               </a>
             </div>
           </div>

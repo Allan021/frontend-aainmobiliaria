@@ -19,6 +19,10 @@ export const propertyAdapter: PropertyPort = {
     return api.get<Property>(`/properties/${id}`);
   },
 
+  getMine() {
+    return api.get<PaginatedResponse<Property>>('/properties/mine');
+  },
+
   create(data: Partial<Property>) {
     return api.post<Property>('/properties', data);
   },
@@ -33,6 +37,10 @@ export const propertyAdapter: PropertyPort = {
 
   uploadImage(id: string, file: File) {
     return api.upload<{ url: string }>(`/properties/${id}/images`, file);
+  },
+
+  removeImage(id: string, imageId: string) {
+    return api.delete(`/properties/${id}/images/${imageId}`);
   },
 
   getStats() {

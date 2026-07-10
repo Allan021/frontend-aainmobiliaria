@@ -32,8 +32,20 @@ export interface Property {
   map_url?: string;
   facebook_title?: string;
   facebook_description?: string;
+  lat?: number | null;
+  lng?: number | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  parking?: number | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface Favorite {
+  id: string;
+  property_id: string;
+  created_at: string;
+  property?: Property;
 }
 
 export interface PropertyImage {
@@ -129,6 +141,10 @@ export interface PropertyFilters {
   pay?: string;
   status?: string;
   search?: string;
+  type?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  beds?: number;
   page?: number;
   limit?: number;
 }
@@ -168,5 +184,14 @@ export function cleanTitle(title: string): string {
   if (!title) return '';
   const emojiRegex = /^[\s\p{Emoji_Presentation}\p{Extended_Pictographic}]+|[\s\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/gu;
   return title.replace(emojiRegex, '').trim();
+}
+
+/** Quita TODOS los emojis y colapsa espacios — para meta tags / SERP */
+export function stripEmojis(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}️]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 

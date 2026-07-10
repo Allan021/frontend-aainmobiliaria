@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Header } from '../ui/components/layout/Header';
+import { Footer } from '../ui/components/layout/Footer';
+import { MyPropertiesApp } from '../ui/components/account/MyPropertiesApp';
+---
+
+<BaseLayout title="Mis propiedades — A&A Inmobiliaria" description="Administre sus publicaciones." noindex>
+  <Header client:load currentRoute="mis-propiedades" />
+  <MyPropertiesApp client:only="react" />
+  <Footer />
+</BaseLayout>

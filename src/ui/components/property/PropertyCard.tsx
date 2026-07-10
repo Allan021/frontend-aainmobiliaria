@@ -8,6 +8,10 @@ interface PropertyCardProps {
   onOpen: (p: Property) => void;
   onWhatsApp: (p: Property) => void;
   animDelay?: number;
+  /** Estado real de favorito (si se controla desde afuera) */
+  saved?: boolean;
+  /** Toggle real de favorito; sin esto el corazón solo es visual */
+  onToggleSave?: (p: Property) => void;
 }
 
 function HeartIcon({ saved, onClick }: { saved: boolean; onClick: (e: React.MouseEvent) => void }) {
@@ -60,9 +64,10 @@ function Badge({ children, gold }: { children: React.ReactNode; gold?: boolean }
   );
 }
 
-export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: PropertyCardProps) {
+export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0, saved: savedProp, onToggleSave }: PropertyCardProps) {
   const [hover, setHover] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [savedLocal, setSavedLocal] = useState(false);
+  const saved = onToggleSave ? !!savedProp : savedLocal;
   const [imgIdx, setImgIdx] = useState(0);
 
   const images = property.images?.length > 0
@@ -73,7 +78,8 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setSaved(s => !s);
+    if (onToggleSave) onToggleSave(property);
+    else setSavedLocal(s => !s);
     import('animejs').then(mod => {
       const animate = (mod as any).animate;
       if (!animate) return;
@@ -220,8 +226,16 @@ export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0 }: Pr
           {cleanTitle(property.title)}
         </h3>
 
-        {/* Area */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: 'var(--main-text-dim, #9A9383)' }}>
+        {/* Specs (estilo Zillow) + Area */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: 'var(--main-text-dim, #9A9383)', flexWrap: 'wrap' }}>
+          {(property.bedrooms || property.bathrooms) && (
+            <span style={{ fontWeight: 700, color: 'var(--main-text-muted, #5A5A63)' }}>
+              {property.bedrooms ? `${property.bedrooms} hab` : ''}
+              {property.bedrooms && property.bathrooms ? ' · ' : ''}
+              {property.bathrooms ? `${property.bathrooms} baños` : ''}
+              {' · '}
+            </span>
+          )}
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <rect x="3" y="3" width="18" height="18" rx="2" />
             <path d="M3 9h18M9 21V9" />

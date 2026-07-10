@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Header } from '../ui/components/layout/Header';
+import { Footer } from '../ui/components/layout/Footer';
+import { FavoritesApp } from '../ui/components/account/FavoritesApp';
+import { WhatsAppModal } from '../ui/components/property/WhatsAppModal';
+---
+
+<BaseLayout title="Mis favoritos — A&A Inmobiliaria" description="Sus propiedades guardadas." noindex>
+  <Header client:load currentRoute="favoritos" />
+  <FavoritesApp client:only="react" />
+  <Footer />
+  <WhatsAppModal client:load open={false} onClose={() => {}} />
+</BaseLayout>

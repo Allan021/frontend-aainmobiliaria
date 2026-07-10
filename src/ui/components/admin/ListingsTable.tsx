@@ -81,7 +81,12 @@ export function ListingsTable({ properties, onEdit, m }: Props) {
                 {thumb ? (
                   <img src={thumb} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '3rem' }}>🏗️</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#9A9383' }}>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                  </div>
                 )}
                 
                 {/* Badges on Thumbnail */}
@@ -118,7 +123,7 @@ export function ListingsTable({ properties, onEdit, m }: Props) {
                   {p.title}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: themeM.mainTextDim, marginBottom: '1.25rem' }}>
-                  📍 {p.municipio || 'N/A'}, {p.departamento || p.dep_code || 'N/A'}
+                  {p.municipio || 'N/A'}, {p.departamento || p.dep_code || 'N/A'}
                 </div>
 
                 {/* Bottom space spacer to push buttons down */}

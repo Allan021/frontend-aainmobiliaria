@@ -294,7 +294,7 @@ function WhatsAppModalInner({ open: propOpen, onClose: propOnClose, property: pr
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--main-text-muted, #5A5A63)' }}>
-                      📍 {activeProperty.municipio}, {activeProperty.departamento}
+                      {activeProperty.municipio}, {activeProperty.departamento}
                     </span>
                     <strong style={{ fontSize: '0.8125rem', color: 'var(--main-text, #111113)', fontWeight: 850 }}>
                       {formatPrice(activeProperty.discount_price ?? activeProperty.price, activeProperty.currency)}

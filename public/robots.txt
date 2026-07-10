@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /login
+Disallow: /acceder
+Disallow: /favoritos
+Disallow: /mis-propiedades
+
+Sitemap: https://www.aabienes.com/sitemap-index.xml

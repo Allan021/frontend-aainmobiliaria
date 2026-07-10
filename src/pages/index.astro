@@ -6,9 +6,26 @@ import { Hero } from '../ui/components/property/Hero';
 import { FeaturedSection, TrustBand, CTASection, WhatsAppFAB } from '../ui/components/property/WebsiteApp';
 import { ReviewsSection } from '../ui/components/property/ReviewsSection';
 import { WhatsAppModal } from '../ui/components/property/WhatsAppModal';
+
+// Sitelinks searchbox: Google puede mostrar buscador directo al sitio
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'A&A Inmobiliaria',
+  url: 'https://www.aabienes.com',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: { '@type': 'EntryPoint', urlTemplate: 'https://www.aabienes.com/buscar?q={search_term_string}' },
+    'query-input': 'required name=search_term_string',
+  },
+};
 ---
 
-<BaseLayout title="A&A Inmobiliaria — Tu Propiedad. Nuestra Misión.">
+<BaseLayout
+  title="A&A Inmobiliaria — Casas, Terrenos y Lotes en Honduras"
+  description="Compre o venda su propiedad en Honduras. Casas, terrenos y lotes verificados con escrituración al día. Búsqueda con mapa, visitas agendadas y financiamiento."
+  jsonLd={websiteJsonLd}
+>
   <Header client:load currentRoute="home" />
   <Hero client:load />
   <FeaturedSection client:visible />

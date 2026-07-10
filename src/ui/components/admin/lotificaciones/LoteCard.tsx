@@ -44,7 +44,7 @@ export function LoteCard({ lote, lotificationId, onEdit, m }: {
               Lote {lote.numero}
             </div>
             {lote.nombre && <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: m.mainText, marginTop: '2px' }}>{lote.nombre}</div>}
-            {lote.area_varas && <div style={{ fontSize: '0.6875rem', color: m.mainTextDim, marginTop: '2px' }}>📐 {lote.area_varas} varas²</div>}
+            {lote.area_varas && <div style={{ fontSize: '0.6875rem', color: m.mainTextDim, marginTop: '2px' }}>{lote.area_varas} varas²</div>}
           </div>
           <span style={{ padding: '3px 10px', borderRadius: '999px', fontSize: '0.6875rem', fontWeight: 600, background: sc.bg, color: sc.text }}>
             {statusLabels[lote.status]}
@@ -74,7 +74,7 @@ export function LoteCard({ lote, lotificationId, onEdit, m }: {
         {/* Buyer */}
         {lote.buyer_name && (
           <div style={{ fontSize: '0.75rem', color: m.mainTextMuted, marginBottom: '0.75rem', padding: '6px 8px', background: 'rgba(74,124,89,0.08)', borderRadius: '6px' }}>
-            👤 {lote.buyer_name}
+            {lote.buyer_name}
             {lote.buyer_phone && <span style={{ color: m.mainTextDim }}> · {lote.buyer_phone}</span>}
           </div>
         )}
@@ -99,7 +99,7 @@ export function LoteCard({ lote, lotificationId, onEdit, m }: {
             background: 'rgba(212,178,84,0.08)', border: '1px solid rgba(212,178,84,0.2)',
             color: '#D4B254', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
           }}>
-            💰 Pagos {pagos.length > 0 ? `(${pagos.length})` : ''}
+            Pagos {pagos.length > 0 ? `(${pagos.length})` : ''}
           </button>
           <button onClick={() => onEdit(lote)} style={{
             padding: '6px 10px', borderRadius: '0.375rem',

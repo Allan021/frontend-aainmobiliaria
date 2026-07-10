@@ -5,6 +5,7 @@ import { Footer } from '../../ui/components/layout/Footer';
 import { PropertyDetail } from '../../ui/components/property/PropertyDetail';
 import { WhatsAppModal } from '../../ui/components/property/WhatsAppModal';
 import { serverFetch } from '../../infrastructure/api/client';
+import { cleanTitle, stripEmojis } from '../../core/domain/entities/types';
 import type { Property, PaginatedResponse } from '../../core/domain/entities/types';
 
 export async function getStaticPaths() {
@@ -24,35 +25,48 @@ export async function getStaticPaths() {
 
 const { property } = Astro.props as { property: Property };
 
-const rawDesc = `${property.type} en ${property.municipio}, ${property.departamento}. ${property.description}`;
+// Meta limpios: sin emojis del título/descripción que el admin escribió en la DB
+const pageTitle = stripEmojis(cleanTitle(property.title));
+const rawDesc = stripEmojis(`${property.type} en ${property.municipio}, ${property.departamento}. ${property.description}`);
 const pageDescription = rawDesc.slice(0, 155).trimEnd() + (rawDesc.length > 155 ? '...' : '');
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'RealEstateListing',
-  name: property.title,
-  description: property.description,
-  url: `https://www.aabienes.com/propiedad/${property.id}`,
-  image: property.images?.[0]?.url || '',
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: property.municipio,
-    addressRegion: property.departamento,
-    addressCountry: 'HN',
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateListing',
+    name: pageTitle,
+    description: stripEmojis(property.description),
+    url: `https://www.aabienes.com/propiedad/${property.id}`,
+    image: property.images?.[0]?.url || '',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: property.municipio,
+      addressRegion: property.departamento,
+      addressCountry: 'HN',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: property.price,
+      priceCurrency: property.currency === 'L' ? 'HNL' : 'USD',
+      availability: 'https://schema.org/InStock',
+    },
   },
-  offers: {
-    '@type': 'Offer',
-    price: property.price,
-    priceCurrency: property.currency === 'L' ? 'HNL' : 'USD',
-    availability: 'https://schema.org/InStock',
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://www.aabienes.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Propiedades', item: 'https://www.aabienes.com/propiedades' },
+      { '@type': 'ListItem', position: 3, name: pageTitle, item: `https://www.aabienes.com/propiedad/${property.id}` },
+    ],
   },
-};
+];
 ---
 
 <BaseLayout
-  title={`${property.title} — A&A Inmobiliaria`}
+  title={`${pageTitle} — A&A Inmobiliaria`}
   description={pageDescription}
-  ogTitle={`${property.title} — A&A Inmobiliaria`}
+  ogTitle={`${pageTitle} — A&A Inmobiliaria`}
   ogDescription={pageDescription}
   ogImage={property.images?.[0]?.url}
   canonical={`https://www.aabienes.com/propiedad/${property.id}`}

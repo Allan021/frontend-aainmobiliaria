@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Header } from '../ui/components/layout/Header';
+import { AuthPage } from '../ui/components/account/AuthPage';
+---
+
+<BaseLayout title="Acceder — A&A Inmobiliaria" description="Inicie sesión o cree su cuenta para guardar favoritos y publicar propiedades." noindex>
+  <Header client:load currentRoute="acceder" />
+  <AuthPage client:only="react" />
+</BaseLayout>

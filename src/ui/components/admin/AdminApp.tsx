@@ -15,6 +15,7 @@ import { api } from '../../../infrastructure/api/client';
 import { LotificacionesView } from './LotificacionesView';
 import { useSettings, useUpdateSettings } from '../../hooks/useSettings';
 import { useUsers, useCreateTeamMember } from '../../hooks/useAuth';
+import { IconHome, IconCheck, IconCheckCircle, IconCalendar } from '../shared/rs-icons';
 
 /* ── Hash routing ───────────────────────────────────── */
 const VALID_ROUTES = ['dashboard', 'catalog', 'leads', 'sales', 'financing', 'team', 'settings'];
@@ -107,20 +108,20 @@ function Dashboard({ onNew, onToggleSidebar, isOpen, m, onNavigate }: {
         <div className="admin-metrics-grid">
           <MetricTile
             label="Total propiedades" value={String(stats?.total || 0)}
-            sub={`${stats?.disponible || 0} disponibles`} icon="🏗️"
+            sub={`${stats?.disponible || 0} disponibles`} icon={<IconHome size={18} />}
           />
           <MetricTile
             label="Disponibles" value={String(stats?.disponible || 0)}
-            delta={`${stats?.apartado || 0} apartadas`} icon="✅" tone="success"
+            delta={`${stats?.apartado || 0} apartadas`} icon={<IconCheckCircle size={18} />} tone="success"
           />
           <MetricTile
             label="Leads pendientes" value={String(pendingLeads.length)}
-            delta={pendingLeads.length > 0 ? '⚡ Responder hoy' : 'Al día'} icon="📞"
+            delta={pendingLeads.length > 0 ? 'Responder hoy' : 'Al día'} icon={<IconCalendar size={18} />}
             tone={pendingLeads.length > 0 ? 'warning' : 'default'} dark
           />
           <MetricTile
             label="Vendidas" value={String(stats?.vendido || 0)}
-            sub={`${sales.length} ventas totales`} icon="💰"
+            sub={`${sales.length} ventas totales`} icon={<IconCheck size={18} />}
           />
         </div>
 
@@ -468,7 +469,7 @@ function SettingsView({ onToggleSidebar, isOpen, m }: {
 
             {errorMsg && (
               <div style={{ fontSize: '0.8125rem', color: '#E57373', fontWeight: 500 }}>
-                ⚠️ {errorMsg}
+                {errorMsg}
               </div>
             )}
 
@@ -619,7 +620,7 @@ function TeamView({ onToggleSidebar, isOpen, m }: {
 
               {errorMsg && (
                 <div style={{ fontSize: '0.8125rem', color: '#E57373', fontWeight: 500 }}>
-                  ⚠️ {errorMsg}
+                  {errorMsg}
                 </div>
               )}
 

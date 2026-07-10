@@ -104,7 +104,12 @@ export function LotificacionesView({ onNew, onEdit, onToggleSidebar, isOpen = fa
                     {thumb ? (
                       <img src={thumb} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '3rem' }}>🏗️</div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#9A9383' }}>
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                          <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                      </div>
                     )}
                     <span style={{ position: 'absolute', top: '10px', right: '10px', padding: '3px 10px', borderRadius: '999px', fontSize: '0.6875rem', fontWeight: 600, background: sc.bg, color: sc.text, backdropFilter: 'blur(4px)' }}>
                       {statusLabels[lot.status] || lot.status}
@@ -114,7 +119,7 @@ export function LotificacionesView({ onNew, onEdit, onToggleSidebar, isOpen = fa
                   {/* Content */}
                   <div style={{ padding: '1.25rem' }}>
                     <div style={{ fontSize: '1rem', fontWeight: 700, color: m.mainText, marginBottom: '4px' }}>{lot.title}</div>
-                    <div style={{ fontSize: '0.75rem', color: m.mainTextDim, marginBottom: '0.875rem' }}>📍 {lot.municipio}, {lot.departamento}</div>
+                    <div style={{ fontSize: '0.75rem', color: m.mainTextDim, marginBottom: '0.875rem' }}>{lot.municipio}, {lot.departamento}</div>
 
                     {/* Lot progress */}
                     {lot.total_lots > 0 && (

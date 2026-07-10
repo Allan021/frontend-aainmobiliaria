@@ -17,6 +17,14 @@ export function useProperty(id: string) {
   });
 }
 
+export function useMyProperties() {
+  return useQuery({
+    queryKey: ['myProperties'],
+    queryFn: () => propertyAdapter.getMine(),
+    retry: false,
+  });
+}
+
 export function usePropertyStats() {
   return useQuery({
     queryKey: ['propertyStats'],

@@ -704,7 +704,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                   <button
                     type="button"
                     onClick={() => {
-                      const magicLink = `\n\n🔗 Ver propiedad: https://www.aabienes.com/propiedad/${property.id}`;
+                      const magicLink = `\n\nVer propiedad: https://www.aabienes.com/propiedad/${property.id}`;
                       const current = form.facebook_description;
                       // Don't add if already present
                       if (current.includes(`/propiedad/${property.id}`)) return;
@@ -788,7 +788,12 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                     style={{ display: 'none' }}
                     onChange={handleFileInput}
                   />
-                  <div style={{ fontSize: '28px', marginBottom: '8px', lineHeight: 1 }}>📷</div>
+                  <div style={{ marginBottom: '8px', lineHeight: 1, display: 'flex', justifyContent: 'center', color: textMuted }}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                      <circle cx="12" cy="13" r="4" />
+                    </svg>
+                  </div>
                   <div style={{ fontSize: '13px', fontWeight: 600, color: textMuted, marginBottom: '4px' }}>
                     {isDragOver ? 'Suelta las fotos aquí' : 'Arrastra fotos aquí'}
                   </div>
@@ -879,7 +884,9 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                   fontSize: '11px', color: isDark ? '#8BA8E8' : '#3B5998',
                   display: 'flex', alignItems: 'center', gap: '6px',
                 }}>
-                  <span>📘</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  </svg>
                   <span>Se publicará automáticamente en Facebook al guardar</span>
                 </div>
               )}
@@ -926,12 +933,15 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
           {/* Status feedback */}
           {fbResult === 'ok' && (
             <span style={{ fontSize: '13px', color: '#4A7C59', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
-              📘 Publicado en Facebook
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+              </svg>
+              Publicado en Facebook
             </span>
           )}
           {fbResult === 'error' && (
             <span style={{ fontSize: '13px', color: '#B8862E', fontWeight: 500 }}>
-              ⚠ Propiedad guardada · Facebook falló
+              Propiedad guardada · Facebook falló
             </span>
           )}
           {error && (

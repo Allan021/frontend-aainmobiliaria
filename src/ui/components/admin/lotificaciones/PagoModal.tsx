@@ -185,7 +185,7 @@ export function PagoModal({ lote, lotificationId, onClose, m }: {
               {isSubmitting ? 'Guardando…' : 'Registrar pago'}
             </Button>
             {pagos.length > 0 && (
-              <Button variant="ghost" size="md" onClick={handlePrint}>🖨 Imprimir estado</Button>
+              <Button variant="ghost" size="md" onClick={handlePrint}>Imprimir estado</Button>
             )}
           </div>
         </div>

@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Header } from '../ui/components/layout/Header';
+import { Footer } from '../ui/components/layout/Footer';
+import { PublishForm } from '../ui/components/account/PublishForm';
+---
+
+<BaseLayout title="Publicar propiedad — A&A Inmobiliaria" description="Publique su casa, terreno o lote gratis. Anónimo: los interesados contactan a través de A&A Inmobiliaria.">
+  <Header client:load currentRoute="publicar" />
+  <PublishForm client:only="react" />
+  <Footer />
+</BaseLayout>

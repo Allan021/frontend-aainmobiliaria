@@ -7,6 +7,7 @@ interface Props {
   ogImage?: string;
   canonical?: string;
   jsonLd?: object;
+  noindex?: boolean;
 }
 
 const {
@@ -17,11 +18,33 @@ const {
   ogImage,
   canonical,
   jsonLd,
+  noindex = false,
 } = Astro.props;
 
 const resolvedOgTitle = ogTitle || title;
 const resolvedOgDescription = ogDescription || description;
 const resolvedOgImage = ogImage || 'https://www.aabienes.com/banner-web.jpg';
+// Canonical automático desde site + ruta (a menos que la página pase uno explícito)
+const resolvedCanonical = canonical
+  || (Astro.site ? new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site).href : undefined);
+
+// JSON-LD global: agencia inmobiliaria
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'RealEstateAgent',
+  name: 'A&A Inmobiliaria',
+  url: 'https://www.aabienes.com',
+  logo: 'https://www.aabienes.com/logo-mark.webp',
+  image: 'https://www.aabienes.com/banner-web.jpg',
+  telephone: '+50499383699',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'El Progreso',
+    addressRegion: 'Yoro',
+    addressCountry: 'HN',
+  },
+  areaServed: 'Honduras',
+};
 ---
 
 <!doctype html>
@@ -39,7 +62,9 @@ const resolvedOgImage = ogImage || 'https://www.aabienes.com/banner-web.jpg';
     <meta name="description" content={description} />
     <title>{title}</title>
 
-    {canonical && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {!noindex && resolvedCanonical && <link rel="canonical" href={resolvedCanonical} />}
+    <link rel="sitemap" href="/sitemap-index.xml" />
 
     <!-- Preconnect to Cloudinary and OpenStreetMap -->
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
@@ -59,7 +84,7 @@ const resolvedOgImage = ogImage || 'https://www.aabienes.com/banner-web.jpg';
     <meta property="og:title" content={resolvedOgTitle} />
     <meta property="og:description" content={resolvedOgDescription} />
     <meta property="og:image" content={resolvedOgImage} />
-    {canonical && <meta property="og:url" content={canonical} />}
+    {resolvedCanonical && <meta property="og:url" content={resolvedCanonical} />}
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -67,6 +92,7 @@ const resolvedOgImage = ogImage || 'https://www.aabienes.com/banner-web.jpg';
     <meta name="twitter:description" content={resolvedOgDescription} />
     <meta name="twitter:image" content={resolvedOgImage} />
 
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body>

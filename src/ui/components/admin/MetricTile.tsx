@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 interface Props {
   label: string;
@@ -6,7 +6,7 @@ interface Props {
   delta?: string;
   sub?: string;
   dark?: boolean;
-  icon?: string;
+  icon?: ReactNode;
   tone?: 'default' | 'success' | 'warning' | 'danger';
 }
 
@@ -66,7 +66,7 @@ export function MetricTile({ label, value, delta, sub, dark, icon, tone = 'defau
           textTransform: 'uppercase', color: accent,
         }}>{label}</div>
         {icon && (
-          <span style={{ fontSize: '1.125rem', lineHeight: 1, opacity: 0.75 }}>{icon}</span>
+          <span style={{ display: 'flex', lineHeight: 1, opacity: 0.75, color: accent }}>{icon}</span>
         )}
       </div>
 

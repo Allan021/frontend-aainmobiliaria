@@ -16,7 +16,7 @@ export function PriceCard({ property, priceCardRef, onWhatsApp, phone }: PriceCa
   })();
 
   return (
-    <div style={{ position: 'sticky', top: 96 }}>
+    <div>
       <div
         ref={priceCardRef}
         style={{
