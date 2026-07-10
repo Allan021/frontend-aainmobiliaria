@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { PropertyDetail } from './PropertyDetail';
+import { PropertyFicha } from './PropertyFicha';
 import type { Property } from '../../../core/domain/entities/types';
 import { api } from '../../../infrastructure/api/client';
 import { QueryProvider } from '../../providers/QueryProvider';
@@ -58,7 +58,7 @@ function FallbackLoader() {
     return null;
   }
 
-  return <PropertyDetail property={property} standalone />;
+  return <PropertyFicha property={property} standalone />;
 }
 
 export function PropertyDetailFallback() {

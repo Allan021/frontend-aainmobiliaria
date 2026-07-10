@@ -2,12 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { QueryProvider } from '../../providers/QueryProvider';
-import { isLoggedIn, requireLogin } from '../../hooks/useFavorites';
+import { isLoggedIn } from '../../hooks/useFavorites';
+import { useLogin, useRegister } from '../../hooks/useAuth';
 import { useHondurasData } from '../../hooks/useHondurasData';
 import { propertyAdapter } from '../../../infrastructure/api/propertyAdapter';
 import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
 import type { Property, PropertyImage } from '../../../core/domain/entities/types';
-import { IconCamera, IconCheckCircle, IconTrash, IconMapPin, IconEye, IconList } from '../shared/rs-icons';
+import { WhatsAppIcon } from '../shared/Icon';
+import { IconHome, IconMountain, IconGrid, IconArea, IconLock, IconHandshake, IconScroll, IconCheck, IconTrash, IconCamera, IconEye, IconList } from '../shared/rs-icons';
+
+const F_ARCHIVO = "'Archivo', 'Plus Jakarta Sans', sans-serif";
+const F_SANS = "'Instrument Sans', 'Plus Jakarta Sans', sans-serif";
+const F_MONO = "'JetBrains Mono', monospace";
 
 const DEP_CODES: Record<string, string> = {
   'Francisco Morazán': 'FM', 'Cortés': 'CO', 'Atlántida': 'ATL', 'Comayagua': 'CM',
@@ -16,14 +22,41 @@ const DEP_CODES: Record<string, string> = {
   'Ocotepeque': 'OC', 'Colón': 'CL', 'Valle': 'VA', 'Gracias a Dios': 'GD', 'Islas de la Bahía': 'IB',
 };
 
-const EMPTY_FORM = {
-  title: '', type: 'Casa', departamento: 'Yoro', municipio: '',
-  price: '', currency: 'L', area_varas: '', area_m2: '',
-  bedrooms: '', bathrooms: '', parking: '', description: '',
-  lat: null as number | null, lng: null as number | null,
+const TIPOS = [
+  { label: 'Casa', icon: <IconHome size={22} /> },
+  { label: 'Terreno', icon: <IconMountain size={22} /> },
+  { label: 'Lote', icon: <IconGrid size={22} /> },
+  { label: 'Comercial', icon: <IconArea size={22} /> },
+];
+
+const inputStyle: React.CSSProperties = {
+  width: '100%', boxSizing: 'border-box',
+  border: '1.5px solid #E4DFD2', borderRadius: 11, padding: '13px 16px',
+  fontFamily: F_SANS, fontSize: 15, outlineColor: '#1F5B42',
+  background: '#FAF8F3', color: '#111113',
 };
 
-/** Mini mapa: clic marca la ubicación de la propiedad */
+const labelText: React.CSSProperties = {
+  fontSize: '13.5px', fontWeight: 700, color: '#45412F', display: 'block', marginBottom: 7,
+};
+
+const primaryBtn: React.CSSProperties = {
+  background: '#1F5B42', color: '#EEF5F0', border: 'none',
+  fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 16,
+  padding: '16px 0', borderRadius: 13, cursor: 'pointer', transition: 'background 0.15s',
+};
+
+const ghostBtn: React.CSSProperties = {
+  background: 'transparent', color: '#6B6455', border: '1.5px solid #E4DFD2',
+  fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15,
+  padding: '15px 26px', borderRadius: 13, cursor: 'pointer', transition: 'background 0.15s',
+};
+
+const card: React.CSSProperties = {
+  background: '#FFFFFF', border: '1px solid #EDE9DF', borderRadius: 20, padding: 36,
+};
+
+/* ── Selector de ubicación (CARTO tiles) ── */
 function LocationPicker({ initial, onPick }: { initial?: [number, number] | null; onPick: (lat: number, lng: number) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -31,12 +64,11 @@ function LocationPicker({ initial, onPick }: { initial?: [number, number] | null
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
-    const map = L.map(ref.current).setView(initial || [14.75, -86.6], initial ? 14 : 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap',
-      maxZoom: 19,
+    const map = L.map(ref.current).setView(initial || [15.35, -87.8], initial ? 14 : 9);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 20,
     }).addTo(map);
-    const icon = L.divIcon({ className: 'map-pin-wrap', html: '<div class="map-price-pin">Aquí</div>', iconSize: [0, 0] });
+    const icon = L.divIcon({ className: 'map-pin-wrap', html: '<div class="map-price-pin map-price-pin--active">Aquí</div>', iconSize: [0, 0] });
     if (initial) markerRef.current = L.marker(initial, { icon }).addTo(map);
     map.on('click', e => {
       if (markerRef.current) markerRef.current.setLatLng(e.latlng);
@@ -47,65 +79,159 @@ function LocationPicker({ initial, onPick }: { initial?: [number, number] | null
     return () => { map.remove(); mapRef.current = null; markerRef.current = null; };
   }, []);
 
-  return <div ref={ref} style={{ width: '100%', height: 300, borderRadius: 14, overflow: 'hidden', zIndex: 0, border: '1.5px solid var(--main-border, #E6E0D2)' }} />;
+  return <div ref={ref} style={{ position: 'relative', height: 260, borderRadius: 14, overflow: 'hidden', border: '1.5px solid #E4DFD2', zIndex: 0, cursor: 'crosshair' }} />;
 }
 
-function Steps({ current }: { current: 1 | 2 | 3 }) {
-  const steps = [{ n: 1, label: 'Datos' }, { n: 2, label: 'Fotos' }, { n: 3, label: 'Listo' }];
+/* ── Indicador de pasos ── */
+function Steps({ current, onGo }: { current: number; onGo: (n: number) => void }) {
+  const defs = [
+    { n: 1, label: 'Cuenta' }, { n: 2, label: 'Propiedad' }, { n: 3, label: 'Fotos y mapa' }, { n: 4, label: 'Listo' },
+  ];
   return (
-    <div className="rs-steps" role="list" aria-label="Progreso de publicación">
-      {steps.map((s, i) => (
-        <div key={s.n} style={{ display: 'contents' }}>
-          {i > 0 && <div className="rs-steps__line" />}
-          <div role="listitem" className={`rs-steps__item ${current === s.n ? 'rs-steps__item--active' : ''} ${current > s.n ? 'rs-steps__item--done' : ''}`}>
-            <span className="rs-steps__num">{current > s.n ? '✓' : s.n}</span>
-            <span className="rs-steps__label">{s.label}</span>
+    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 36, fontFamily: F_SANS }} role="list" aria-label="Progreso">
+      {defs.map((d, i) => {
+        const done = current > d.n;
+        const activo = current === d.n;
+        return (
+          <div key={d.n} style={{ flex: i < defs.length - 1 ? 1 : '0 0 auto', display: 'flex', alignItems: 'center', gap: 10 }} role="listitem">
+            <button onClick={() => { if (d.n < current && current !== 4) onGo(d.n); }} type="button" style={{
+              width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+              fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 14,
+              display: 'grid', placeItems: 'center', cursor: d.n < current && current !== 4 ? 'pointer' : 'default',
+              border: activo ? '2px solid #1F5B42' : done ? '2px solid #4A7C59' : '2px solid #E4DFD2',
+              background: activo ? '#1F5B42' : done ? '#4A7C59' : '#FFFFFF',
+              color: activo || done ? '#EEF5F0' : '#9A9383',
+            }}>{done ? <IconCheck size={14} /> : d.n}</button>
+            <span style={{ fontSize: '13.5px', fontWeight: activo ? 700 : 600, color: activo ? '#111113' : done ? '#4A7C59' : '#9A9383', whiteSpace: 'nowrap' }}>{d.label}</span>
+            {i < defs.length - 1 && <div style={{ flex: 1, height: 2, background: done ? '#4A7C59' : '#E4DFD2', margin: '0 12px', transition: 'background 0.3s' }} />}
           </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Paso 1: cuenta ── */
+function PasoCuenta({ onDone }: { onDone: () => void }) {
+  const [mode, setMode] = useState<'register' | 'login'>('register');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const login = useLogin();
+  const register = useRegister();
+  const pending = login.isPending || register.isPending;
+  const error = (mode === 'login' ? login.error : register.error) as Error | null;
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (mode === 'register') register.mutate({ email, password, name }, { onSuccess: onDone });
+    else login.mutate({ email, password }, { onSuccess: onDone });
+  };
+
+  return (
+    <div style={card}>
+      <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 24, margin: '0 0 6px', letterSpacing: '-0.02em' }}>
+        {mode === 'register' ? 'Creá tu cuenta' : 'Entrá a tu cuenta'}
+      </h2>
+      <p style={{ fontSize: '14.5px', color: '#6B6455', margin: '0 0 28px' }}>
+        {mode === 'register'
+          ? 'Solo para coordinar contigo — tus datos nunca se muestran en el sitio.'
+          : 'Bienvenido de nuevo.'}{' '}
+        <button type="button" onClick={() => setMode(m => m === 'register' ? 'login' : 'register')} style={{
+          color: '#1F5B42', fontWeight: 700, background: 'none', border: 'none',
+          cursor: 'pointer', fontFamily: 'inherit', fontSize: '14.5px', padding: 0,
+          textDecoration: 'underline', textUnderlineOffset: 2,
+        }}>{mode === 'register' ? '¿Ya tenés cuenta?' : '¿Cuenta nueva?'}</button>
+      </p>
+
+      {error && (
+        <div style={{ background: '#F9EBE7', color: '#8C3A2E', border: '1px solid #EBD2CB', borderRadius: 11, padding: '12px 16px', fontSize: '13.5px', fontWeight: 600, marginBottom: 18 }} role="alert">
+          {error.message}
         </div>
-      ))}
+      )}
+
+      <form onSubmit={submit}>
+        <div className="pub-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          {mode === 'register' && (
+            <label style={{ display: 'block' }}>
+              <span style={labelText}>Nombre completo</span>
+              <input required placeholder="Ej. María Rodríguez" value={name} onChange={e => setName(e.target.value)} style={inputStyle} autoComplete="name" />
+            </label>
+          )}
+          <label style={{ display: 'block' }}>
+            <span style={labelText}>Correo electrónico</span>
+            <input required type="email" placeholder="tucorreo@ejemplo.com" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} autoComplete="email" inputMode="email" />
+          </label>
+          <label style={{ display: 'block' }}>
+            <span style={labelText}>Contraseña</span>
+            <input required type="password" minLength={6} placeholder="Mínimo 6 caracteres" value={password} onChange={e => setPassword(e.target.value)}
+              style={inputStyle} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
+          </label>
+        </div>
+
+        <div style={{
+          background: '#EEF5F0', borderRadius: 12, padding: '14px 18px', marginTop: 22,
+          fontSize: '13.5px', color: '#17452F', display: 'flex', gap: 10, alignItems: 'flex-start',
+        }}>
+          <span style={{ color: '#1F5B42', display: 'flex', marginTop: 1 }}><IconLock size={15} /></span>
+          <span><strong>Tus datos nunca se muestran en el sitio.</strong> Solo los usamos para coordinar visitas y avisarte cuando haya interesados.</span>
+        </div>
+
+        <button type="submit" disabled={pending} style={{ ...primaryBtn, marginTop: 26, width: '100%', opacity: pending ? 0.7 : 1 }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#17452F'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = '#1F5B42'; }}
+        >{pending ? 'Un momento…' : 'Continuar →'}</button>
+      </form>
     </div>
   );
 }
 
 function PublishInner() {
   const { departamentos } = useHondurasData();
+  const [paso, setPaso] = useState(1);
   const [editId, setEditId] = useState<string | null>(null);
   const [loadingExisting, setLoadingExisting] = useState(true);
-  const [step, setStep] = useState<'form' | 'photos' | 'done'>('form');
   const [property, setProperty] = useState<Property | null>(null);
-  const [photos, setPhotos] = useState<PropertyImage[]>([]);
+  const [photos, setPhotos] = useState<PropertyImage[]>([]);        // modo edición (ya subidas)
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);      // modo creación (locales)
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
-  const [form, setForm] = useState(EMPTY_FORM);
+
+  const [form, setForm] = useState({
+    title: '', type: 'Casa', departamento: 'Yoro', municipio: '',
+    price: '', currency: 'L', area_varas: '', area_m2: '',
+    bedrooms: '', bathrooms: '', parking: '', description: '',
+    lat: null as number | null, lng: null as number | null,
+  });
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }));
 
-  // Modo edición: /publicar?id=<uuid>
   useEffect(() => {
-    if (!isLoggedIn()) { requireLogin(); return; }
     const id = new URLSearchParams(window.location.search).get('id');
-    if (!id) { setLoadingExisting(false); return; }
+    const logged = isLoggedIn();
+    if (!id) {
+      setPaso(logged ? 2 : 1);
+      setLoadingExisting(false);
+      return;
+    }
+    if (!logged) { window.location.href = `/acceder?next=${encodeURIComponent('/publicar?id=' + id)}`; return; }
     setEditId(id);
     propertyAdapter.getById(id)
       .then(p => {
         setProperty(p);
         setPhotos(p.images || []);
         setForm({
-          title: p.title || '',
-          type: p.type || 'Casa',
-          departamento: p.departamento || 'Yoro',
-          municipio: p.municipio || '',
-          price: p.price != null ? String(p.price) : '',
-          currency: p.currency || 'L',
-          area_varas: p.area_varas || '',
-          area_m2: p.area_m2 || '',
+          title: p.title || '', type: p.type || 'Casa',
+          departamento: p.departamento || 'Yoro', municipio: p.municipio || '',
+          price: p.price != null ? String(p.price) : '', currency: p.currency || 'L',
+          area_varas: p.area_varas || '', area_m2: p.area_m2 || '',
           bedrooms: p.bedrooms != null ? String(p.bedrooms) : '',
           bathrooms: p.bathrooms != null ? String(p.bathrooms) : '',
           parking: p.parking != null ? String(p.parking) : '',
           description: p.description || '',
-          lat: p.lat ?? null,
-          lng: p.lng ?? null,
+          lat: p.lat ?? null, lng: p.lng ?? null,
         });
+        setPaso(2);
       })
       .catch(() => setError('No se pudo cargar la propiedad.'))
       .finally(() => setLoadingExisting(false));
@@ -113,273 +239,395 @@ function PublishInner() {
 
   const dep = departamentos.find(d => d.nombre === form.departamento);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const validarPropiedad = (): boolean => {
     setError('');
-    if (form.lat == null) { setError('Marque la ubicación en el mapa: haga clic sobre el punto de su propiedad.'); return; }
+    if (!form.title.trim()) { setError('Poné un título a tu anuncio.'); return false; }
+    if (!form.price || Number(form.price) <= 0) { setError('Ingresá el precio.'); return false; }
+    if (!form.municipio) { setError('Seleccioná el municipio.'); return false; }
+    if (!form.description.trim()) { setError('Agregá una descripción breve.'); return false; }
+    return true;
+  };
+
+  const payload = (): Partial<Property> => ({
+    title: form.title,
+    type: form.type as Property['type'],
+    departamento: form.departamento,
+    dep_code: DEP_CODES[form.departamento] || undefined,
+    municipio: form.municipio,
+    price: Number(form.price),
+    currency: form.currency,
+    area_varas: form.area_varas || undefined,
+    area_m2: form.area_m2 || undefined,
+    description: form.description,
+    bedrooms: form.bedrooms ? Number(form.bedrooms) : null,
+    bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
+    parking: form.parking ? Number(form.parking) : null,
+    lat: form.lat,
+    lng: form.lng,
+  });
+
+  const enviar = async () => {
+    setError('');
+    if (form.lat == null) { setError('Marcá la ubicación en el mapa: hacé clic sobre el punto de tu propiedad.'); return; }
     setSaving(true);
-    const payload: Partial<Property> = {
-      title: form.title,
-      type: form.type as Property['type'],
-      departamento: form.departamento,
-      dep_code: DEP_CODES[form.departamento] || undefined,
-      municipio: form.municipio,
-      price: Number(form.price),
-      currency: form.currency,
-      area_varas: form.area_varas || undefined,
-      area_m2: form.area_m2 || undefined,
-      description: form.description,
-      bedrooms: form.bedrooms ? Number(form.bedrooms) : null,
-      bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
-      parking: form.parking ? Number(form.parking) : null,
-      lat: form.lat,
-      lng: form.lng,
-    };
     try {
-      let saved: Property;
       if (editId) {
-        saved = await propertyAdapter.update(editId, payload);
-        saved.images = photos;
+        const saved = await propertyAdapter.update(editId, payload());
+        setProperty(saved);
       } else {
-        saved = await propertyAdapter.create({ ...payload, status: 'disponible' });
+        // Nueva publicación: entra en revisión (borrador) hasta que A&A la verifique
+        const created = await propertyAdapter.create({ ...payload(), status: 'borrador' });
+        setProperty(created);
+        if (pendingFiles.length > 0) {
+          setUploading(true);
+          for (const file of pendingFiles) {
+            await propertyAdapter.uploadImage(created.id, file).catch(() => {});
+          }
+          setUploading(false);
+        }
       }
-      setProperty(saved);
-      setStep('photos');
+      setPaso(4);
       window.scrollTo({ top: 0 });
     } catch (err) {
-      setError((err as Error).message || 'No se pudo guardar');
+      setError((err as Error).message || 'No se pudo enviar');
     } finally {
       setSaving(false);
     }
   };
 
-  const uploadFiles = async (files: FileList | null) => {
-    if (!files || !property) return;
-    setUploading(true);
-    setError('');
-    try {
-      for (const file of Array.from(files)) {
-        await propertyAdapter.uploadImage(property.id, file);
+  const addFiles = async (files: FileList | null) => {
+    if (!files) return;
+    if (editId && property) {
+      setUploading(true);
+      setError('');
+      try {
+        for (const file of Array.from(files)) await propertyAdapter.uploadImage(property.id, file);
+        const fresh = await propertyAdapter.getById(property.id);
+        setPhotos(fresh.images || []);
+      } catch (err) {
+        setError((err as Error).message || 'Error subiendo imagen');
+      } finally {
+        setUploading(false);
       }
-      // Re-sincroniza para obtener ids de las imágenes nuevas (permite borrarlas)
-      const fresh = await propertyAdapter.getById(property.id);
-      setPhotos(fresh.images || []);
-    } catch (err) {
-      setError((err as Error).message || 'Error subiendo imagen');
-    } finally {
-      setUploading(false);
+    } else {
+      setPendingFiles(prev => [...prev, ...Array.from(files)]);
     }
   };
 
   const deletePhoto = async (img: PropertyImage) => {
     if (!property) return;
     setPhotos(ps => ps.filter(p => p.id !== img.id));
-    try {
-      await propertyAdapter.removeImage(property.id, img.id);
-    } catch {
-      setPhotos(ps => [...ps, img]);
-      setError('No se pudo eliminar la foto.');
-    }
+    try { await propertyAdapter.removeImage(property.id, img.id); }
+    catch { setPhotos(ps => [...ps, img]); }
+  };
+
+  const tipoBtn = (t: typeof TIPOS[number]) => {
+    const sel = form.type === t.label;
+    return (
+      <button key={t.label} type="button" onClick={() => set('type', t.label)} style={{
+        border: sel ? '2px solid #1F5B42' : '1.5px solid #E4DFD2',
+        background: sel ? '#EEF5F0' : '#FAF8F3',
+        color: sel ? '#1F5B42' : '#45412F',
+        borderRadius: 13, padding: '16px 8px', cursor: 'pointer',
+        fontFamily: F_SANS, textAlign: 'center', transition: 'all 0.15s',
+      }}>
+        <span style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>{t.icon}</span>
+        <span style={{ display: 'block', fontWeight: 700, fontSize: '13.5px' }}>{t.label}</span>
+      </button>
+    );
   };
 
   if (loadingExisting) {
     return (
-      <div className="rs-page" style={{ maxWidth: 720 }}>
-        <div className="rs-skeleton" style={{ height: 34, width: '55%', marginBottom: 12 }} />
-        <div className="rs-skeleton" style={{ height: 16, width: '75%', marginBottom: 28 }} />
-        <div className="rs-skeleton" style={{ height: 46, marginBottom: 14 }} />
-        <div className="rs-skeleton" style={{ height: 46, marginBottom: 14 }} />
-        <div className="rs-skeleton" style={{ height: 300 }} />
-      </div>
-    );
-  }
-
-  if (step === 'done' && property) {
-    return (
-      <div className="rs-page" style={{ maxWidth: 560, textAlign: 'center', paddingTop: '4rem' }}>
-        <div className="rs-empty__icon" style={{ width: 72, height: 72 }}>
-          <IconCheckCircle size={34} />
-        </div>
-        <h1 className="rs-page__title">{editId ? '¡Cambios guardados!' : '¡Su propiedad está publicada!'}</h1>
-        <p className="rs-page__sub" style={{ margin: '10px auto 0' }}>
-          La publicación es anónima: los interesados contactan a través de A&A Inmobiliaria y nosotros coordinamos con usted.
-        </p>
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: '1.75rem', flexWrap: 'wrap' }}>
-          <a href={`/propiedad/${property.id}`} className="rs-btn rs-btn--primary"><IconEye size={16} /> Ver publicación</a>
-          <a href="/mis-propiedades" className="rs-btn rs-btn--secondary"><IconList size={16} /> Mis propiedades</a>
-        </div>
-      </div>
-    );
-  }
-
-  if (step === 'photos' && property) {
-    return (
-      <div className="rs-page" style={{ maxWidth: 680 }}>
-        <div className="rs-page__eyebrow">{editId ? 'Editar publicación' : 'Nueva publicación'}</div>
-        <h1 className="rs-page__title">Fotos de la propiedad</h1>
-        <p className="rs-page__sub">Las propiedades con 5 o más fotos reciben hasta 3× más interesados.</p>
-        <Steps current={2} />
-
-        {error && <div className="rs-alert rs-alert--error" role="alert" style={{ marginBottom: 14 }}>{error}</div>}
-
-        <label style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          border: '2px dashed var(--color-pine-300, #7FB596)', borderRadius: 16,
-          padding: '2.5rem 1rem', cursor: 'pointer', background: 'var(--color-pine-50, #EEF5F0)',
-          color: 'var(--color-pine-700, #174834)', fontWeight: 700, fontSize: '0.9375rem', gap: 10,
-          transition: 'border-color 0.2s, background 0.2s',
-        }}>
-          <IconCamera size={28} />
-          {uploading ? 'Subiendo…' : 'Toque para elegir fotos'}
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-pine-600, #1F5B42)', opacity: 0.85 }}>
-            JPG o PNG · puede elegir varias a la vez
-          </span>
-          <input type="file" accept="image/*" multiple style={{ display: 'none' }}
-            onChange={e => uploadFiles(e.target.files)} disabled={uploading} />
-        </label>
-
-        {photos.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 10, marginTop: 18 }}>
-            {photos.map(img => (
-              <div key={img.id || img.url} className="rs-card" style={{ position: 'relative', overflow: 'hidden', borderRadius: 12 }}>
-                <img src={optimizeCloudinaryUrl(img.url, 260)} alt="Foto de la propiedad"
-                  style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }} />
-                {img.id && (
-                  <button type="button" onClick={() => deletePhoto(img)} aria-label="Eliminar foto"
-                    className="rs-icon-btn"
-                    style={{ position: 'absolute', top: 6, right: 6, width: 32, height: 32, background: 'rgba(255,255,255,0.92)', color: '#8C3A2E', borderColor: 'transparent' }}>
-                    <IconTrash size={15} />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
-          <button onClick={() => setStep('form')} className="rs-btn rs-btn--ghost" type="button">← Volver a datos</button>
-          <button onClick={() => setStep('done')} disabled={uploading} className="rs-btn rs-btn--primary" style={{ flex: 1 }}>
-            {photos.length > 0 ? 'Finalizar' : 'Finalizar sin fotos'}
-          </button>
-        </div>
+      <div style={{ maxWidth: 880, margin: '0 auto', padding: '48px 24px' }}>
+        <div className="rs-skeleton" style={{ height: 42, width: '60%', margin: '0 auto 16px' }} />
+        <div className="rs-skeleton" style={{ height: 400, borderRadius: 20 }} />
       </div>
     );
   }
 
   return (
-    <div className="rs-page" style={{ maxWidth: 720 }}>
-      <div className="rs-page__eyebrow">{editId ? 'Editar publicación' : 'Publicación gratuita'}</div>
-      <h1 className="rs-page__title">{editId ? 'Edite su propiedad' : 'Publique su propiedad'}</h1>
-      <p className="rs-page__sub">
-        Anónimo de principio a fin: los interesados contactan por el número de A&A Inmobiliaria, nunca el suyo.
-      </p>
-      <Steps current={1} />
-
-      {error && <div className="rs-alert rs-alert--error" role="alert" style={{ marginBottom: 14 }}>{error}</div>}
-
-      <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <div className="rs-section-title">Información básica</div>
-
-        <div>
-          <label className="rs-label" htmlFor="pub-title">Título del anuncio</label>
-          <input id="pub-title" className="rs-input" required value={form.title} onChange={e => set('title', e.target.value)}
-            placeholder="Ej: Casa de 3 habitaciones en Col. Las Palmas" />
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-          <div>
-            <label className="rs-label" htmlFor="pub-type">Tipo</label>
-            <select id="pub-type" className="rs-input" value={form.type} onChange={e => set('type', e.target.value)}>
-              {['Casa', 'Terreno', 'Lote', 'Comercial'].map(t => <option key={t}>{t}</option>)}
-            </select>
+    <div style={{ maxWidth: 880, margin: '0 auto', padding: '48px 24px 80px', fontFamily: F_SANS, color: '#111113' }}>
+      {/* Encabezado */}
+      {paso < 4 && (
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: '#EEF5F0', border: '1px solid #CDE2D4', borderRadius: 999,
+            padding: '7px 16px', marginBottom: 18,
+          }}>
+            <span style={{ fontFamily: F_MONO, fontSize: 11, letterSpacing: '0.14em', color: '#1F5B42', fontWeight: 500 }}>
+              100% GRATIS · SIN COMISIÓN POR PUBLICAR
+            </span>
           </div>
-          <div>
-            <label className="rs-label" htmlFor="pub-price">Precio</label>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <select aria-label="Moneda" className="rs-input" value={form.currency} onChange={e => set('currency', e.target.value)} style={{ width: 74, flexShrink: 0 }}>
-                <option value="L">L</option>
-                <option value="$">$</option>
-              </select>
-              <input id="pub-price" className="rs-input" required type="number" min={1} inputMode="numeric"
-                value={form.price} onChange={e => set('price', e.target.value)} placeholder="1500000" />
+          <h1 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 'clamp(30px, 5vw, 42px)', letterSpacing: '-0.03em', margin: '0 0 12px', lineHeight: 1.08 }}>
+            {editId ? 'Editá tu propiedad.' : <>Publicá tu propiedad.<br /><span style={{ color: '#1F5B42' }}>Nosotros traemos los compradores.</span></>}
+          </h1>
+          <p style={{ fontSize: 16, color: '#6B6455', maxWidth: 560, margin: '0 auto' }}>
+            Tus datos quedan privados — A&A atiende cada consulta, coordina las visitas con vos y te acompaña hasta la escritura.
+          </p>
+        </div>
+      )}
+
+      <Steps current={paso} onGo={setPaso} />
+
+      {error && (
+        <div style={{ background: '#F9EBE7', color: '#8C3A2E', border: '1px solid #EBD2CB', borderRadius: 12, padding: '13px 18px', fontSize: '13.5px', fontWeight: 600, marginBottom: 18 }} role="alert">
+          {error}
+        </div>
+      )}
+
+      {/* PASO 1: CUENTA */}
+      {paso === 1 && <PasoCuenta onDone={() => setPaso(2)} />}
+
+      {/* PASO 2: PROPIEDAD */}
+      {paso === 2 && (
+        <div style={card}>
+          <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 24, margin: '0 0 6px', letterSpacing: '-0.02em' }}>Contanos de tu propiedad</h2>
+          <p style={{ fontSize: '14.5px', color: '#6B6455', margin: '0 0 28px' }}>Entre más completa la información, más rápido encontramos comprador.</p>
+
+          <span style={labelText}>¿Qué vendés?</span>
+          <div className="pub-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 24 }}>
+            {TIPOS.map(tipoBtn)}
+          </div>
+
+          <label style={{ display: 'block', marginBottom: 22 }}>
+            <span style={labelText}>Título del anuncio</span>
+            <input placeholder="Ej. Casa Res. Los Almendros" value={form.title} onChange={e => set('title', e.target.value)} style={inputStyle} />
+          </label>
+
+          <div className="pub-grid-2" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20, marginBottom: 22 }}>
+            <label style={{ display: 'block' }}>
+              <span style={labelText}>Precio</span>
+              <input placeholder="Ej. 850000" type="number" min={1} inputMode="numeric" value={form.price} onChange={e => set('price', e.target.value)} style={inputStyle} />
+            </label>
+            <div>
+              <span style={labelText}>Moneda</span>
+              <div style={{ display: 'flex', border: '1.5px solid #E4DFD2', borderRadius: 11, overflow: 'hidden' }}>
+                {[{ v: 'L', l: 'Lempiras' }, { v: '$', l: 'Dólares' }].map(m => {
+                  const sel = form.currency === m.v;
+                  return (
+                    <button key={m.v} type="button" onClick={() => set('currency', m.v)} style={{
+                      flex: 1, border: 'none', padding: '13px 0',
+                      fontFamily: F_SANS, fontWeight: sel ? 700 : 600, fontSize: 14, cursor: 'pointer',
+                      background: sel ? '#1F5B42' : '#FAF8F3', color: sel ? '#EEF5F0' : '#6B6455', transition: 'all 0.15s',
+                    }}>{m.l}</button>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="rs-section-title" style={{ marginTop: 8 }}>Ubicación</div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-          <div>
-            <label className="rs-label" htmlFor="pub-dep">Departamento</label>
-            <select id="pub-dep" className="rs-input" value={form.departamento}
-              onChange={e => { set('departamento', e.target.value); set('municipio', ''); }}>
-              {departamentos.map(d => <option key={d.id}>{d.nombre}</option>)}
-            </select>
+          <div className="pub-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 22 }}>
+            <label style={{ display: 'block' }}>
+              <span style={labelText}>Departamento</span>
+              <select value={form.departamento} onChange={e => { set('departamento', e.target.value); set('municipio', ''); }} style={{ ...inputStyle, cursor: 'pointer' }}>
+                {departamentos.map(d => <option key={d.id}>{d.nombre}</option>)}
+              </select>
+            </label>
+            <label style={{ display: 'block' }}>
+              <span style={labelText}>Municipio</span>
+              <select value={form.municipio} onChange={e => set('municipio', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="">Seleccioná…</option>
+                {(dep?.municipios || []).map(m => <option key={m.id}>{m.nombre}</option>)}
+              </select>
+            </label>
           </div>
-          <div>
-            <label className="rs-label" htmlFor="pub-muni">Municipio</label>
-            <select id="pub-muni" className="rs-input" required value={form.municipio} onChange={e => set('municipio', e.target.value)}>
-              <option value="">Seleccione…</option>
-              {(dep?.municipios || []).map(m => <option key={m.id}>{m.nombre}</option>)}
-            </select>
+
+          <div className="pub-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 22 }}>
+            <label style={{ display: 'block' }}>
+              <span style={labelText}>Varas²</span>
+              <input placeholder="350" value={form.area_varas} onChange={e => set('area_varas', e.target.value)} style={inputStyle} />
+            </label>
+            <label style={{ display: 'block' }}>
+              <span style={labelText}>Habitaciones</span>
+              <input placeholder="3" type="number" min={0} inputMode="numeric" value={form.bedrooms} onChange={e => set('bedrooms', e.target.value)} style={inputStyle} />
+            </label>
+            <label style={{ display: 'block' }}>
+              <span style={labelText}>Baños</span>
+              <input placeholder="2" type="number" min={0} step="0.5" inputMode="decimal" value={form.bathrooms} onChange={e => set('bathrooms', e.target.value)} style={inputStyle} />
+            </label>
+            <label style={{ display: 'block' }}>
+              <span style={labelText}>Parqueos</span>
+              <input placeholder="2" type="number" min={0} inputMode="numeric" value={form.parking} onChange={e => set('parking', e.target.value)} style={inputStyle} />
+            </label>
+          </div>
+
+          <label style={{ display: 'block', marginBottom: 22 }}>
+            <span style={labelText}>Descripción breve</span>
+            <textarea placeholder="Ej. Casa en circuito cerrado, sala amplia, patio con espacio para ampliar…" rows={3}
+              value={form.description} onChange={e => set('description', e.target.value)}
+              style={{ ...inputStyle, resize: 'vertical' }} />
+          </label>
+
+          <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+            {!editId && !isLoggedIn() && (
+              <button type="button" onClick={() => setPaso(1)} style={ghostBtn}
+                onMouseEnter={e => { e.currentTarget.style.background = '#F0EDE4'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+              >← Atrás</button>
+            )}
+            <button type="button" onClick={() => { if (validarPropiedad()) { setPaso(3); window.scrollTo({ top: 0 }); } }}
+              style={{ ...primaryBtn, flex: 1 }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#17452F'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#1F5B42'; }}
+            >Continuar →</button>
           </div>
         </div>
+      )}
 
-        <div>
-          <label className="rs-label">Punto en el mapa</label>
+      {/* PASO 3: FOTOS + MAPA */}
+      {paso === 3 && (
+        <div style={card}>
+          <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 24, margin: '0 0 6px', letterSpacing: '-0.02em' }}>Fotos y ubicación</h2>
+          <p style={{ fontSize: '14.5px', color: '#6B6455', margin: '0 0 28px' }}>Las propiedades con 5+ fotos reciben el triple de consultas.</p>
+
+          <span style={labelText}>Fotos</span>
+          <div className="pub-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 26 }}>
+            <label style={{
+              aspectRatio: '1', border: '2px dashed #1F5B42', borderRadius: 12,
+              display: 'grid', placeItems: 'center', background: '#EEF5F0', cursor: 'pointer',
+            }}>
+              <div style={{ textAlign: 'center', color: '#1F5B42' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}><IconCamera size={22} /></div>
+                <div style={{ fontSize: '11.5px', fontWeight: 700 }}>{uploading ? 'Subiendo…' : 'Subir fotos'}</div>
+              </div>
+              <input type="file" accept="image/*" multiple style={{ display: 'none' }} disabled={uploading}
+                onChange={e => { addFiles(e.target.files); e.target.value = ''; }} />
+            </label>
+
+            {/* Modo edición: fotos ya subidas */}
+            {editId && photos.map(img => (
+              <div key={img.id || img.url} style={{ position: 'relative', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: '1px solid #EDE9DF' }}>
+                <img src={optimizeCloudinaryUrl(img.url, 260)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                {img.id && (
+                  <button type="button" onClick={() => deletePhoto(img)} aria-label="Eliminar foto" style={{
+                    position: 'absolute', top: 6, right: 6, width: 30, height: 30, borderRadius: 8,
+                    background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer',
+                    display: 'grid', placeItems: 'center', color: '#8C3A2E',
+                  }}><IconTrash size={14} /></button>
+                )}
+              </div>
+            ))}
+
+            {/* Modo creación: previews locales */}
+            {!editId && pendingFiles.map((f, i) => (
+              <div key={i} style={{ position: 'relative', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: '1px solid #EDE9DF' }}>
+                <img src={URL.createObjectURL(f)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <button type="button" onClick={() => setPendingFiles(fs => fs.filter((_, j) => j !== i))} aria-label="Quitar foto" style={{
+                  position: 'absolute', top: 6, right: 6, width: 30, height: 30, borderRadius: 8,
+                  background: 'rgba(255,255,255,0.92)', border: 'none', cursor: 'pointer',
+                  display: 'grid', placeItems: 'center', color: '#8C3A2E',
+                }}><IconTrash size={14} /></button>
+              </div>
+            ))}
+
+            {/* Placeholders */}
+            {Array.from({ length: Math.max(0, 3 - (editId ? photos.length : pendingFiles.length)) }).map((_, i) => (
+              <div key={`ph-${i}`} style={{
+                aspectRatio: '1', border: '1.5px dashed #E4DFD2', borderRadius: 12,
+                display: 'grid', placeItems: 'center', background: '#FAF8F3',
+              }}>
+                <span style={{ fontFamily: F_MONO, fontSize: 10, color: '#C4BDA9' }}>FOTO {(editId ? photos.length : pendingFiles.length) + i + 2}</span>
+              </div>
+            ))}
+          </div>
+
+          <span style={labelText}>Marcá la ubicación en el mapa</span>
           <LocationPicker
             initial={form.lat != null && form.lng != null ? [form.lat, form.lng] : null}
             onPick={(lat, lng) => { set('lat', lat); set('lng', lng); }}
           />
-          {form.lat != null ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--color-pine-600, #1F5B42)', fontWeight: 700, marginTop: 8 }}>
-              <IconMapPin size={14} /> Ubicación marcada ({form.lat.toFixed(5)}, {form.lng?.toFixed(5)})
-            </div>
+          <div style={{ fontSize: '12.5px', color: form.lat != null ? '#1F5B42' : '#9A9383', margin: '8px 0 26px', fontWeight: form.lat != null ? 700 : 400 }}>
+            {form.lat != null
+              ? 'Ubicación marcada. En el sitio se muestra solo la zona aproximada — nunca la dirección exacta.'
+              : 'Hacé clic sobre el punto de tu propiedad. En el sitio se muestra solo la zona aproximada.'}
+          </div>
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button type="button" onClick={() => setPaso(2)} style={ghostBtn}
+              onMouseEnter={e => { e.currentTarget.style.background = '#F0EDE4'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+            >← Atrás</button>
+            <button type="button" onClick={enviar} disabled={saving || uploading} style={{ ...primaryBtn, flex: 1, opacity: saving || uploading ? 0.7 : 1 }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#17452F'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#1F5B42'; }}
+            >{saving || uploading ? 'Enviando…' : editId ? 'Guardar cambios →' : 'Enviar a revisión →'}</button>
+          </div>
+        </div>
+      )}
+
+      {/* PASO 4: LISTO */}
+      {paso === 4 && property && (
+        <div style={{ ...card, padding: '48px 36px', textAlign: 'center' }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: '50%', background: '#EEF5F0',
+            display: 'grid', placeItems: 'center', margin: '0 auto 20px', color: '#1F5B42',
+          }}><IconCheck size={30} /></div>
+          <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 28, margin: '0 0 10px', letterSpacing: '-0.02em' }}>
+            {editId ? '¡Cambios guardados!' : '¡Recibimos tu propiedad!'}
+          </h2>
+          {editId ? (
+            <p style={{ fontSize: '15.5px', color: '#6B6455', margin: '0 auto 28px', maxWidth: 480, lineHeight: 1.65 }}>
+              Tu publicación quedó actualizada.
+            </p>
           ) : (
-            <div style={{ fontSize: '0.78rem', color: 'var(--main-text-dim, #9A9383)', marginTop: 8 }}>
-              Haga clic en el mapa para marcar dónde está su propiedad. Solo se muestra la zona aproximada al público.
-            </div>
+            <>
+              <p style={{ fontSize: '15.5px', color: '#6B6455', margin: '0 auto 8px', maxWidth: 480, lineHeight: 1.65 }}>
+                Nuestro equipo verificará la escritura en el <strong style={{ color: '#111113' }}>Instituto de la Propiedad</strong> y te escribirá por WhatsApp en las próximas <strong style={{ color: '#111113' }}>24 horas</strong> para publicarla.
+              </p>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                background: '#FAF8F3', border: '1px solid #E4DFD2', borderRadius: 12,
+                padding: '12px 20px', margin: '20px 0 28px', fontSize: '13.5px', color: '#45412F', flexWrap: 'wrap', justifyContent: 'center',
+              }}>
+                <span style={{ fontFamily: F_MONO, color: '#B8862E' }}>EN REVISIÓN</span>
+                <span>→</span><span>Verificación legal</span><span>→</span><span style={{ color: '#9A9383' }}>Publicada</span>
+              </div>
+            </>
           )}
-        </div>
-
-        <div className="rs-section-title" style={{ marginTop: 8 }}>Detalles</div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-          <div>
-            <label className="rs-label" htmlFor="pub-beds">Habitaciones</label>
-            <input id="pub-beds" className="rs-input" type="number" min={0} inputMode="numeric" value={form.bedrooms} onChange={e => set('bedrooms', e.target.value)} placeholder="3" />
-          </div>
-          <div>
-            <label className="rs-label" htmlFor="pub-baths">Baños</label>
-            <input id="pub-baths" className="rs-input" type="number" min={0} step="0.5" inputMode="decimal" value={form.bathrooms} onChange={e => set('bathrooms', e.target.value)} placeholder="2" />
-          </div>
-          <div>
-            <label className="rs-label" htmlFor="pub-park">Parqueos</label>
-            <input id="pub-park" className="rs-input" type="number" min={0} inputMode="numeric" value={form.parking} onChange={e => set('parking', e.target.value)} placeholder="1" />
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-          <div>
-            <label className="rs-label" htmlFor="pub-varas">Área (varas²)</label>
-            <input id="pub-varas" className="rs-input" value={form.area_varas} onChange={e => set('area_varas', e.target.value)} placeholder="Ej: 350 varas²" />
-          </div>
-          <div>
-            <label className="rs-label" htmlFor="pub-m2">Área (m²)</label>
-            <input id="pub-m2" className="rs-input" value={form.area_m2} onChange={e => set('area_m2', e.target.value)} placeholder="Ej: 244 m²" />
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={() => window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: null } }))} style={{
+              background: '#25D366', color: '#0A3D22', fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15,
+              padding: '14px 26px', borderRadius: 12, border: 'none', cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 8, transition: 'background 0.15s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#3BE07B'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#25D366'; }}
+            ><WhatsAppIcon size={15} color="#0A3D22" /> Dar seguimiento por WhatsApp</button>
+            <a href="/mis-propiedades" style={{
+              border: '1.5px solid #E4DFD2', color: '#45412F', fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15,
+              padding: '14px 26px', borderRadius: 12, textDecoration: 'none',
+              display: 'inline-flex', alignItems: 'center', gap: 8, transition: 'background 0.15s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#F0EDE4'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+            ><IconList size={15} /> Mis propiedades</a>
+            {editId && (
+              <a href={`/propiedad/${property.id}`} style={{
+                border: '1.5px solid #E4DFD2', color: '#45412F', fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15,
+                padding: '14px 26px', borderRadius: 12, textDecoration: 'none',
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+              }}><IconEye size={15} /> Ver publicación</a>
+            )}
           </div>
         </div>
+      )}
 
-        <div>
-          <label className="rs-label" htmlFor="pub-desc">Descripción</label>
-          <textarea id="pub-desc" className="rs-input" required rows={4} value={form.description} onChange={e => set('description', e.target.value)}
-            placeholder="Describa su propiedad: estado, ubicación, servicios, extras…" />
-        </div>
-
-        <button type="submit" disabled={saving} className="rs-btn rs-btn--primary" style={{ padding: '1rem', fontSize: '0.9375rem' }}>
-          {saving ? 'Guardando…' : editId ? 'Guardar cambios y continuar' : 'Continuar a fotos'}
-        </button>
-      </form>
+      {/* Garantías */}
+      <div className="pub-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 36 }}>
+        {[
+          { icon: <IconLock size={20} />, t: 'Tus datos, privados', d: 'Nadie ve tu nombre ni tu número. A&A filtra a los curiosos.' },
+          { icon: <IconHandshake size={20} />, t: 'Nosotros negociamos', d: 'Coordinamos visitas y negociamos por vos con compradores reales.' },
+          { icon: <IconScroll size={20} />, t: 'Cierre con escritura', d: 'Acompañamiento legal completo hasta la firma de escritura pública.' },
+        ].map(g => (
+          <div key={g.t} style={{ textAlign: 'center', padding: '18px 12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8, color: '#1F5B42' }}>{g.icon}</div>
+            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{g.t}</div>
+            <div style={{ fontSize: 13, color: '#6B6455', lineHeight: 1.5 }}>{g.d}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

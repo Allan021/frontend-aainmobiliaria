@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { Header } from '../../ui/components/layout/Header';
 import { Footer } from '../../ui/components/layout/Footer';
-import { PropertyDetail } from '../../ui/components/property/PropertyDetail';
+import { PropertyFicha } from '../../ui/components/property/PropertyFicha';
 import { WhatsAppModal } from '../../ui/components/property/WhatsAppModal';
 import { serverFetch } from '../../infrastructure/api/client';
 import { cleanTitle, stripEmojis } from '../../core/domain/entities/types';
@@ -73,11 +73,7 @@ const jsonLd = [
   jsonLd={jsonLd}
 >
   <Header client:load currentRoute="catalog" />
-  <PropertyDetail
-    client:load
-    property={property}
-    standalone
-  />
+  <PropertyFicha client:load property={property} standalone />
   <Footer />
   <WhatsAppModal client:visible open={false} onClose={() => {}} />
 </BaseLayout>

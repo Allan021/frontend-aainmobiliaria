@@ -2,9 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Header } from '../ui/components/layout/Header';
 import { Footer } from '../ui/components/layout/Footer';
-import { Hero } from '../ui/components/property/Hero';
-import { FeaturedSection, TrustBand, CTASection, WhatsAppFAB } from '../ui/components/property/WebsiteApp';
-import { ReviewsSection } from '../ui/components/property/ReviewsSection';
+import { HomeLanding } from '../ui/components/home/HomeLanding';
+import { WhatsAppFAB } from '../ui/components/property/WebsiteApp';
 import { WhatsAppModal } from '../ui/components/property/WhatsAppModal';
 
 // Sitelinks searchbox: Google puede mostrar buscador directo al sitio
@@ -27,11 +26,7 @@ const websiteJsonLd = {
   jsonLd={websiteJsonLd}
 >
   <Header client:load currentRoute="home" />
-  <Hero client:load />
-  <FeaturedSection client:visible />
-  <TrustBand />
-  <ReviewsSection client:visible />
-  <CTASection client:visible />
+  <HomeLanding client:load />
   <Footer />
   <WhatsAppFAB client:visible />
   <WhatsAppModal client:load open={false} onClose={() => {}} />

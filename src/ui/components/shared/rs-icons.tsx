@@ -122,6 +122,97 @@ export const IconLogout = ({ size = 24 }: IconProps) => (
   </svg>
 );
 
+export const IconBed = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M2 4v16" />
+    <path d="M2 8h18a2 2 0 0 1 2 2v10" />
+    <path d="M2 17h20" />
+    <path d="M6 8v9" />
+  </svg>
+);
+
+export const IconBath = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a5 5 0 0 0 5 5h6a5 5 0 0 0 5-5v-5H4" />
+    <line x1="10" y1="5" x2="8" y2="7" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+  </svg>
+);
+
+export const IconCar = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+    <circle cx="7" cy="17" r="2" />
+    <path d="M9 17h6" />
+    <circle cx="17" cy="17" r="2" />
+  </svg>
+);
+
+export const IconArea = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9h18M9 21V9" />
+  </svg>
+);
+
+export const IconShield = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </svg>
+);
+
+export const IconLock = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
+
+export const IconHandshake = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="m11 17 2 2a1 1 0 1 0 3-3" />
+    <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
+    <path d="m21 3 1 11h-2" />
+    <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
+    <path d="M3 4h8" />
+  </svg>
+);
+
+export const IconScroll = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+  </svg>
+);
+
+export const IconVideo = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <polygon points="23 7 16 12 23 17 23 7" />
+    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+  </svg>
+);
+
+export const IconMountain = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M3 17l4-8 4 4 4-6 6 10H3z" />
+  </svg>
+);
+
+export const IconGrid = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <rect x="2" y="3" width="20" height="18" rx="2" />
+    <path d="M2 9h20M12 9v12" />
+  </svg>
+);
+
+export const IconPhoneCall = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+  </svg>
+);
+
 export const IconPause = ({ size = 24 }: IconProps) => (
   <svg {...base(size)}>
     <rect x="6" y="4" width="4" height="16" />

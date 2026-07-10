@@ -10,7 +10,7 @@ import { IconHome, IconEdit, IconEye, IconTrash, IconPlus, IconLogout, IconPause
 
 const STATUS_BADGE: Record<string, { text: string; bg: string; fg: string }> = {
   disponible: { text: 'Publicada', bg: '#E8F0EA', fg: '#2F6B45' },
-  borrador: { text: 'Pausada', bg: '#F3EFE6', fg: '#7A7364' },
+  borrador: { text: 'En revisión', bg: '#FBF1D9', fg: '#96701F' },
   apartado: { text: 'Apartada', bg: '#FBF1D9', fg: '#96701F' },
   vendido: { text: 'Vendida', bg: '#DCE7F3', fg: '#2E5C8C' },
 };
@@ -116,10 +116,11 @@ function MyPropertiesInner() {
                 <a href={`/propiedad/${p.id}`} className="rs-btn rs-btn--secondary rs-btn--sm">
                   <IconEye size={14} /> Ver
                 </a>
-                {(p.status === 'disponible' || p.status === 'borrador') && (
+                {/* Solo pausar; publicar desde revisión lo hace A&A tras verificar la escritura */}
+                {p.status === 'disponible' && (
                   <button onClick={() => toggleStatus.mutate(p)} disabled={toggleStatus.isPending}
                     className="rs-btn rs-btn--secondary rs-btn--sm">
-                    {p.status === 'disponible' ? <><IconPause size={14} /> Pausar</> : <><IconPlay size={14} /> Publicar</>}
+                    <IconPause size={14} /> Pausar
                   </button>
                 )}
                 <button

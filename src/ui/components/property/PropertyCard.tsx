@@ -1,7 +1,13 @@
 import { useState } from 'react';
-import { formatPrice, cleanTitle, type Property } from '../../../core/domain/entities/types';
-import { WhatsAppButton } from '../shared/WhatsAppButton';
+import { cleanTitle, type Property } from '../../../core/domain/entities/types';
+import { useCurrency, priceParts } from '../../hooks/useCurrency';
 import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
+import { WhatsAppIcon } from '../shared/Icon';
+import { IconBed, IconBath, IconCar, IconArea, IconCheck, IconHeart } from '../shared/rs-icons';
+
+const F_ARCHIVO = "'Archivo', 'Plus Jakarta Sans', sans-serif";
+const F_SANS = "'Instrument Sans', 'Plus Jakarta Sans', sans-serif";
+const F_MONO = "'JetBrains Mono', monospace";
 
 interface PropertyCardProps {
   property: Property;
@@ -14,262 +20,148 @@ interface PropertyCardProps {
   onToggleSave?: (p: Property) => void;
 }
 
-function HeartIcon({ saved, onClick }: { saved: boolean; onClick: (e: React.MouseEvent) => void }) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={saved ? 'Quitar de favoritos' : 'Guardar en favoritos'}
-      style={{
-        position: 'absolute', top: 12, right: 12,
-        width: 36, height: 36, borderRadius: '50%',
-        background: 'rgba(255,255,255,0.85)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255,255,255,0.3)',
-        cursor: 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        transition: 'all 0.20s ease',
-        zIndex: 2,
-      }}
-      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-    >
-      <svg width="18" height="18" viewBox="0 0 24 24"
-        fill={saved ? '#E53E3E' : 'none'}
-        stroke={saved ? '#E53E3E' : '#111113'}
-        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-        style={{ transition: 'fill 0.2s, stroke 0.2s' }}
-      >
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-      </svg>
-    </button>
-  );
-}
-
-function Badge({ children, gold }: { children: React.ReactNode; gold?: boolean }) {
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center',
-      padding: '0.3rem 0.75rem',
-      borderRadius: 999, fontSize: '0.6875rem', fontWeight: 700,
-      letterSpacing: '0.04em',
-      background: gold ? 'linear-gradient(135deg, #D4B254 0%, #B8962E 100%)' : 'rgba(17, 17, 19, 0.65)',
-      color: gold ? '#111113' : '#FAF8F3',
-      backdropFilter: 'blur(12px)',
-      border: gold ? '1px solid rgba(212, 178, 84, 0.4)' : '1px solid rgba(255, 255, 255, 0.15)',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-    }}>
-      {children}
-    </span>
-  );
-}
-
-export function PropertyCard({ property, onOpen, onWhatsApp, animDelay = 0, saved: savedProp, onToggleSave }: PropertyCardProps) {
+export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, onToggleSave }: PropertyCardProps) {
   const [hover, setHover] = useState(false);
   const [savedLocal, setSavedLocal] = useState(false);
   const saved = onToggleSave ? !!savedProp : savedLocal;
-  const [imgIdx, setImgIdx] = useState(0);
+  const [currency] = useCurrency();
 
-  const images = property.images?.length > 0
-    ? property.images.map(i => i.url)
-    : ['/montana.jpg'];
-
-  const currentImg = images[imgIdx] || images[0];
+  const img = property.images?.[0]?.url;
+  const { main, alt } = priceParts(property.discount_price ?? property.price, property.currency, currency);
+  const enCuotas = property.financing;
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onToggleSave) onToggleSave(property);
     else setSavedLocal(s => !s);
-    import('animejs').then(mod => {
-      const animate = (mod as any).animate;
-      if (!animate) return;
-      const btn = e.currentTarget as HTMLButtonElement;
-      animate(btn, {
-        scale: [1, 1.35, 1],
-        duration: 380,
-        ease: 'outBack',
-      });
-    });
-  };
-
-  const handleImgDot = (e: React.MouseEvent, i: number) => {
-    e.stopPropagation();
-    setImgIdx(i);
   };
 
   return (
     <article
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      onClick={() => onOpen(property)}
       style={{
-        borderRadius: 20,
-        overflow: 'hidden',
-        cursor: 'pointer',
-        background: 'var(--main-card-bg, #ffffff)',
-        border: '1px solid var(--main-border, #E6E0D2)',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1)',
-        boxShadow: hover
-          ? '0 24px 48px -12px rgba(17,17,19,0.12), 0 8px 24px -4px rgba(212, 178, 84, 0.08)'
-          : '0 4px 20px -2px rgba(17,17,19,0.04), 0 2px 8px -1px rgba(17,17,19,0.02)',
-        transform: hover ? 'translateY(-6px)' : 'translateY(0)',
-        borderColor: hover ? '#D4B254' : 'var(--main-border, #E6E0D2)',
+        background: '#FFFFFF', border: '1px solid #EDE9DF', borderRadius: 16,
+        overflow: 'hidden', display: 'flex', flexDirection: 'column',
+        fontFamily: F_SANS, color: '#111113',
+        transition: 'box-shadow 0.2s, transform 0.2s',
+        boxShadow: hover ? '0 20px 48px -16px rgba(17,17,19,0.18)' : 'none',
+        transform: hover ? 'translateY(-3px)' : 'translateY(0)',
       }}
     >
-      {/* Image */}
-      <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#111113', flexShrink: 0 }}>
-        <img
-          src={optimizeCloudinaryUrl(currentImg, 480)}
-          alt={property.title}
-          width={480}
-          height={360}
-          style={{
-            width: '100%', height: '100%', objectFit: 'cover',
-            transform: hover ? 'scale(1.06)' : 'scale(1)',
-            transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
-          }}
-          loading="lazy"
-          decoding="async"
-        />
-
-        {/* Gradient overlay */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(to top, rgba(10,10,11,0.55) 0%, transparent 50%)',
-          opacity: hover ? 1 : 0.7,
-          transition: 'opacity 0.3s',
-        }} />
-
-        {/* Top badges */}
-        <div style={{ position: 'absolute', top: 12, left: 12, display: 'flex', gap: 6, zIndex: 2 }}>
-          {property.financing ? <Badge gold>Financiamiento</Badge> : <Badge>Solo contado</Badge>}
-          {property.property_type === 'lotificadora' && (
-            <Badge>{property.available_lots || 1} lotes</Badge>
+      {/* Foto */}
+      <div style={{ position: 'relative' }}>
+        <div onClick={() => onOpen(property)} style={{ display: 'block', height: 200, background: '#EDE9DF', cursor: 'pointer', overflow: 'hidden' }}>
+          {img ? (
+            <img
+              src={optimizeCloudinaryUrl(img, 480)}
+              alt={cleanTitle(property.title)}
+              width={480} height={200} loading="lazy" decoding="async"
+              style={{
+                width: '100%', height: '100%', objectFit: 'cover',
+                transform: hover ? 'scale(1.04)' : 'scale(1)',
+                transition: 'transform 0.4s cubic-bezier(0.22,1,0.36,1)',
+              }}
+            />
+          ) : (
+            <div style={{ height: '100%', display: 'grid', placeItems: 'center', fontFamily: F_MONO, fontSize: '10.5px', color: '#9A9383' }}>
+              FOTO PENDIENTE
+            </div>
           )}
         </div>
-
-        {/* Heart */}
-        <HeartIcon saved={saved} onClick={handleSave} />
-
-        {/* Image dots (if multiple images) */}
-        {images.length > 1 && (
-          <div style={{
-            position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', gap: 5, opacity: hover ? 1 : 0, transition: 'opacity 0.2s', zIndex: 2,
-          }}>
-            {images.map((_, i) => (
-              <div
-                key={i}
-                onClick={e => handleImgDot(e, i)}
-                style={{
-                  width: i === imgIdx ? 18 : 6, height: 6,
-                  borderRadius: 3, background: i === imgIdx ? '#fff' : 'rgba(255,255,255,0.55)',
-                  cursor: 'pointer', transition: 'all 0.2s ease',
-                }}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Price bottom-left on image */}
-        <div style={{
-          position: 'absolute', bottom: 12, left: 12, zIndex: 2,
-          opacity: hover ? 1 : 0, transition: 'opacity 0.25s',
-        }}>
-          <div style={{
-            background: 'rgba(10, 10, 11, 0.65)', backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: 10, padding: '0.4rem 0.8rem',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
-          }}>
-            <div style={{ fontSize: '0.625rem', color: '#D4B254', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>
-              Precio
-            </div>
-            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#FAF8F3', fontFeatureSettings: "'tnum' 1" }}>
-              {property.discount_price
-                ? formatPrice(property.discount_price, property.currency)
-                : formatPrice(property.price, property.currency)}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Card body */}
-      <div style={{ padding: '1rem 1.125rem 1.125rem', display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-        {/* Location + area */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: 'var(--main-text-muted, #5A5A63)', fontWeight: 600 }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D4B254" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-            <span>{property.municipio}, {property.departamento}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.75rem', fontWeight: 600, color: 'var(--main-text, #111113)' }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="#D4B254" stroke="none">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-            4.9
-          </div>
-        </div>
-
-        {/* Title */}
-        <h3 style={{
-          fontSize: '1rem', fontWeight: 700,
-          color: 'var(--main-text, #111113)', margin: 0, lineHeight: 1.4,
-          letterSpacing: '-0.02em',
-          display: '-webkit-box', WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical', overflow: 'hidden',
-        }}>
-          {cleanTitle(property.title)}
-        </h3>
-
-        {/* Specs (estilo Zillow) + Area */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: 'var(--main-text-dim, #9A9383)', flexWrap: 'wrap' }}>
-          {(property.bedrooms || property.bathrooms) && (
-            <span style={{ fontWeight: 700, color: 'var(--main-text-muted, #5A5A63)' }}>
-              {property.bedrooms ? `${property.bedrooms} hab` : ''}
-              {property.bedrooms && property.bathrooms ? ' · ' : ''}
-              {property.bathrooms ? `${property.bathrooms} baños` : ''}
-              {' · '}
+        <div style={{ position: 'absolute', top: 12, left: 12, display: 'flex', gap: 6 }}>
+          <span style={{
+            background: '#111113', color: '#D4B254', fontSize: 11, fontWeight: 700,
+            letterSpacing: '0.04em', padding: '5px 10px', borderRadius: 999, textTransform: 'uppercase',
+          }}>{property.type}</span>
+          {enCuotas && (
+            <span style={{ background: '#1F5B42', color: '#EEF5F0', fontSize: 11, fontWeight: 700, padding: '5px 10px', borderRadius: 999 }}>
+              En cuotas
             </span>
           )}
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <path d="M3 9h18M9 21V9" />
+        </div>
+        <button onClick={handleSave}
+          aria-label={saved ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+          style={{
+            position: 'absolute', top: 10, right: 10, width: 36, height: 36, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.92)', border: '1px solid #EDE9DF', cursor: 'pointer',
+            display: 'grid', placeItems: 'center',
+            color: saved ? '#C65D3B' : '#9A9383', transition: 'color 0.15s, transform 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill={saved ? '#C65D3B' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
-          <span>{property.area_varas} · {property.area_m2}</span>
-          {property.dimensions && <span>· {property.dimensions}</span>}
+        </button>
+      </div>
+
+      {/* Cuerpo */}
+      <div style={{ padding: '18px 18px 16px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
+          <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em' }}>{main}</div>
+          <div style={{ fontSize: '12.5px', color: '#9A9383', fontWeight: 600, whiteSpace: 'nowrap' }}>{alt}</div>
         </div>
 
-        {/* Divider + price + CTA */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          marginTop: 10, paddingTop: 12, borderTop: '1px solid var(--main-border, #F3EFE6)',
-        }}>
-          <div style={{ fontFeatureSettings: "'tnum' 1" }}>
-            {property.discount_price ? (
-              <>
-                <div style={{ fontSize: '0.6875rem', color: '#E53E3E', textDecoration: 'line-through', opacity: 0.7, lineHeight: 1 }}>
-                  {formatPrice(property.price, property.currency)}
-                </div>
-                <div style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--main-text, #111113)', lineHeight: 1.2 }}>
-                  {formatPrice(property.discount_price, property.currency)}
-                </div>
-              </>
-            ) : (
-              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--main-text, #111113)', lineHeight: 1.2 }}>
-                {formatPrice(property.price, property.currency)}
-              </div>
-            )}
-          </div>
+        <div>
+          <button onClick={() => onOpen(property)} style={{
+            fontWeight: 700, fontSize: '15.5px', color: '#111113', background: 'none', border: 'none',
+            padding: 0, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', transition: 'color 0.15s',
+            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.35,
+          }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#C65D3B'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#111113'; }}
+          >{cleanTitle(property.title)}</button>
+          <div style={{ fontSize: '13.5px', color: '#6B6455', marginTop: 2 }}>{property.municipio}, {property.departamento}</div>
+        </div>
 
-          <WhatsAppButton
-            onClick={e => { e.stopPropagation(); onWhatsApp(property); }}
-            size="sm"
-            label="WhatsApp"
-          />
+        {/* Specs */}
+        <div style={{ display: 'flex', gap: 14, fontSize: 13, color: '#45412F', fontWeight: 600, flexWrap: 'wrap' }}>
+          {property.bedrooms ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><IconBed size={14} /> {property.bedrooms} hab</span>
+          ) : null}
+          {property.bathrooms ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><IconBath size={14} /> {property.bathrooms} baños</span>
+          ) : null}
+          {property.parking ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><IconCar size={14} /> {property.parking}</span>
+          ) : null}
+          {property.area_varas ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><IconArea size={13} /> {property.area_varas}</span>
+          ) : null}
+        </div>
+
+        {/* Escritura */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#4A7C59', fontWeight: 600,
+          borderTop: '1px solid #F0EDE4', paddingTop: 10, marginTop: 'auto',
+        }}>
+          <span style={{ width: 16, height: 16, borderRadius: '50%', background: '#EEF5F0', display: 'grid', placeItems: 'center' }}>
+            <IconCheck size={10} />
+          </span>
+          Escritura verificada · Instituto de la Propiedad
+        </div>
+
+        {/* CTAs */}
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={() => onOpen(property)} style={{
+            flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 14, color: '#111113',
+            border: '1.5px solid #111113', borderRadius: 10, padding: '10px 0',
+            background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s, color 0.15s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#111113'; e.currentTarget.style.color = '#D4B254'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#111113'; }}
+          >Agendar visita</button>
+          <button onClick={e => { e.stopPropagation(); onWhatsApp(property); }} style={{
+            flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 14, color: '#0A3D22',
+            background: '#25D366', borderRadius: 10, padding: '11.5px 0',
+            border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'background 0.15s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#3BE07B'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#25D366'; }}
+          ><WhatsAppIcon size={14} color="#0A3D22" /> Consultar</button>
         </div>
       </div>
     </article>

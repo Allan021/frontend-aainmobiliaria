@@ -1,54 +1,92 @@
-import { Button, Eyebrow } from '../shared/Button';
 import { WhatsAppIcon } from '../shared/Icon';
 
 interface FooterProps {
-  onWhatsApp: () => void;
+  onWhatsApp?: () => void;
+}
+
+const F_ARCHIVO = "'Archivo', 'Plus Jakarta Sans', sans-serif";
+const F_SANS = "'Instrument Sans', 'Plus Jakarta Sans', sans-serif";
+const F_MONO = "'JetBrains Mono', monospace";
+
+const linkStyle: React.CSSProperties = { color: '#B9B9C0', textDecoration: 'none', transition: 'color 0.15s' };
+
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a href={href} style={linkStyle}
+      onMouseEnter={e => { e.currentTarget.style.color = '#D4B254'; }}
+      onMouseLeave={e => { e.currentTarget.style.color = '#B9B9C0'; }}
+    >{children}</a>
+  );
 }
 
 export function Footer({ onWhatsApp }: FooterProps) {
+  const handleWhatsApp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onWhatsApp) onWhatsApp();
+    else window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: null } }));
+  };
+
   return (
-    <footer className="bg-obsidian-900 text-bone-50 pt-24 pb-12 px-6 md:px-12">
-      <div className="max-w-[1280px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+    <footer style={{ background: '#0A0A0B', color: '#B9B9C0', padding: '64px 24px 32px', fontFamily: F_SANS }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div className="footer-grid" style={{
+          display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr 1fr', gap: 40,
+          paddingBottom: 44, borderBottom: '1px solid #232327',
+        }}>
           <div>
-            <div className="flex items-center gap-3.5 mb-5">
-              <div className="w-14 h-14 bg-obsidian-950 rounded-lg overflow-hidden flex">
-                <img src="/logo-mark.webp" alt="" width={56} height={56} className="w-14 h-14 object-cover" style={{ mixBlendMode: 'screen' }} />
-              </div>
-              <div>
-                <div className="text-xl font-bold text-gold-300 tracking-tight leading-tight">A&A Inmobiliaria</div>
-                <div className="text-[10px] tracking-[0.18em] text-bone-400 mt-1 font-semibold">TU PROPIEDAD · NUESTRA MISIÓN</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <div style={{
+                width: 36, height: 36, background: '#D4B254', color: '#111113', borderRadius: 8,
+                display: 'grid', placeItems: 'center', fontFamily: F_ARCHIVO, fontWeight: 900, fontSize: 13,
+              }}>A&A</div>
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
+                <span style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15, color: '#FAF8F3' }}>A&A Inmobiliaria</span>
+                <span style={{ fontSize: 9, letterSpacing: '0.18em', color: '#D4B254', fontWeight: 600 }}>TU PROPIEDAD · NUESTRA MISIÓN</span>
               </div>
             </div>
-            <p className="text-sm leading-relaxed text-bone-300 max-w-[340px]">
-              Le acompañamos en la búsqueda, revisión legal, y firma de escritura de su nueva propiedad.
+            <p style={{ fontSize: 14, lineHeight: 1.65, margin: 0, maxWidth: 300 }}>
+              Le acompañamos en la búsqueda, revisión legal y firma de escritura de su nueva propiedad. El Progreso, Yoro, Honduras.
             </p>
           </div>
 
-          {[
-            { title: 'Propiedades', links: ['Todas las propiedades', 'Terrenos', 'Lotes', 'Lotificaciones'] },
-            { title: 'A&A', links: ['Nosotros', 'Asesoría legal', 'Financiamiento', 'Preguntas frecuentes'] },
-            { title: 'Contacto', links: ['WhatsApp', 'Iniciar sesión', 'Visitar oficinas', 'Horario de atención'] },
-          ].map(col => (
-            <div key={col.title}>
-              <Eyebrow color="#D4B254" className="block mb-4">{col.title}</Eyebrow>
-              <ul className="flex flex-col gap-2.5">
-                {col.links.map(l => (
-                  <li key={l}>
-                    <a className="text-sm text-bone-300 cursor-pointer hover:text-bone-50 transition-colors">{l}</a>
-                  </li>
-                ))}
-              </ul>
+          <div>
+            <div style={{ fontFamily: F_MONO, fontSize: '10.5px', letterSpacing: '0.16em', color: '#6E6E78', marginBottom: 16 }}>PROPIEDADES</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14 }}>
+              <FooterLink href="/buscar">Buscar en el mapa</FooterLink>
+              <FooterLink href="/buscar">Casas</FooterLink>
+              <FooterLink href="/propiedades">Terrenos y lotes</FooterLink>
+              <FooterLink href="/lotificaciones">Lotificaciones</FooterLink>
             </div>
-          ))}
+          </div>
+
+          <div>
+            <div style={{ fontFamily: F_MONO, fontSize: '10.5px', letterSpacing: '0.16em', color: '#6E6E78', marginBottom: 16 }}>A&A</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14 }}>
+              <FooterLink href="/publicar">Publicar gratis</FooterLink>
+              <FooterLink href="/nosotros">Asesoría legal</FooterLink>
+              <FooterLink href="/nosotros">Financiamiento</FooterLink>
+              <FooterLink href="/nosotros">Nosotros</FooterLink>
+            </div>
+          </div>
+
+          <div>
+            <div style={{ fontFamily: F_MONO, fontSize: '10.5px', letterSpacing: '0.16em', color: '#6E6E78', marginBottom: 16 }}>CONTACTO</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14 }}>
+              <a href="#" onClick={handleWhatsApp} style={{ color: '#25D366', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 7, textDecoration: 'none' }}>
+                <WhatsAppIcon size={14} color="#25D366" /> WhatsApp
+              </a>
+              <span>El Progreso, Yoro</span>
+              <span>Lun–Sáb · 8:00 AM – 5:00 PM</span>
+            </div>
+          </div>
         </div>
 
-        <div className="pt-8 border-t border-obsidian-700 flex flex-wrap justify-between items-center gap-4">
-          <div className="text-xs text-bone-400">© 2025 A&A Inmobiliaria · El Progreso, Yoro, Honduras</div>
-          <div className="flex gap-2">
-            <Button variant="gold" size="sm" iconEl={<WhatsAppIcon size={14} />} onClick={onWhatsApp}>WhatsApp</Button>
-            <Button variant="darkOutline" size="sm" onClick={() => window.location.href = '/login'}>Iniciar sesión</Button>
-          </div>
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          paddingTop: 24, fontSize: 13, color: '#6E6E78', flexWrap: 'wrap', gap: 12,
+        }}>
+          <span>© 2026 A&A Inmobiliaria · El Progreso, Yoro, Honduras</span>
+          <span>Escrituración verificada en el Instituto de la Propiedad</span>
         </div>
       </div>
     </footer>
