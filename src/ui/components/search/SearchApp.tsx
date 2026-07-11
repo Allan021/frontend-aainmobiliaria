@@ -50,14 +50,14 @@ function ResultCard({ p, active, saved, onSelect, onOpen, onWhatsApp, onToggleSa
   const img = p.images?.[0]?.url;
 
   return (
-    <div onClick={onSelect} style={{
+    <div onClick={onSelect} className="result-card" style={{
       display: 'flex', gap: 14, background: 'var(--pub-surface)', borderRadius: 14, padding: 10,
       border: active ? '2px solid #C65D3B' : '1px solid var(--pub-border)',
       boxShadow: active ? '0 12px 32px -10px rgba(198,93,59,0.25)' : 'none',
       cursor: 'pointer', fontFamily: F_SANS, color: 'var(--pub-ink)',
       transition: 'border-color 0.15s, box-shadow 0.2s',
     }}>
-      <div style={{ position: 'relative', width: 168, flexShrink: 0, alignSelf: 'stretch', minHeight: 150 }}>
+      <div className="result-card__media" style={{ position: 'relative', width: 168, flexShrink: 0, alignSelf: 'stretch', minHeight: 150 }}>
         <div style={{ position: 'absolute', inset: 0, borderRadius: 10, overflow: 'hidden', background: 'var(--pub-border)' }}>
           {img ? (
             <img src={optimizeCloudinaryUrl(img, 340)} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

@@ -36,9 +36,12 @@ export function Footer({ onWhatsApp }: FooterProps) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
               <div style={{
-                width: 36, height: 36, background: '#D4B254', color: '#111113', borderRadius: 8,
-                display: 'grid', placeItems: 'center', fontFamily: F_ARCHIVO, fontWeight: 900, fontSize: 13,
-              }}>A&A</div>
+                width: 40, height: 40, background: '#0A0A0B', border: '1px solid #232327', borderRadius: 8,
+                display: 'grid', placeItems: 'center', overflow: 'hidden', flexShrink: 0,
+              }}>
+                <img src="/logo-mark.webp" alt="A&A Inmobiliaria" width={40} height={40}
+                  style={{ width: 40, height: 40, objectFit: 'cover', mixBlendMode: 'screen' }} />
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
                 <span style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15, color: '#FAF8F3' }}>A&A Inmobiliaria</span>
                 <span style={{ fontSize: 9, letterSpacing: '0.18em', color: '#D4B254', fontWeight: 600 }}>TU PROPIEDAD · NUESTRA MISIÓN</span>

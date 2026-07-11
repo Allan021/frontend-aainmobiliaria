@@ -1260,6 +1260,17 @@ body {
   .ficha-stats { grid-template-columns: 1fr 1fr !important; }
 }
 
+/* ── Cards de resultados del buscador — móvil: se apilan ── */
+@media (max-width: 600px) {
+  .result-card { flex-direction: column !important; gap: 10px !important; }
+  .result-card__media {
+    width: 100% !important;
+    align-self: auto !important;
+    min-height: 0 !important;
+    height: 180px;
+  }
+}
+
 /* ── Ficha de propiedad rediseñada — responsive ── */
 @media (max-width: 1024px) {
   .ficha-body { grid-template-columns: 1fr !important; }

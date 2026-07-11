@@ -5,7 +5,7 @@ import { useSettings } from '../../hooks/useSettings';
 import { useFavoriteIds, useToggleFavorite, isLoggedIn, requireLogin } from '../../hooks/useFavorites';
 import { leadAdapter } from '../../../infrastructure/api/leadAdapter';
 import { cleanTitle, fmtVaras, type Property } from '../../../core/domain/entities/types';
-import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
+import { optimizeCloudinaryUrl, cloudinarySrcSet } from '../../../core/utils/cloudinaryUtils';
 import { GalleryModal } from './detail/GalleryModal';
 import { WhatsAppIcon } from '../shared/Icon';
 import { IconShield, IconCheck, IconCamera, IconMapPin, IconVideo } from '../shared/rs-icons';
@@ -250,7 +250,10 @@ function FichaInner({ property }: Props) {
         <div className="ficha-gallery" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10, height: 440 }}>
           <div onClick={() => images.length > 0 && setGallery({ open: true, idx: 0 })} style={galleryCell(0, '18px 0 0 18px')}>
             {images[0] ? (
-              <img src={optimizeCloudinaryUrl(images[0].url, 1100)} alt={cleanTitle(property.title)}
+              <img src={optimizeCloudinaryUrl(images[0].url, 1100)}
+                srcSet={cloudinarySrcSet(images[0].url, 1100)}
+                sizes="(max-width: 768px) 100vw, 66vw"
+                alt={cleanTitle(property.title)}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               <div style={{
@@ -463,7 +466,7 @@ function FichaInner({ property }: Props) {
 
       {gallery.open && images.length > 0 && (
         <GalleryModal
-          images={images}
+          images={images.map(i => ({ url: optimizeCloudinaryUrl(i.url, 1920) }))}
           startIdx={gallery.idx}
           onClose={() => setGallery({ open: false, idx: 0 })}
         />

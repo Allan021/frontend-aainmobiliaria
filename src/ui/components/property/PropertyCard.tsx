@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { cleanTitle, fmtVaras, type Property } from '../../../core/domain/entities/types';
 import { useCurrency, priceParts } from '../../hooks/useCurrency';
-import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
+import { optimizeCloudinaryUrl, cloudinarySrcSet } from '../../../core/utils/cloudinaryUtils';
 import { WhatsAppIcon } from '../shared/Icon';
 import { IconBed, IconBath, IconCar, IconArea, IconCheck, IconHeart } from '../shared/rs-icons';
 
@@ -55,6 +55,8 @@ export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, o
           {img ? (
             <img
               src={optimizeCloudinaryUrl(img, 480)}
+              srcSet={cloudinarySrcSet(img, 480)}
+              sizes="(max-width: 768px) 100vw, 400px"
               alt={cleanTitle(property.title)}
               width={480} height={200} loading="lazy" decoding="async"
               style={{
