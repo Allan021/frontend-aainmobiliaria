@@ -9,6 +9,14 @@ import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
 const DEFAULT_CENTER: [number, number] = [15.35, -87.8];
 const DEFAULT_ZOOM = 10;
 
+function tileUrl(): string {
+  const dark = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
+  return dark
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+}
+
+
 interface MapViewProps {
   properties: Property[];
   currency: Currency;
@@ -31,7 +39,7 @@ export function MapView({ properties, currency, selectedId, onSelect, onOpen }: 
     if (!containerRef.current || mapRef.current) return;
     const map = L.map(containerRef.current, { zoomControl: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
     // Tiles CARTO Voyager — más limpios que OSM estándar, gratis con atribución
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    L.tileLayer(tileUrl(), {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 20,

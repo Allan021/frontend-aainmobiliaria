@@ -11,28 +11,57 @@ interface HeaderProps {
   toggleTheme?: () => void;
 }
 
+// Nav fusionado: "Buscar" cubre propiedades y lotificaciones (accesos dentro del buscador)
 const NAV_ITEMS = [
   { to: 'home', label: 'Inicio', url: '/' },
   { to: 'buscar', label: 'Buscar', url: '/buscar' },
-  { to: 'catalog', label: 'Propiedades', url: '/propiedades' },
-  { to: 'lotificaciones', label: 'Lotificaciones', url: '/lotificaciones' },
   { to: 'about', label: 'Nosotros', url: '/nosotros' },
 ];
 
+function isActive(current: string, to: string): boolean {
+  if (current === to) return true;
+  // Las páginas de catálogo/lotificaciones/ficha cuelgan de "Buscar"
+  return to === 'buscar' && (current === 'catalog' || current === 'lotificaciones');
+}
+
 const F_ARCHIVO = "'Archivo', 'Plus Jakarta Sans', sans-serif";
 const F_SANS = "'Instrument Sans', 'Plus Jakarta Sans', sans-serif";
+
+function SunMoonIcon({ dark }: { dark: boolean }) {
+  return dark ? (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  ) : (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
 
 export function Header({ currentRoute, onNavigate, onWhatsApp }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [logged, setLogged] = useState(false);
   const [currency, toggleCurrency] = useCurrency();
+  const [theme, setThemeState] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
     setLogged(!!localStorage.getItem('aa_token'));
-    // Sitio público siempre claro — dark mode solo existe en el admin
-    document.documentElement.setAttribute('data-theme', 'light');
-    localStorage.removeItem('aa_pub_theme');
+    const stored = localStorage.getItem('aa_pub_theme') === 'dark' ? 'dark' : 'light';
+    setThemeState(stored);
+    document.documentElement.setAttribute('data-theme', stored);
   }, []);
+
+  const toggleTheme = () => {
+    const next = theme === 'light' ? 'dark' : 'light';
+    setThemeState(next);
+    localStorage.setItem('aa_pub_theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+  };
 
   const navigate = (to: string, e: React.MouseEvent) => {
     if (onNavigate) {
@@ -66,23 +95,26 @@ export function Header({ currentRoute, onNavigate, onWhatsApp }: HeaderProps) {
           maxWidth: 1280, margin: '0 auto', padding: '0 16px', minHeight: 64,
           display: 'flex', alignItems: 'center', gap: 12,
         }}>
-          {/* Brand */}
-          <a href="/" onClick={e => navigate('home', e)} style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', flexShrink: 0 }}>
+          {/* Brand — logo real de la marca */}
+          <a href="/" onClick={e => navigate('home', e)} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0, minWidth: 0 }}>
             <div style={{
-              width: 40, height: 40, background: '#D4B254', color: '#111113', borderRadius: 8,
-              display: 'grid', placeItems: 'center',
-              fontFamily: F_ARCHIVO, fontWeight: 900, fontSize: 15, letterSpacing: '-0.02em',
-            }}>A&A</div>
-            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
-              <span style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 16, color: '#FAF8F3' }}>A&A Inmobiliaria</span>
-              <span style={{ fontSize: '9.5px', letterSpacing: '0.18em', color: '#D4B254', fontWeight: 600 }}>TU PROPIEDAD · NUESTRA MISIÓN</span>
+              width: 40, height: 40, background: '#0A0A0B', borderRadius: 8,
+              border: '1px solid #38383F',
+              display: 'grid', placeItems: 'center', overflow: 'hidden', flexShrink: 0,
+            }}>
+              <img src="/logo-mark.webp" alt="A&A Inmobiliaria" width={40} height={40}
+                style={{ width: 40, height: 40, objectFit: 'cover', mixBlendMode: 'screen' }} />
+            </div>
+            <div className="header-brand-text" style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15, minWidth: 0 }}>
+              <span style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 16, color: '#FAF8F3', whiteSpace: 'nowrap' }}>A&A Inmobiliaria</span>
+              <span className="header-brand-sub" style={{ fontSize: '9.5px', letterSpacing: '0.18em', color: '#D4B254', fontWeight: 600, whiteSpace: 'nowrap' }}>TU PROPIEDAD · NUESTRA MISIÓN</span>
             </div>
           </a>
 
           {/* Desktop nav */}
           <nav className="header-nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1, justifyContent: 'center' }}>
             {NAV_ITEMS.map(item => {
-              const active = currentRoute === item.to;
+              const active = isActive(currentRoute, item.to);
               return (
                 <a key={item.to} href={item.url} onClick={e => navigate(item.to, e)}
                   style={{
@@ -111,6 +143,18 @@ export function Header({ currentRoute, onNavigate, onWhatsApp }: HeaderProps) {
 
           {/* Desktop CTAs */}
           <div className="header-ctas-desktop" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+            <button onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+              style={{
+                width: 32, height: 32, borderRadius: 999,
+                background: '#1C1C1F', border: '1px solid #38383F', color: '#B9B9C0',
+                cursor: 'pointer', display: 'grid', placeItems: 'center', transition: 'color 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#D4B254'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#B9B9C0'; }}
+            ><SunMoonIcon dark={theme === 'dark'} /></button>
+
             <button onClick={toggleCurrency} aria-label="Cambiar moneda"
               style={{
                 display: 'flex', alignItems: 'center', background: '#1C1C1F',
@@ -150,6 +194,15 @@ export function Header({ currentRoute, onNavigate, onWhatsApp }: HeaderProps) {
 
           {/* Mobile: hamburger */}
           <div className="header-hamburger" style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+            <button onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              style={{
+                width: 32, height: 32, borderRadius: 999, flexShrink: 0,
+                background: '#1C1C1F', border: '1px solid #38383F', color: '#B9B9C0',
+                cursor: 'pointer', display: 'grid', placeItems: 'center',
+              }}
+            ><SunMoonIcon dark={theme === 'dark'} /></button>
+
             <button onClick={toggleCurrency} aria-label="Cambiar moneda"
               style={{
                 display: 'flex', alignItems: 'center', background: '#1C1C1F',
@@ -192,7 +245,7 @@ export function Header({ currentRoute, onNavigate, onWhatsApp }: HeaderProps) {
           }}>
             <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: '1rem' }}>
               {[...NAV_ITEMS, { to: 'publicar', label: 'Publicar gratis', url: '/publicar' }].map(item => {
-                const active = currentRoute === item.to;
+                const active = isActive(currentRoute, item.to);
                 const gold = item.to === 'publicar';
                 return (
                   <a key={item.to} href={item.url} onClick={e => navigate(item.to, e)}

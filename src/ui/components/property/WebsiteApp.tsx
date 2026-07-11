@@ -440,11 +440,11 @@ function CatalogViewInner({
   useStaggerCards(gridRef, [properties.length, filters.dep, filters.pay]);
 
   return (
-    <div style={{ background: '#FAF8F3', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--pub-bg)', minHeight: '100vh' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>
         {/* Header */}
         <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: 'clamp(30px, 5vw, 50px)', fontWeight: 800, letterSpacing: '-0.035em', color: '#111113', margin: '0 0 0.375rem' }}>
+          <h1 style={{ fontSize: 'clamp(30px, 5vw, 50px)', fontWeight: 800, letterSpacing: '-0.035em', color: 'var(--pub-ink)', margin: '0 0 0.375rem' }}>
             {heading}
           </h1>
           <p style={{ fontSize: '1rem', color: '#9A9383', margin: 0 }}>
@@ -453,7 +453,7 @@ function CatalogViewInner({
         </div>
 
         {/* Filter bar */}
-        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E6E0D2', padding: '1.25rem 1.5rem', marginBottom: '2rem' }}>
+        <div style={{ background: 'var(--pub-surface)', borderRadius: 16, border: '1px solid var(--pub-border)', padding: '1.25rem 1.5rem', marginBottom: '2rem' }}>
           <FilterBar filters={filters} setFilters={setFilters} theme="light" />
         </div>
 
@@ -473,7 +473,7 @@ function CatalogViewInner({
           ))}
           {!isLoading && properties.length === 0 && (
             <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '5rem 1rem' }}>
-              <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111113', marginBottom: '0.5rem' }}>
+              <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--pub-ink)', marginBottom: '0.5rem' }}>
                 Sin resultados
               </div>
               <p style={{ color: '#9A9383', marginBottom: '1.5rem', fontSize: '0.9375rem' }}>
@@ -481,7 +481,7 @@ function CatalogViewInner({
               </p>
               <button
                 onClick={() => setFilters({})}
-                style={{ padding: '0.75rem 1.5rem', borderRadius: 999, background: '#111113', color: '#FAF8F3', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}
+                style={{ padding: '0.75rem 1.5rem', borderRadius: 999, background: 'var(--pub-ink)', color: 'var(--pub-bg)', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}
               >
                 Limpiar filtros
               </button>

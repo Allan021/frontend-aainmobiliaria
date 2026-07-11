@@ -53,9 +53,10 @@ const orgJsonLd = {
     <meta charset="utf-8" />
     <script is:inline>
       (function() {
-        // Sitio público: siempre claro. Solo el admin conserva dark mode (aa_theme).
+        // Tema antes del primer paint: público usa aa_pub_theme, admin usa aa_theme
         const isAdmin = location.pathname.startsWith('/admin');
-        const theme = isAdmin ? (localStorage.getItem('aa_theme') || 'light') : 'light';
+        const key = isAdmin ? 'aa_theme' : 'aa_pub_theme';
+        const theme = localStorage.getItem(key) === 'dark' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
       })();
     </script>

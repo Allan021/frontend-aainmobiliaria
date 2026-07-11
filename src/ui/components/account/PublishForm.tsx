@@ -22,6 +22,14 @@ const DEP_CODES: Record<string, string> = {
   'Ocotepeque': 'OC', 'Colón': 'CL', 'Valle': 'VA', 'Gracias a Dios': 'GD', 'Islas de la Bahía': 'IB',
 };
 
+
+function tileUrl(): string {
+  const dark = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
+  return dark
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+}
+
 const TIPOS = [
   { label: 'Casa', icon: <IconHome size={22} /> },
   { label: 'Terreno', icon: <IconMountain size={22} /> },
@@ -31,13 +39,13 @@ const TIPOS = [
 
 const inputStyle: React.CSSProperties = {
   width: '100%', boxSizing: 'border-box',
-  border: '1.5px solid #E4DFD2', borderRadius: 11, padding: '13px 16px',
+  border: '1.5px solid var(--pub-border2)', borderRadius: 11, padding: '13px 16px',
   fontFamily: F_SANS, fontSize: 15, outlineColor: '#1F5B42',
-  background: '#FAF8F3', color: '#111113',
+  background: 'var(--pub-bg)', color: 'var(--pub-ink)',
 };
 
 const labelText: React.CSSProperties = {
-  fontSize: '13.5px', fontWeight: 700, color: '#45412F', display: 'block', marginBottom: 7,
+  fontSize: '13.5px', fontWeight: 700, color: 'var(--pub-muted2)', display: 'block', marginBottom: 7,
 };
 
 const primaryBtn: React.CSSProperties = {
@@ -47,13 +55,13 @@ const primaryBtn: React.CSSProperties = {
 };
 
 const ghostBtn: React.CSSProperties = {
-  background: 'transparent', color: '#6B6455', border: '1.5px solid #E4DFD2',
+  background: 'transparent', color: 'var(--pub-muted)', border: '1.5px solid var(--pub-border2)',
   fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15,
   padding: '15px 26px', borderRadius: 13, cursor: 'pointer', transition: 'background 0.15s',
 };
 
 const card: React.CSSProperties = {
-  background: '#FFFFFF', border: '1px solid #EDE9DF', borderRadius: 20, padding: 36,
+  background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 20, padding: 36,
 };
 
 /* ── Selector de ubicación (CARTO tiles) ── */
@@ -65,7 +73,7 @@ function LocationPicker({ initial, onPick }: { initial?: [number, number] | null
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
     const map = L.map(ref.current).setView(initial || [15.35, -87.8], initial ? 14 : 9);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    L.tileLayer(tileUrl(), {
       attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 20,
     }).addTo(map);
     const icon = L.divIcon({ className: 'map-pin-wrap', html: '<div class="map-price-pin map-price-pin--active">Aquí</div>', iconSize: [0, 0] });
@@ -79,7 +87,7 @@ function LocationPicker({ initial, onPick }: { initial?: [number, number] | null
     return () => { map.remove(); mapRef.current = null; markerRef.current = null; };
   }, []);
 
-  return <div ref={ref} style={{ position: 'relative', height: 260, borderRadius: 14, overflow: 'hidden', border: '1.5px solid #E4DFD2', zIndex: 0, cursor: 'crosshair' }} />;
+  return <div ref={ref} style={{ position: 'relative', height: 260, borderRadius: 14, overflow: 'hidden', border: '1.5px solid var(--pub-border2)', zIndex: 0, cursor: 'crosshair' }} />;
 }
 
 /* ── Indicador de pasos ── */
@@ -98,12 +106,12 @@ function Steps({ current, onGo }: { current: number; onGo: (n: number) => void }
               width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
               fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 14,
               display: 'grid', placeItems: 'center', cursor: d.n < current && current !== 4 ? 'pointer' : 'default',
-              border: activo ? '2px solid #1F5B42' : done ? '2px solid #4A7C59' : '2px solid #E4DFD2',
-              background: activo ? '#1F5B42' : done ? '#4A7C59' : '#FFFFFF',
-              color: activo || done ? '#EEF5F0' : '#9A9383',
+              border: activo ? '2px solid #1F5B42' : done ? '2px solid #4A7C59' : '2px solid var(--pub-border2)',
+              background: activo ? '#1F5B42' : done ? '#4A7C59' : 'var(--pub-surface)',
+              color: activo || done ? '#EEF5F0' : 'var(--pub-dim)',
             }}>{done ? <IconCheck size={14} /> : d.n}</button>
-            <span style={{ fontSize: '13.5px', fontWeight: activo ? 700 : 600, color: activo ? '#111113' : done ? '#4A7C59' : '#9A9383', whiteSpace: 'nowrap' }}>{d.label}</span>
-            {i < defs.length - 1 && <div style={{ flex: 1, height: 2, background: done ? '#4A7C59' : '#E4DFD2', margin: '0 12px', transition: 'background 0.3s' }} />}
+            <span className={activo ? '' : 'pub-step-label'} style={{ fontSize: '13.5px', fontWeight: activo ? 700 : 600, color: activo ? 'var(--pub-ink)' : done ? '#4A7C59' : 'var(--pub-dim)', whiteSpace: 'nowrap' }}>{d.label}</span>
+            {i < defs.length - 1 && <div style={{ flex: 1, height: 2, background: done ? '#4A7C59' : 'var(--pub-border2)', margin: '0 12px', transition: 'background 0.3s' }} />}
           </div>
         );
       })}
@@ -133,7 +141,7 @@ function PasoCuenta({ onDone }: { onDone: () => void }) {
       <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 24, margin: '0 0 6px', letterSpacing: '-0.02em' }}>
         {mode === 'register' ? 'Creá tu cuenta' : 'Entrá a tu cuenta'}
       </h2>
-      <p style={{ fontSize: '14.5px', color: '#6B6455', margin: '0 0 28px' }}>
+      <p style={{ fontSize: '14.5px', color: 'var(--pub-muted)', margin: '0 0 28px' }}>
         {mode === 'register'
           ? 'Solo para coordinar contigo — tus datos nunca se muestran en el sitio.'
           : 'Bienvenido de nuevo.'}{' '}
@@ -170,8 +178,8 @@ function PasoCuenta({ onDone }: { onDone: () => void }) {
         </div>
 
         <div style={{
-          background: '#EEF5F0', borderRadius: 12, padding: '14px 18px', marginTop: 22,
-          fontSize: '13.5px', color: '#17452F', display: 'flex', gap: 10, alignItems: 'flex-start',
+          background: 'var(--pub-green-bg)', borderRadius: 12, padding: '14px 18px', marginTop: 22,
+          fontSize: '13.5px', color: 'var(--pub-green-ink)', display: 'flex', gap: 10, alignItems: 'flex-start',
         }}>
           <span style={{ color: '#1F5B42', display: 'flex', marginTop: 1 }}><IconLock size={15} /></span>
           <span><strong>Tus datos nunca se muestran en el sitio.</strong> Solo los usamos para coordinar visitas y avisarte cuando haya interesados.</span>
@@ -325,9 +333,9 @@ function PublishInner() {
     const sel = form.type === t.label;
     return (
       <button key={t.label} type="button" onClick={() => set('type', t.label)} style={{
-        border: sel ? '2px solid #1F5B42' : '1.5px solid #E4DFD2',
-        background: sel ? '#EEF5F0' : '#FAF8F3',
-        color: sel ? '#1F5B42' : '#45412F',
+        border: sel ? '2px solid #1F5B42' : '1.5px solid var(--pub-border2)',
+        background: sel ? 'var(--pub-green-bg)' : 'var(--pub-bg)',
+        color: sel ? '#1F5B42' : 'var(--pub-muted2)',
         borderRadius: 13, padding: '16px 8px', cursor: 'pointer',
         fontFamily: F_SANS, textAlign: 'center', transition: 'all 0.15s',
       }}>
@@ -347,13 +355,13 @@ function PublishInner() {
   }
 
   return (
-    <div style={{ maxWidth: 880, margin: '0 auto', padding: '48px 24px 80px', fontFamily: F_SANS, color: '#111113' }}>
+    <div style={{ maxWidth: 880, margin: '0 auto', padding: '48px 24px 80px', fontFamily: F_SANS, color: 'var(--pub-ink)' }}>
       {/* Encabezado */}
       {paso < 4 && (
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: '#EEF5F0', border: '1px solid #CDE2D4', borderRadius: 999,
+            background: 'var(--pub-green-bg)', border: '1px solid var(--pub-green-border)', borderRadius: 999,
             padding: '7px 16px', marginBottom: 18,
           }}>
             <span style={{ fontFamily: F_MONO, fontSize: 11, letterSpacing: '0.14em', color: '#1F5B42', fontWeight: 500 }}>
@@ -363,7 +371,7 @@ function PublishInner() {
           <h1 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 'clamp(30px, 5vw, 42px)', letterSpacing: '-0.03em', margin: '0 0 12px', lineHeight: 1.08 }}>
             {editId ? 'Editá tu propiedad.' : <>Publicá tu propiedad.<br /><span style={{ color: '#1F5B42' }}>Nosotros traemos los compradores.</span></>}
           </h1>
-          <p style={{ fontSize: 16, color: '#6B6455', maxWidth: 560, margin: '0 auto' }}>
+          <p style={{ fontSize: 16, color: 'var(--pub-muted)', maxWidth: 560, margin: '0 auto' }}>
             Tus datos quedan privados — A&A atiende cada consulta, coordina las visitas con vos y te acompaña hasta la escritura.
           </p>
         </div>
@@ -384,7 +392,7 @@ function PublishInner() {
       {paso === 2 && (
         <div style={card}>
           <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 24, margin: '0 0 6px', letterSpacing: '-0.02em' }}>Contanos de tu propiedad</h2>
-          <p style={{ fontSize: '14.5px', color: '#6B6455', margin: '0 0 28px' }}>Entre más completa la información, más rápido encontramos comprador.</p>
+          <p style={{ fontSize: '14.5px', color: 'var(--pub-muted)', margin: '0 0 28px' }}>Entre más completa la información, más rápido encontramos comprador.</p>
 
           <span style={labelText}>¿Qué vendés?</span>
           <div className="pub-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 24 }}>
@@ -403,14 +411,14 @@ function PublishInner() {
             </label>
             <div>
               <span style={labelText}>Moneda</span>
-              <div style={{ display: 'flex', border: '1.5px solid #E4DFD2', borderRadius: 11, overflow: 'hidden' }}>
+              <div style={{ display: 'flex', border: '1.5px solid var(--pub-border2)', borderRadius: 11, overflow: 'hidden' }}>
                 {[{ v: 'L', l: 'Lempiras' }, { v: '$', l: 'Dólares' }].map(m => {
                   const sel = form.currency === m.v;
                   return (
                     <button key={m.v} type="button" onClick={() => set('currency', m.v)} style={{
                       flex: 1, border: 'none', padding: '13px 0',
                       fontFamily: F_SANS, fontWeight: sel ? 700 : 600, fontSize: 14, cursor: 'pointer',
-                      background: sel ? '#1F5B42' : '#FAF8F3', color: sel ? '#EEF5F0' : '#6B6455', transition: 'all 0.15s',
+                      background: sel ? '#1F5B42' : 'var(--pub-bg)', color: sel ? '#EEF5F0' : 'var(--pub-muted)', transition: 'all 0.15s',
                     }}>{m.l}</button>
                   );
                 })}
@@ -463,7 +471,7 @@ function PublishInner() {
           <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
             {!editId && !isLoggedIn() && (
               <button type="button" onClick={() => setPaso(1)} style={ghostBtn}
-                onMouseEnter={e => { e.currentTarget.style.background = '#F0EDE4'; }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--pub-border)'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
               >← Atrás</button>
             )}
@@ -480,13 +488,13 @@ function PublishInner() {
       {paso === 3 && (
         <div style={card}>
           <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 24, margin: '0 0 6px', letterSpacing: '-0.02em' }}>Fotos y ubicación</h2>
-          <p style={{ fontSize: '14.5px', color: '#6B6455', margin: '0 0 28px' }}>Las propiedades con 5+ fotos reciben el triple de consultas.</p>
+          <p style={{ fontSize: '14.5px', color: 'var(--pub-muted)', margin: '0 0 28px' }}>Las propiedades con 5+ fotos reciben el triple de consultas.</p>
 
           <span style={labelText}>Fotos</span>
           <div className="pub-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 26 }}>
             <label style={{
               aspectRatio: '1', border: '2px dashed #1F5B42', borderRadius: 12,
-              display: 'grid', placeItems: 'center', background: '#EEF5F0', cursor: 'pointer',
+              display: 'grid', placeItems: 'center', background: 'var(--pub-green-bg)', cursor: 'pointer',
             }}>
               <div style={{ textAlign: 'center', color: '#1F5B42' }}>
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}><IconCamera size={22} /></div>
@@ -498,7 +506,7 @@ function PublishInner() {
 
             {/* Modo edición: fotos ya subidas */}
             {editId && photos.map(img => (
-              <div key={img.id || img.url} style={{ position: 'relative', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: '1px solid #EDE9DF' }}>
+              <div key={img.id || img.url} style={{ position: 'relative', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--pub-border)' }}>
                 <img src={optimizeCloudinaryUrl(img.url, 260)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 {img.id && (
                   <button type="button" onClick={() => deletePhoto(img)} aria-label="Eliminar foto" style={{
@@ -512,7 +520,7 @@ function PublishInner() {
 
             {/* Modo creación: previews locales */}
             {!editId && pendingFiles.map((f, i) => (
-              <div key={i} style={{ position: 'relative', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: '1px solid #EDE9DF' }}>
+              <div key={i} style={{ position: 'relative', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--pub-border)' }}>
                 <img src={URL.createObjectURL(f)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 <button type="button" onClick={() => setPendingFiles(fs => fs.filter((_, j) => j !== i))} aria-label="Quitar foto" style={{
                   position: 'absolute', top: 6, right: 6, width: 30, height: 30, borderRadius: 8,
@@ -525,10 +533,10 @@ function PublishInner() {
             {/* Placeholders */}
             {Array.from({ length: Math.max(0, 3 - (editId ? photos.length : pendingFiles.length)) }).map((_, i) => (
               <div key={`ph-${i}`} style={{
-                aspectRatio: '1', border: '1.5px dashed #E4DFD2', borderRadius: 12,
-                display: 'grid', placeItems: 'center', background: '#FAF8F3',
+                aspectRatio: '1', border: '1.5px dashed var(--pub-border2)', borderRadius: 12,
+                display: 'grid', placeItems: 'center', background: 'var(--pub-bg)',
               }}>
-                <span style={{ fontFamily: F_MONO, fontSize: 10, color: '#C4BDA9' }}>FOTO {(editId ? photos.length : pendingFiles.length) + i + 2}</span>
+                <span style={{ fontFamily: F_MONO, fontSize: 10, color: 'var(--pub-dim)' }}>FOTO {(editId ? photos.length : pendingFiles.length) + i + 2}</span>
               </div>
             ))}
           </div>
@@ -538,7 +546,7 @@ function PublishInner() {
             initial={form.lat != null && form.lng != null ? [form.lat, form.lng] : null}
             onPick={(lat, lng) => { set('lat', lat); set('lng', lng); }}
           />
-          <div style={{ fontSize: '12.5px', color: form.lat != null ? '#1F5B42' : '#9A9383', margin: '8px 0 26px', fontWeight: form.lat != null ? 700 : 400 }}>
+          <div style={{ fontSize: '12.5px', color: form.lat != null ? '#1F5B42' : 'var(--pub-dim)', margin: '8px 0 26px', fontWeight: form.lat != null ? 700 : 400 }}>
             {form.lat != null
               ? 'Ubicación marcada. En el sitio se muestra solo la zona aproximada — nunca la dirección exacta.'
               : 'Hacé clic sobre el punto de tu propiedad. En el sitio se muestra solo la zona aproximada.'}
@@ -546,7 +554,7 @@ function PublishInner() {
 
           <div style={{ display: 'flex', gap: 12 }}>
             <button type="button" onClick={() => setPaso(2)} style={ghostBtn}
-              onMouseEnter={e => { e.currentTarget.style.background = '#F0EDE4'; }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--pub-border)'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
             >← Atrás</button>
             <button type="button" onClick={enviar} disabled={saving || uploading} style={{ ...primaryBtn, flex: 1, opacity: saving || uploading ? 0.7 : 1 }}
@@ -561,28 +569,28 @@ function PublishInner() {
       {paso === 4 && property && (
         <div style={{ ...card, padding: '48px 36px', textAlign: 'center' }}>
           <div style={{
-            width: 72, height: 72, borderRadius: '50%', background: '#EEF5F0',
+            width: 72, height: 72, borderRadius: '50%', background: 'var(--pub-green-bg)',
             display: 'grid', placeItems: 'center', margin: '0 auto 20px', color: '#1F5B42',
           }}><IconCheck size={30} /></div>
           <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 28, margin: '0 0 10px', letterSpacing: '-0.02em' }}>
             {editId ? '¡Cambios guardados!' : '¡Recibimos tu propiedad!'}
           </h2>
           {editId ? (
-            <p style={{ fontSize: '15.5px', color: '#6B6455', margin: '0 auto 28px', maxWidth: 480, lineHeight: 1.65 }}>
+            <p style={{ fontSize: '15.5px', color: 'var(--pub-muted)', margin: '0 auto 28px', maxWidth: 480, lineHeight: 1.65 }}>
               Tu publicación quedó actualizada.
             </p>
           ) : (
             <>
-              <p style={{ fontSize: '15.5px', color: '#6B6455', margin: '0 auto 8px', maxWidth: 480, lineHeight: 1.65 }}>
-                Nuestro equipo verificará la escritura en el <strong style={{ color: '#111113' }}>Instituto de la Propiedad</strong> y te escribirá por WhatsApp en las próximas <strong style={{ color: '#111113' }}>24 horas</strong> para publicarla.
+              <p style={{ fontSize: '15.5px', color: 'var(--pub-muted)', margin: '0 auto 8px', maxWidth: 480, lineHeight: 1.65 }}>
+                Nuestro equipo verificará la escritura en el <strong style={{ color: 'var(--pub-ink)' }}>Instituto de la Propiedad</strong> y te escribirá por WhatsApp en las próximas <strong style={{ color: 'var(--pub-ink)' }}>24 horas</strong> para publicarla.
               </p>
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 10,
-                background: '#FAF8F3', border: '1px solid #E4DFD2', borderRadius: 12,
-                padding: '12px 20px', margin: '20px 0 28px', fontSize: '13.5px', color: '#45412F', flexWrap: 'wrap', justifyContent: 'center',
+                background: 'var(--pub-bg)', border: '1px solid var(--pub-border2)', borderRadius: 12,
+                padding: '12px 20px', margin: '20px 0 28px', fontSize: '13.5px', color: 'var(--pub-muted2)', flexWrap: 'wrap', justifyContent: 'center',
               }}>
                 <span style={{ fontFamily: F_MONO, color: '#B8862E' }}>EN REVISIÓN</span>
-                <span>→</span><span>Verificación legal</span><span>→</span><span style={{ color: '#9A9383' }}>Publicada</span>
+                <span>→</span><span>Verificación legal</span><span>→</span><span style={{ color: 'var(--pub-dim)' }}>Publicada</span>
               </div>
             </>
           )}
@@ -596,16 +604,16 @@ function PublishInner() {
               onMouseLeave={e => { e.currentTarget.style.background = '#25D366'; }}
             ><WhatsAppIcon size={15} color="#0A3D22" /> Dar seguimiento por WhatsApp</button>
             <a href="/mis-propiedades" style={{
-              border: '1.5px solid #E4DFD2', color: '#45412F', fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15,
+              border: '1.5px solid var(--pub-border2)', color: 'var(--pub-muted2)', fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15,
               padding: '14px 26px', borderRadius: 12, textDecoration: 'none',
               display: 'inline-flex', alignItems: 'center', gap: 8, transition: 'background 0.15s',
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#F0EDE4'; }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--pub-border)'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
             ><IconList size={15} /> Mis propiedades</a>
             {editId && (
               <a href={`/propiedad/${property.id}`} style={{
-                border: '1.5px solid #E4DFD2', color: '#45412F', fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15,
+                border: '1.5px solid var(--pub-border2)', color: 'var(--pub-muted2)', fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 15,
                 padding: '14px 26px', borderRadius: 12, textDecoration: 'none',
                 display: 'inline-flex', alignItems: 'center', gap: 8,
               }}><IconEye size={15} /> Ver publicación</a>
@@ -624,7 +632,7 @@ function PublishInner() {
           <div key={g.t} style={{ textAlign: 'center', padding: '18px 12px' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8, color: '#1F5B42' }}>{g.icon}</div>
             <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{g.t}</div>
-            <div style={{ fontSize: 13, color: '#6B6455', lineHeight: 1.5 }}>{g.d}</div>
+            <div style={{ fontSize: 13, color: 'var(--pub-muted)', lineHeight: 1.5 }}>{g.d}</div>
           </div>
         ))}
       </div>

@@ -4,7 +4,7 @@ import { useProperties } from '../../hooks/useProperties';
 import { useCurrency, priceParts } from '../../hooks/useCurrency';
 import { useFavoriteIds, useToggleFavorite, isLoggedIn, requireLogin } from '../../hooks/useFavorites';
 import { MapView } from './MapView';
-import { cleanTitle, type Property } from '../../../core/domain/entities/types';
+import { cleanTitle, fmtVaras, type Property } from '../../../core/domain/entities/types';
 import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
 import { WhatsAppIcon } from '../shared/Icon';
 import { IconSearch, IconMap, IconList, IconHome, IconBed, IconBath, IconArea, IconCheck } from '../shared/rs-icons';
@@ -30,9 +30,9 @@ const PRICE_RANGES = [
 ];
 
 const selectStyle: React.CSSProperties = {
-  border: '1.5px solid #E4DFD2', borderRadius: 10, padding: '10px 12px',
-  fontFamily: F_SANS, fontSize: '13.5px', fontWeight: 600, color: '#111113',
-  background: '#FAF8F3', cursor: 'pointer', outlineColor: '#1F5B42',
+  border: '1.5px solid var(--pub-border2)', borderRadius: 10, padding: '10px 12px',
+  fontFamily: F_SANS, fontSize: '13.5px', fontWeight: 600, color: 'var(--pub-ink)',
+  background: 'var(--pub-bg)', cursor: 'pointer', outlineColor: '#1F5B42',
 };
 
 function getInitialParam(name: string): string {
@@ -51,18 +51,18 @@ function ResultCard({ p, active, saved, onSelect, onOpen, onWhatsApp, onToggleSa
 
   return (
     <div onClick={onSelect} style={{
-      display: 'flex', gap: 14, background: '#FFFFFF', borderRadius: 14, padding: 10,
-      border: active ? '2px solid #C65D3B' : '1px solid #EDE9DF',
+      display: 'flex', gap: 14, background: 'var(--pub-surface)', borderRadius: 14, padding: 10,
+      border: active ? '2px solid #C65D3B' : '1px solid var(--pub-border)',
       boxShadow: active ? '0 12px 32px -10px rgba(198,93,59,0.25)' : 'none',
-      cursor: 'pointer', fontFamily: F_SANS, color: '#111113',
+      cursor: 'pointer', fontFamily: F_SANS, color: 'var(--pub-ink)',
       transition: 'border-color 0.15s, box-shadow 0.2s',
     }}>
       <div style={{ position: 'relative', width: 168, flexShrink: 0, alignSelf: 'stretch', minHeight: 150 }}>
-        <div style={{ position: 'absolute', inset: 0, borderRadius: 10, overflow: 'hidden', background: '#EDE9DF' }}>
+        <div style={{ position: 'absolute', inset: 0, borderRadius: 10, overflow: 'hidden', background: 'var(--pub-border)' }}>
           {img ? (
             <img src={optimizeCloudinaryUrl(img, 340)} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
-            <div style={{ height: '100%', display: 'grid', placeItems: 'center', fontFamily: F_MONO, fontSize: '8.5px', color: '#9A9383', textAlign: 'center', padding: '0 8px' }}>FOTO PENDIENTE</div>
+            <div style={{ height: '100%', display: 'grid', placeItems: 'center', fontFamily: F_MONO, fontSize: '8.5px', color: 'var(--pub-dim)', textAlign: 'center', padding: '0 8px' }}>FOTO PENDIENTE</div>
           )}
         </div>
         <span style={{
@@ -76,23 +76,23 @@ function ResultCard({ p, active, saved, onSelect, onOpen, onWhatsApp, onToggleSa
           <span style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 19, letterSpacing: '-0.02em' }}>{main}</span>
           <button onClick={e => { e.stopPropagation(); onToggleSave(); }}
             aria-label={saved ? 'Quitar de favoritos' : 'Guardar en favoritos'}
-            style={{ border: 'none', background: 'transparent', cursor: 'pointer', lineHeight: 1, color: saved ? '#C65D3B' : '#9A9383', padding: 0, display: 'flex' }}>
+            style={{ border: 'none', background: 'transparent', cursor: 'pointer', lineHeight: 1, color: saved ? '#C65D3B' : 'var(--pub-dim)', padding: 0, display: 'flex' }}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill={saved ? '#C65D3B' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </button>
         </div>
         <div>
-          <span onClick={e => { e.stopPropagation(); onOpen(); }} style={{ fontWeight: 700, fontSize: '14.5px', color: '#111113', display: 'block', cursor: 'pointer' }}
+          <span onClick={e => { e.stopPropagation(); onOpen(); }} style={{ fontWeight: 700, fontSize: '14.5px', color: 'var(--pub-ink)', display: 'block', cursor: 'pointer' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#C65D3B'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#111113'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--pub-ink)'; }}
           >{cleanTitle(p.title)}</span>
-          <span style={{ fontSize: '12.5px', color: '#6B6455' }}>{p.municipio}, {p.departamento}</span>
+          <span style={{ fontSize: '12.5px', color: 'var(--pub-muted)' }}>{p.municipio}, {p.departamento}</span>
         </div>
-        <div style={{ display: 'flex', gap: 10, fontSize: 12, color: '#45412F', fontWeight: 600, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 10, fontSize: 12, color: 'var(--pub-muted2)', fontWeight: 600, flexWrap: 'wrap' }}>
           {p.bedrooms ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><IconBed size={13} /> {p.bedrooms}</span> : null}
           {p.bathrooms ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><IconBath size={13} /> {p.bathrooms}</span> : null}
-          {p.area_varas ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><IconArea size={12} /> {p.area_varas}</span> : null}
+          {p.area_varas ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><IconArea size={12} /> {fmtVaras(p.area_varas)}</span> : null}
           {p.financing ? <span style={{ color: '#1F5B42' }}>En cuotas</span> : null}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#4A7C59', fontWeight: 600, marginTop: 'auto' }}>
@@ -124,7 +124,7 @@ function ResultCard({ p, active, saved, onSelect, onOpen, onWhatsApp, onToggleSa
 
 function RowSkeleton() {
   return (
-    <div style={{ display: 'flex', gap: 14, background: '#fff', borderRadius: 14, padding: 10, border: '1px solid #EDE9DF' }}>
+    <div style={{ display: 'flex', gap: 14, background: 'var(--pub-surface)', borderRadius: 14, padding: 10, border: '1px solid var(--pub-border)' }}>
       <div className="rs-skeleton" style={{ width: 168, height: 150, flexShrink: 0 }} />
       <div style={{ flex: 1, paddingTop: 4 }}>
         <div className="rs-skeleton" style={{ height: 19, width: '40%', marginBottom: 10 }} />
@@ -183,10 +183,10 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
     window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: p } }));
 
   return (
-    <div style={{ background: '#FAF8F3', fontFamily: F_SANS, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: 'var(--pub-bg)', fontFamily: F_SANS, display: 'flex', flexDirection: 'column' }}>
       {/* Barra de filtros */}
       <div style={{
-        background: '#FFFFFF', borderBottom: '1px solid #E4DFD2',
+        background: 'var(--pub-surface)', borderBottom: '1px solid var(--pub-border2)',
         position: 'sticky', top: 64, zIndex: 400,
       }}>
         <div style={{ maxWidth: 1440, margin: '0 auto', padding: '12px 24px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -201,9 +201,9 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
               aria-label="Buscar por ubicación"
               style={{
                 width: '100%', boxSizing: 'border-box',
-                border: '1.5px solid #E4DFD2', borderRadius: 10, padding: '10px 14px 10px 34px',
+                border: '1.5px solid var(--pub-border2)', borderRadius: 10, padding: '10px 14px 10px 34px',
                 fontFamily: F_SANS, fontSize: 14, fontWeight: 500,
-                outlineColor: '#1F5B42', background: '#FAF8F3', color: '#111113',
+                outlineColor: '#1F5B42', background: 'var(--pub-bg)', color: 'var(--pub-ink)',
               }}
             />
           </div>
@@ -214,15 +214,25 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
               <button key={c.label} onClick={() => setType(c.value)} style={{
                 fontFamily: F_SANS, fontSize: '13.5px', fontWeight: active ? 700 : 600,
                 padding: '9px 16px', borderRadius: 999,
-                border: `1.5px solid ${active ? '#1F5B42' : '#E4DFD2'}`,
-                background: active ? '#1F5B42' : '#FFFFFF',
-                color: active ? '#EEF5F0' : '#45412F',
+                border: `1.5px solid ${active ? '#1F5B42' : 'var(--pub-border2)'}`,
+                background: active ? '#1F5B42' : 'var(--pub-surface)',
+                color: active ? '#EEF5F0' : 'var(--pub-muted2)',
                 cursor: 'pointer', transition: 'all 0.15s',
               }}>{c.label}</button>
             );
           })}
 
-          <div className="search-filter-divider" style={{ width: 1, height: 28, background: '#E4DFD2' }} />
+          <a href="/lotificaciones" style={{
+            fontFamily: F_SANS, fontSize: '13.5px', fontWeight: 600,
+            padding: '9px 16px', borderRadius: 999,
+            border: '1.5px solid var(--pub-border2)', background: 'var(--pub-surface)', color: 'var(--pub-muted2)',
+            textDecoration: 'none', transition: 'all 0.15s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#1F5B42'; e.currentTarget.style.color = '#1F5B42'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--pub-border2)'; e.currentTarget.style.color = 'var(--pub-muted2)'; }}
+          >Lotificaciones →</a>
+
+          <div className="search-filter-divider" style={{ width: 1, height: 28, background: 'var(--pub-border2)' }} />
 
           <select value={priceIdx} onChange={e => setPriceIdx(Number(e.target.value))} aria-label="Rango de precio" style={selectStyle}>
             {PRICE_RANGES.map((r, i) => <option key={r.label} value={i}>{r.label}</option>)}
@@ -240,7 +250,7 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
           </label>
 
           <div style={{ flex: 1 }} />
-          <span style={{ fontFamily: F_MONO, fontSize: 12, color: '#6B6455' }} aria-live="polite">
+          <span style={{ fontFamily: F_MONO, fontSize: 12, color: 'var(--pub-muted)' }} aria-live="polite">
             {isLoading ? 'Buscando…' : `${data?.total ?? properties.length} resultados`}
           </span>
         </div>
@@ -260,12 +270,12 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
 
         <div className={`search-results-col ${mobileMap ? 'search-results-col--hidden' : ''}`}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, gap: 10 }}>
-            <h1 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 20, margin: 0, letterSpacing: '-0.02em', color: '#111113' }}>
+            <h1 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 20, margin: 0, letterSpacing: '-0.02em', color: 'var(--pub-ink)' }}>
               Propiedades en Honduras
             </h1>
             <select value={sort} onChange={e => setSort(e.target.value)} aria-label="Ordenar" style={{
-              border: '1.5px solid #E4DFD2', borderRadius: 8, padding: '7px 10px',
-              fontFamily: F_SANS, fontSize: '12.5px', fontWeight: 600, background: '#FFFFFF', cursor: 'pointer', color: '#111113',
+              border: '1.5px solid var(--pub-border2)', borderRadius: 8, padding: '7px 10px',
+              fontFamily: F_SANS, fontSize: '12.5px', fontWeight: 600, background: 'var(--pub-surface)', cursor: 'pointer', color: 'var(--pub-ink)',
             }}>
               <option value="recent">Más recientes</option>
               <option value="priceAsc">Menor precio</option>
@@ -299,7 +309,7 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
 
           {!isLoading && properties.length > 0 && (
             <div style={{ textAlign: 'center', padding: '24px 0 8px' }}>
-              <span style={{ fontSize: 13, color: '#9A9383' }}>
+              <span style={{ fontSize: 13, color: 'var(--pub-dim)' }}>
                 Mostrando {properties.length} propiedades ·{' '}
                 <button onClick={() => openWhatsApp(null as unknown as Property)} style={{
                   color: '#1F5B42', fontWeight: 700, background: 'none', border: 'none',

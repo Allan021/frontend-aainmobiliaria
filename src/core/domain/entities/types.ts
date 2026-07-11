@@ -186,6 +186,12 @@ export function cleanTitle(title: string): string {
   return title.replace(emojiRegex, '').trim();
 }
 
+/** Área en varas² lista para mostrar: agrega "v²" solo si el dato es numérico pelado */
+export function fmtVaras(v?: string | null): string {
+  if (!v) return '';
+  return /[a-záéíóúº²]/i.test(v) ? v : `${v} v²`;
+}
+
 /** Quita TODOS los emojis y colapsa espacios — para meta tags / SERP */
 export function stripEmojis(text: string): string {
   if (!text) return '';

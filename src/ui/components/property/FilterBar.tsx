@@ -76,9 +76,9 @@ function CategoryChip({
         gap: 8,
         padding: '0.5rem 1rem',
         borderRadius: 999,
-        background: active ? '#111113' : '#fff',
-        border: `1.5px solid ${active ? '#111113' : '#E6E0D2'}`,
-        color: active ? '#FAF8F3' : '#5A5A63',
+        background: active ? 'var(--pub-ink)' : 'var(--pub-surface)',
+        border: `1.5px solid ${active ? 'var(--pub-ink)' : 'var(--pub-border2)'}`,
+        color: active ? 'var(--pub-bg)' : 'var(--pub-muted)',
         cursor: 'pointer',
         transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
         fontFamily: 'inherit',
@@ -89,16 +89,16 @@ function CategoryChip({
       }}
       onMouseEnter={e => {
         if (!active) {
-          e.currentTarget.style.borderColor = '#111113';
-          e.currentTarget.style.color = '#111113';
-          e.currentTarget.style.background = '#FAF8F3';
+          e.currentTarget.style.borderColor = 'var(--pub-ink)';
+          e.currentTarget.style.color = 'var(--pub-ink)';
+          e.currentTarget.style.background = 'var(--pub-bg)';
         }
       }}
       onMouseLeave={e => {
         if (!active) {
-          e.currentTarget.style.borderColor = '#E6E0D2';
-          e.currentTarget.style.color = '#5A5A63';
-          e.currentTarget.style.background = '#fff';
+          e.currentTarget.style.borderColor = 'var(--pub-border2)';
+          e.currentTarget.style.color = 'var(--pub-muted)';
+          e.currentTarget.style.background = 'var(--pub-surface)';
         }
       }}
     >
@@ -161,8 +161,8 @@ export function FilterBar({ filters, setFilters, theme = 'light' }: FilterBarPro
       <div style={{ display: 'flex', gap: '0.875rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{
           minWidth: 220, padding: '0.5rem 0.875rem',
-          borderRadius: 10, border: `1.5px solid ${filters.dep ? '#111113' : '#E6E0D2'}`,
-          background: '#fff', transition: 'border-color 0.15s',
+          borderRadius: 10, border: `1.5px solid ${filters.dep ? 'var(--pub-ink)' : 'var(--pub-border2)'}`,
+          background: 'var(--pub-surface)', transition: 'border-color 0.15s',
         }}>
           <SelectField
             options={depOptions}

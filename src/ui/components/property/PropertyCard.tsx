@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { cleanTitle, type Property } from '../../../core/domain/entities/types';
+import { cleanTitle, fmtVaras, type Property } from '../../../core/domain/entities/types';
 import { useCurrency, priceParts } from '../../hooks/useCurrency';
 import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
 import { WhatsAppIcon } from '../shared/Icon';
@@ -41,9 +41,9 @@ export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, o
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        background: '#FFFFFF', border: '1px solid #EDE9DF', borderRadius: 16,
+        background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 16,
         overflow: 'hidden', display: 'flex', flexDirection: 'column',
-        fontFamily: F_SANS, color: '#111113',
+        fontFamily: F_SANS, color: 'var(--pub-ink)',
         transition: 'box-shadow 0.2s, transform 0.2s',
         boxShadow: hover ? '0 20px 48px -16px rgba(17,17,19,0.18)' : 'none',
         transform: hover ? 'translateY(-3px)' : 'translateY(0)',
@@ -51,7 +51,7 @@ export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, o
     >
       {/* Foto */}
       <div style={{ position: 'relative' }}>
-        <div onClick={() => onOpen(property)} style={{ display: 'block', height: 200, background: '#EDE9DF', cursor: 'pointer', overflow: 'hidden' }}>
+        <div onClick={() => onOpen(property)} style={{ display: 'block', height: 200, background: 'var(--pub-border)', cursor: 'pointer', overflow: 'hidden' }}>
           {img ? (
             <img
               src={optimizeCloudinaryUrl(img, 480)}
@@ -64,7 +64,7 @@ export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, o
               }}
             />
           ) : (
-            <div style={{ height: '100%', display: 'grid', placeItems: 'center', fontFamily: F_MONO, fontSize: '10.5px', color: '#9A9383' }}>
+            <div style={{ height: '100%', display: 'grid', placeItems: 'center', fontFamily: F_MONO, fontSize: '10.5px', color: 'var(--pub-dim)' }}>
               FOTO PENDIENTE
             </div>
           )}
@@ -84,9 +84,9 @@ export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, o
           aria-label={saved ? 'Quitar de favoritos' : 'Guardar en favoritos'}
           style={{
             position: 'absolute', top: 10, right: 10, width: 36, height: 36, borderRadius: '50%',
-            background: 'rgba(255,255,255,0.92)', border: '1px solid #EDE9DF', cursor: 'pointer',
+            background: 'rgba(255,255,255,0.92)', border: '1px solid var(--pub-border)', cursor: 'pointer',
             display: 'grid', placeItems: 'center',
-            color: saved ? '#C65D3B' : '#9A9383', transition: 'color 0.15s, transform 0.15s',
+            color: saved ? '#C65D3B' : 'var(--pub-dim)', transition: 'color 0.15s, transform 0.15s',
           }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; }}
           onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
@@ -101,23 +101,23 @@ export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, o
       <div style={{ padding: '18px 18px 16px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
           <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em' }}>{main}</div>
-          <div style={{ fontSize: '12.5px', color: '#9A9383', fontWeight: 600, whiteSpace: 'nowrap' }}>{alt}</div>
+          <div style={{ fontSize: '12.5px', color: 'var(--pub-dim)', fontWeight: 600, whiteSpace: 'nowrap' }}>{alt}</div>
         </div>
 
         <div>
           <button onClick={() => onOpen(property)} style={{
-            fontWeight: 700, fontSize: '15.5px', color: '#111113', background: 'none', border: 'none',
+            fontWeight: 700, fontSize: '15.5px', color: 'var(--pub-ink)', background: 'none', border: 'none',
             padding: 0, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', transition: 'color 0.15s',
             display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.35,
           }}
             onMouseEnter={e => { e.currentTarget.style.color = '#C65D3B'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#111113'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--pub-ink)'; }}
           >{cleanTitle(property.title)}</button>
-          <div style={{ fontSize: '13.5px', color: '#6B6455', marginTop: 2 }}>{property.municipio}, {property.departamento}</div>
+          <div style={{ fontSize: '13.5px', color: 'var(--pub-muted)', marginTop: 2 }}>{property.municipio}, {property.departamento}</div>
         </div>
 
         {/* Specs */}
-        <div style={{ display: 'flex', gap: 14, fontSize: 13, color: '#45412F', fontWeight: 600, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 14, fontSize: 13, color: 'var(--pub-muted2)', fontWeight: 600, flexWrap: 'wrap' }}>
           {property.bedrooms ? (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><IconBed size={14} /> {property.bedrooms} hab</span>
           ) : null}
@@ -128,14 +128,14 @@ export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, o
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><IconCar size={14} /> {property.parking}</span>
           ) : null}
           {property.area_varas ? (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><IconArea size={13} /> {property.area_varas}</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><IconArea size={13} /> {fmtVaras(property.area_varas)}</span>
           ) : null}
         </div>
 
         {/* Escritura */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#4A7C59', fontWeight: 600,
-          borderTop: '1px solid #F0EDE4', paddingTop: 10, marginTop: 'auto',
+          borderTop: '1px solid var(--pub-border)', paddingTop: 10, marginTop: 'auto',
         }}>
           <span style={{ width: 16, height: 16, borderRadius: '50%', background: '#EEF5F0', display: 'grid', placeItems: 'center' }}>
             <IconCheck size={10} />
@@ -146,12 +146,12 @@ export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, o
         {/* CTAs */}
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={() => onOpen(property)} style={{
-            flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 14, color: '#111113',
-            border: '1.5px solid #111113', borderRadius: 10, padding: '10px 0',
+            flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 14, color: 'var(--pub-ink)',
+            border: '1.5px solid var(--pub-ink)', borderRadius: 10, padding: '10px 0',
             background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s, color 0.15s',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#111113'; e.currentTarget.style.color = '#D4B254'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#111113'; }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--pub-ink)'; e.currentTarget.style.color = 'var(--pub-bg)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--pub-ink)'; }}
           >Agendar visita</button>
           <button onClick={e => { e.stopPropagation(); onWhatsApp(property); }} style={{
             flex: 1, textAlign: 'center', fontWeight: 700, fontSize: 14, color: '#0A3D22',

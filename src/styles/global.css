@@ -1197,11 +1197,67 @@ body {
   .footer-grid { grid-template-columns: 1fr !important; }
 }
 
+/* =========================================================
+   TEMA PÚBLICO (rediseño) — variables light/dark
+   El toggle del header cambia data-theme en <html>
+   ========================================================= */
+
+:root,
+[data-theme="light"] {
+  --pub-bg: #FAF8F3;
+  --pub-surface: #FFFFFF;
+  --pub-border: #EDE9DF;
+  --pub-border2: #E4DFD2;
+  --pub-ink: #111113;
+  --pub-muted: #6B6455;
+  --pub-muted2: #45412F;
+  --pub-dim: #9A9383;
+  --pub-green-bg: #EEF5F0;
+  --pub-green-border: #CDE2D4;
+  --pub-green-ink: #17452F;
+}
+
+[data-theme="dark"] {
+  --pub-bg: #111113;
+  --pub-surface: #1C1C1F;
+  --pub-border: #2A2A30;
+  --pub-border2: #38383F;
+  --pub-ink: #FAF8F3;
+  --pub-muted: #B9B9C0;
+  --pub-muted2: #C9C9CE;
+  --pub-dim: #8A8A92;
+  --pub-green-bg: #14251C;
+  --pub-green-border: #1F5B42;
+  --pub-green-ink: #A8CBB4;
+}
+
+/* ── Header rediseñado — responsive ── */
+@media (max-width: 480px) {
+  .header-brand-sub { display: none !important; }
+}
+@media (max-width: 380px) {
+  .header-brand-text { display: none !important; }
+}
+
 /* ── Publicar rediseñado — responsive ── */
 @media (max-width: 768px) {
   .pub-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
   .pub-grid-3 { grid-template-columns: 1fr !important; }
   .pub-grid-2 { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 560px) {
+  /* En móvil solo se ve la etiqueta del paso activo */
+  .pub-step-label { display: none !important; }
+}
+
+/* ── Barra diáspora — móvil ── */
+@media (max-width: 640px) {
+  .diaspora-bar { font-size: 12px !important; padding: 7px 14px !important; gap: 6px !important; }
+}
+
+/* ── Stats de la ficha — móvil ── */
+@media (max-width: 560px) {
+  .ficha-stats { grid-template-columns: 1fr 1fr !important; }
 }
 
 /* ── Ficha de propiedad rediseñada — responsive ── */

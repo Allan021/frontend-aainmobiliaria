@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Header } from '../ui/components/layout/Header';
+import { Footer } from '../ui/components/layout/Footer';
+---
+
+<BaseLayout title="Términos y Condiciones — A&A Inmobiliaria" description="Términos de uso y política de privacidad de A&A Inmobiliaria.">
+  <Header client:load currentRoute="" />
+  <main class="legal">
+    <div class="legal__eyebrow">LEGAL · A&A INMOBILIARIA</div>
+    <h1>Términos y Condiciones</h1>
+    <p class="legal__updated">Última actualización: julio de 2026</p>
+
+    <h2>1. Sobre el servicio</h2>
+    <p>
+      aabienes.com es la plataforma de A&A Inmobiliaria (El Progreso, Yoro, Honduras) para publicar y encontrar
+      casas, terrenos y lotes. A&A actúa como intermediario: coordina consultas, visitas y el proceso de cierre
+      entre compradores y propietarios.
+    </p>
+
+    <h2>2. Publicación de propiedades</h2>
+    <p>
+      Publicar es gratuito. Al enviar una propiedad usted declara ser el propietario o contar con autorización para
+      ofrecerla. Toda publicación pasa por una revisión de A&A (incluida la verificación de escritura en el
+      Instituto de la Propiedad) antes de mostrarse al público. A&A puede rechazar, pausar o retirar publicaciones
+      con información falsa, incompleta o documentación irregular.
+    </p>
+
+    <h2>3. Anonimato del propietario</h2>
+    <p>
+      Los datos del propietario (nombre, teléfono, correo) nunca se muestran en el sitio. Todo interesado contacta a
+      través de los canales de A&A Inmobiliaria, que coordina la comunicación entre las partes.
+    </p>
+
+    <h2>4. Intermediación y comisión</h2>
+    <p>
+      A&A atiende las consultas, coordina visitas y acompaña la negociación hasta la firma de escritura pública.
+      La comisión por intermediación se acuerda con el propietario antes de publicar o al momento de recibir
+      la primera oferta. Publicar no genera ningún costo.
+    </p>
+
+    <h2>5. Información de las publicaciones</h2>
+    <p>
+      Los precios, medidas, fotografías y estimaciones de financiamiento son informativos y pueden cambiar sin
+      previo aviso. Las cuotas mostradas son estimaciones de referencia sin valor contractual; el plan definitivo se
+      confirma por escrito con el equipo de A&A. La ubicación mostrada en el mapa es aproximada por seguridad.
+    </p>
+
+    <h2 id="privacidad">6. Política de privacidad</h2>
+    <p>
+      Los datos que usted proporciona (nombre, correo, teléfono, propiedades publicadas y visitas agendadas) se usan
+      exclusivamente para operar el servicio: coordinar visitas, atender consultas y darle seguimiento por WhatsApp.
+      No vendemos ni compartimos sus datos con terceros ajenos a la operación. Puede solicitar la eliminación de su
+      cuenta y sus datos escribiéndonos por WhatsApp.
+    </p>
+
+    <h2>7. Cuenta de usuario</h2>
+    <p>
+      Usted es responsable de mantener la confidencialidad de su contraseña. A&A puede suspender cuentas que
+      publiquen información fraudulenta o hagan mal uso de la plataforma.
+    </p>
+
+    <h2>8. Contacto</h2>
+    <p>
+      Para cualquier consulta sobre estos términos, escríbanos por WhatsApp o visítenos en El Progreso, Yoro,
+      Honduras. Horario: lunes a sábado, 8:00 AM – 5:00 PM.
+    </p>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .legal {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    font-family: 'Instrument Sans', 'Plus Jakarta Sans', sans-serif;
+    color: var(--pub-ink, #111113);
+    background: var(--pub-bg, #FAF8F3);
+  }
+  .legal__eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: #B8862E;
+    margin-bottom: 10px;
+  }
+  .legal h1 {
+    font-family: 'Archivo', 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: clamp(30px, 5vw, 42px);
+    letter-spacing: -0.03em;
+    margin: 0 0 6px;
+  }
+  .legal__updated {
+    color: var(--pub-dim, #9A9383);
+    font-size: 13px;
+    margin: 0 0 32px;
+  }
+  .legal h2 {
+    font-family: 'Archivo', 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: -0.02em;
+    margin: 32px 0 10px;
+  }
+  .legal p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--pub-muted2, #45412F);
+    margin: 0 0 12px;
+  }
+</style>
