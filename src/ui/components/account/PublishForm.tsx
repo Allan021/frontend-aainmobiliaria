@@ -429,13 +429,15 @@ function PublishInner() {
           <div className="pub-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 22 }}>
             <label style={{ display: 'block' }}>
               <span style={labelText}>Departamento</span>
-              <select value={form.departamento} onChange={e => { set('departamento', e.target.value); set('municipio', ''); }} style={{ ...inputStyle, cursor: 'pointer' }}>
+              <select className="pub-select pub-select--lg" style={{ width: '100%' }}
+                value={form.departamento} onChange={e => { set('departamento', e.target.value); set('municipio', ''); }}>
                 {departamentos.map(d => <option key={d.id}>{d.nombre}</option>)}
               </select>
             </label>
             <label style={{ display: 'block' }}>
               <span style={labelText}>Municipio</span>
-              <select value={form.municipio} onChange={e => set('municipio', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+              <select className="pub-select pub-select--lg" style={{ width: '100%' }}
+                value={form.municipio} onChange={e => set('municipio', e.target.value)}>
                 <option value="">Seleccioná…</option>
                 {(dep?.municipios || []).map(m => <option key={m.id}>{m.nombre}</option>)}
               </select>

@@ -29,12 +29,6 @@ const PRICE_RANGES = [
   { label: 'Más de L 3 M', min: '3000000', max: '' },
 ];
 
-const selectStyle: React.CSSProperties = {
-  border: '1.5px solid var(--pub-border2)', borderRadius: 10, padding: '10px 12px',
-  fontFamily: F_SANS, fontSize: '13.5px', fontWeight: 600, color: 'var(--pub-ink)',
-  background: 'var(--pub-bg)', cursor: 'pointer', outlineColor: '#1F5B42',
-};
-
 function getInitialParam(name: string): string {
   if (typeof window === 'undefined') return '';
   return new URLSearchParams(window.location.search).get(name) || '';
@@ -234,11 +228,11 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
 
           <div className="search-filter-divider" style={{ width: 1, height: 28, background: 'var(--pub-border2)' }} />
 
-          <select value={priceIdx} onChange={e => setPriceIdx(Number(e.target.value))} aria-label="Rango de precio" style={selectStyle}>
+          <select className="pub-select" value={priceIdx} onChange={e => setPriceIdx(Number(e.target.value))} aria-label="Rango de precio">
             {PRICE_RANGES.map((r, i) => <option key={r.label} value={i}>{r.label}</option>)}
           </select>
 
-          <select value={beds} onChange={e => setBeds(e.target.value)} aria-label="Habitaciones" style={selectStyle}>
+          <select className="pub-select" value={beds} onChange={e => setBeds(e.target.value)} aria-label="Habitaciones">
             <option value="">Habitaciones</option>
             {[1, 2, 3, 4].map(n => <option key={n} value={n}>{n}+</option>)}
           </select>
@@ -273,10 +267,8 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
             <h1 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 20, margin: 0, letterSpacing: '-0.02em', color: 'var(--pub-ink)' }}>
               Propiedades en Honduras
             </h1>
-            <select value={sort} onChange={e => setSort(e.target.value)} aria-label="Ordenar" style={{
-              border: '1.5px solid var(--pub-border2)', borderRadius: 8, padding: '7px 10px',
-              fontFamily: F_SANS, fontSize: '12.5px', fontWeight: 600, background: 'var(--pub-surface)', cursor: 'pointer', color: 'var(--pub-ink)',
-            }}>
+            <select className="pub-select" value={sort} onChange={e => setSort(e.target.value)} aria-label="Ordenar"
+              style={{ fontSize: '12.5px', padding: '7px 30px 7px 10px', borderRadius: 8 }}>
               <option value="recent">Más recientes</option>
               <option value="priceAsc">Menor precio</option>
               <option value="priceDesc">Mayor precio</option>

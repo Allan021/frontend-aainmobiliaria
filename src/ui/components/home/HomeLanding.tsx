@@ -34,7 +34,7 @@ function DiasporaBar() {
       fontFamily: F_SANS,
     }}>
       <span style={{ fontWeight: 600, letterSpacing: '0.02em' }}>¿Comprás desde Estados Unidos?</span>
-      <span style={{ opacity: 0.85 }}>Tours en video, documentos verificados y cierre a distancia — todo por WhatsApp.</span>
+      <span className="diaspora-bar__detail" style={{ opacity: 0.85 }}>Tours en video, documentos verificados y cierre a distancia — todo por WhatsApp.</span>
       <button onClick={() => openWhatsAppModal()} style={{
         color: '#D4B254', fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: 3,
         background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, padding: 0,
@@ -201,7 +201,7 @@ function Hero({ properties }: { properties: Property[] }) {
             </div>
             <div className="hero-search-tipo" style={{ flex: 1, padding: '10px 18px', borderRight: '1px solid #E4DFD2' }}>
               <div style={fieldLabel}>TIPO</div>
-              <select style={{ ...searchField, cursor: 'pointer' }} aria-label="Tipo de propiedad"
+              <select className="pub-select pub-select--bare" aria-label="Tipo de propiedad"
                 onChange={e => { if (e.target.value) window.location.href = `/buscar?type=${e.target.value}`; }}>
                 <option value="">Todo tipo</option>
                 <option value="Casa">Casa</option>
