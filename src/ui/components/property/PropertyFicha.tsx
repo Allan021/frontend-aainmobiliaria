@@ -4,11 +4,11 @@ import { useCurrency, priceParts, fmtLps, fmtUsd, HNL_PER_USD } from '../../hook
 import { useSettings } from '../../hooks/useSettings';
 import { useFavoriteIds, useToggleFavorite, isLoggedIn, requireLogin } from '../../hooks/useFavorites';
 import { leadAdapter } from '../../../infrastructure/api/leadAdapter';
-import { cleanTitle, fmtVaras, type Property } from '../../../core/domain/entities/types';
+import { cleanTitle, fmtVaras, parseDescription, type Property } from '../../../core/domain/entities/types';
 import { optimizeCloudinaryUrl, cloudinarySrcSet } from '../../../core/utils/cloudinaryUtils';
 import { GalleryModal } from './detail/GalleryModal';
 import { WhatsAppIcon } from '../shared/Icon';
-import { IconShield, IconCheck, IconCamera, IconMapPin, IconVideo } from '../shared/rs-icons';
+import { IconShield, IconCheck, IconCamera, IconMapPin, IconVideo, IconDroplet, IconZap, IconScroll, IconArea } from '../shared/rs-icons';
 
 const F_ARCHIVO = "'Archivo', 'Plus Jakarta Sans', sans-serif";
 const F_SANS = "'Instrument Sans', 'Plus Jakarta Sans', sans-serif";
@@ -226,7 +226,7 @@ function FichaInner({ property }: Props) {
     property.area_varas ? { v: fmtVaras(property.area_varas), l: property.area_m2 ? `≈ ${property.area_m2}` : 'Área' } : null,
   ].filter(Boolean) as { v: string; l: string }[];
 
-  const descParagraphs = (property.description || '').split(/\n\n+/).filter(Boolean);
+  const descBlocks = parseDescription(property.description);
 
   const openConsulta = () =>
     window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property } }));
@@ -329,11 +329,71 @@ function FichaInner({ property }: Props) {
               </div>
             )}
 
+            {/* Servicios y documentos — clave en terrenos/solares */}
+            {(property.has_water || property.has_power || property.has_deed) && (
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', margin: '0 0 4px' }}>
+                {property.has_water && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 10, padding: '9px 14px', fontSize: '13.5px', fontWeight: 600, color: 'var(--pub-muted2)' }}>
+                    <span style={{ color: '#1F5B42', display: 'flex' }}><IconDroplet size={15} /></span> Agua potable
+                  </span>
+                )}
+                {property.has_power && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 10, padding: '9px 14px', fontSize: '13.5px', fontWeight: 600, color: 'var(--pub-muted2)' }}>
+                    <span style={{ color: '#B8962E', display: 'flex' }}><IconZap size={15} /></span> Energía eléctrica
+                  </span>
+                )}
+                {property.has_deed && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 10, padding: '9px 14px', fontSize: '13.5px', fontWeight: 600, color: 'var(--pub-muted2)' }}>
+                    <span style={{ color: '#4A7C59', display: 'flex' }}><IconScroll size={15} /></span> Escritura en regla
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Lo especial — chips estilo Zillow "What's special" */}
+            {(property.highlights?.length ?? 0) > 0 && (
+              <>
+                <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: '28px 0 12px' }}>Lo especial</h3>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {property.highlights.map(h => (
+                    <span key={h} style={{
+                      background: 'var(--pub-bg)', border: '1px solid var(--pub-border2)',
+                      borderRadius: 8, padding: '8px 13px',
+                      fontSize: '12.5px', fontWeight: 700, letterSpacing: '0.03em',
+                      textTransform: 'uppercase', color: 'var(--pub-muted2)',
+                    }}>{h}</span>
+                  ))}
+                </div>
+              </>
+            )}
+
             {/* Descripción */}
             <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: '28px 0 12px' }}>Sobre esta propiedad</h3>
-            {descParagraphs.length > 0 ? descParagraphs.map((p, i) => (
-              <p key={i} style={{ fontSize: '15.5px', lineHeight: 1.7, color: 'var(--pub-muted2)', margin: i === descParagraphs.length - 1 ? 0 : '0 0 14px', whiteSpace: 'pre-line' }}>{p}</p>
-            )) : (
+            {descBlocks.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {descBlocks.map((b, i) => {
+                  if (b.type === 'heading') {
+                    return (
+                      <div key={i} style={{
+                        fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 14.5, color: 'var(--pub-ink)',
+                        letterSpacing: '-0.01em', margin: i === 0 ? '0 0 8px' : '18px 0 8px',
+                      }}>{b.text.replace(/:$/, '')}</div>
+                    );
+                  }
+                  if (b.type === 'bullet') {
+                    return (
+                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '3px 0' }}>
+                        <span style={{ color: '#4A7C59', display: 'flex', marginTop: 3, flexShrink: 0 }}><IconCheck size={14} /></span>
+                        <span style={{ fontSize: '15px', lineHeight: 1.55, color: 'var(--pub-muted2)' }}>{b.text}</span>
+                      </div>
+                    );
+                  }
+                  return (
+                    <p key={i} style={{ fontSize: '15.5px', lineHeight: 1.7, color: 'var(--pub-muted2)', margin: '6px 0' }}>{b.text}</p>
+                  );
+                })}
+              </div>
+            ) : (
               <p style={{ fontSize: '15.5px', color: 'var(--pub-dim)', margin: 0 }}>Consultá los detalles por WhatsApp.</p>
             )}
 

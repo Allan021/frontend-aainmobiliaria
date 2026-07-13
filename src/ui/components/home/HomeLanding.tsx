@@ -226,7 +226,7 @@ function Hero({ properties }: { properties: Property[] }) {
               { label: 'Terrenos en Yoro', url: '/buscar?q=Yoro&type=Terreno' },
               { label: 'Lotes en cuotas', url: '/buscar?type=Lote' },
               { label: 'Casas en El Progreso', url: '/buscar?q=El Progreso&type=Casa' },
-              { label: 'Lotificaciones', url: '/lotificaciones' },
+              { label: 'Lotificaciones', url: '/buscar?type=lotificadora' },
             ].map(c => (
               <a key={c.label} href={c.url} style={chip}
                 onMouseEnter={e => { e.currentTarget.style.color = 'var(--hero-accent)'; e.currentTarget.style.borderColor = 'var(--hero-chip-border)'; }}
@@ -279,7 +279,7 @@ function Featured({ properties, isLoading }: { properties: Property[]; isLoading
             Escrituradas y listas para visitar.
           </h2>
         </div>
-        <a href="/propiedades" style={{
+        <a href="/buscar" style={{
           fontWeight: 700, fontSize: 15, color: 'var(--pub-ink)',
           borderBottom: '2px solid #D4B254', paddingBottom: 3, textDecoration: 'none',
         }}>Ver todas las propiedades →</a>

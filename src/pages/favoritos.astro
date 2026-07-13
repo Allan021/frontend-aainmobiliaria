@@ -10,5 +10,5 @@ import { WhatsAppModal } from '../ui/components/property/WhatsAppModal';
   <Header client:load currentRoute="favoritos" />
   <FavoritesApp client:only="react" />
   <Footer />
-  <WhatsAppModal client:load open={false} onClose={() => {}} />
+  <WhatsAppModal client:idle open={false} onClose={() => {}} />
 </BaseLayout>

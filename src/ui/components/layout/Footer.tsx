@@ -56,9 +56,9 @@ export function Footer({ onWhatsApp }: FooterProps) {
             <div style={{ fontFamily: F_MONO, fontSize: '10.5px', letterSpacing: '0.16em', color: '#6E6E78', marginBottom: 16 }}>PROPIEDADES</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14 }}>
               <FooterLink href="/buscar">Buscar en el mapa</FooterLink>
-              <FooterLink href="/buscar">Casas</FooterLink>
-              <FooterLink href="/propiedades">Terrenos y lotes</FooterLink>
-              <FooterLink href="/lotificaciones">Lotificaciones</FooterLink>
+              <FooterLink href="/buscar?type=Casa">Casas</FooterLink>
+              <FooterLink href="/buscar?type=Terreno">Terrenos y lotes</FooterLink>
+              <FooterLink href="/buscar?type=lotificadora">Lotificaciones</FooterLink>
             </div>
           </div>
 

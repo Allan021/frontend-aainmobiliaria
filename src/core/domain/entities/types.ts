@@ -37,8 +37,31 @@ export interface Property {
   bedrooms?: number | null;
   bathrooms?: number | null;
   parking?: number | null;
+  has_water?: boolean;
+  has_power?: boolean;
+  has_deed?: boolean;
   created_at: string;
   updated_at: string;
+}
+
+/** Borrador de propiedad generado por IA desde un prompt libre */
+export interface PropertyDraft {
+  title: string;
+  description: string;
+  type: 'Casa' | 'Terreno' | 'Lote' | 'Comercial';
+  price: number | null;
+  currency: 'L' | '$' | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  parking: number | null;
+  area_varas: string | null;
+  area_m2: string | null;
+  has_water: boolean;
+  has_power: boolean;
+  has_deed: boolean;
+  highlights: string[];
+  municipio: string | null;
+  departamento: string | null;
 }
 
 export interface Favorite {
@@ -199,5 +222,33 @@ export function stripEmojis(text: string): string {
     .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}️]/gu, '')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+export type DescBlock = { type: 'heading' | 'text' | 'bullet'; text: string };
+
+/**
+ * Convierte la descripción cruda del admin (llena de emojis y viñetas ✅/📍)
+ * en bloques estructurados y limpios para renderizar como en Zillow:
+ * subtítulos, párrafos y listas con checks — sin emojis sueltos.
+ */
+export function parseDescription(raw?: string | null): DescBlock[] {
+  if (!raw) return [];
+  const CHECK = /[✅☑✔✓]/u;
+  const DASH_START = /^\s*[•·▪▸►◦‣▶✦❖◆➤➔➜✱\-–—*]/u;
+  const blocks: DescBlock[] = [];
+
+  for (const line of raw.split(/\r?\n/)) {
+    const original = line.trim();
+    if (!original) continue;
+    const text = stripEmojis(original).replace(/^[•·▪▸►◦‣▶✦❖◆➤➔➜✱\-–—*]\s*/u, '').trim();
+    if (!text) continue;
+
+    const lead = original.slice(0, 4); // primeros chars para detectar la viñeta
+    const isBullet = CHECK.test(lead) || DASH_START.test(original);
+    const isHeading = !isBullet && text.length <= 60 && text.endsWith(':') && text === text.toUpperCase();
+
+    blocks.push({ type: isHeading ? 'heading' : isBullet ? 'bullet' : 'text', text });
+  }
+  return blocks;
 }
 

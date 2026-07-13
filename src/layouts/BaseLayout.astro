@@ -5,6 +5,7 @@ interface Props {
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;
+  ogType?: string;
   canonical?: string;
   jsonLd?: object;
   noindex?: boolean;
@@ -16,10 +17,13 @@ const {
   ogTitle,
   ogDescription,
   ogImage,
+  ogType = 'website',
   canonical,
   jsonLd,
   noindex = false,
 } = Astro.props;
+
+const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap';
 
 const resolvedOgTitle = ogTitle || title;
 const resolvedOgDescription = ogDescription || description;
@@ -75,10 +79,13 @@ const orgJsonLd = {
     <link rel="preconnect" href="https://www.openstreetmap.org" />
     <link rel="dns-prefetch" href="https://www.openstreetmap.org" />
 
-    <!-- Tipografías del rediseño: Archivo (títulos) + Instrument Sans (texto) + JetBrains Mono (etiquetas) -->
+    <!-- Tipografías del rediseño (Archivo/Instrument Sans/JetBrains Mono) —
+         carga NO bloqueante: se aplica sin retrasar el primer paint (LCP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style" href={FONTS_HREF} />
+    <link rel="stylesheet" href={FONTS_HREF} media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href={FONTS_HREF} /></noscript>
 
     <!-- Preload critical fonts (WOFF2 — 68% smaller than TTF) -->
     <link rel="preload" href="/fonts/PlusJakartaSans-Regular.woff2" as="font" type="font/woff2" crossorigin />
@@ -86,7 +93,7 @@ const orgJsonLd = {
     <link rel="preload" href="/fonts/PlusJakartaSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- Open Graph -->
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:locale" content="es_HN" />
     <meta property="og:site_name" content="A&A Inmobiliaria" />
     <meta property="og:title" content={resolvedOgTitle} />

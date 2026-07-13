@@ -6,7 +6,9 @@ import { useCreateProperty, useUpdateProperty, useDeleteProperty } from '../../h
 import { useHondurasData } from '../../hooks/useHondurasData';
 import { SelectField } from '../shared/SelectField';
 import { api } from '../../../infrastructure/api/client';
+import { aiAdapter } from '../../../infrastructure/api/aiAdapter';
 import { ConfirmModal } from './ConfirmModal';
+import { LocationPicker } from '../shared/LocationPicker';
 import type { Property } from '../../../core/domain/entities/types';
 
 interface Props {
@@ -42,6 +44,10 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
     map_url: '',
     facebook_title: '',
     facebook_description: '',
+    bedrooms: '', bathrooms: '', parking: '',
+    has_water: false, has_power: false, has_deed: false,
+    highlights: [] as string[],
+    lat: null as number | null, lng: null as number | null,
   });
   const [images, setImages] = useState<ImageItem[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -51,6 +57,9 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
   const [error, setError] = useState('');
   const [isDark, setIsDark] = useState(getStoredTheme() === 'dark');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
 
   const createProperty = useCreateProperty();
   const updateProperty = useUpdateProperty();
@@ -108,6 +117,12 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         map_url: (property as any).map_url || '',
         facebook_title: (property as any).facebook_title || '',
         facebook_description: (property as any).facebook_description || '',
+        bedrooms: property.bedrooms != null ? String(property.bedrooms) : '',
+        bathrooms: property.bathrooms != null ? String(property.bathrooms) : '',
+        parking: property.parking != null ? String(property.parking) : '',
+        has_water: !!property.has_water, has_power: !!property.has_power, has_deed: !!property.has_deed,
+        highlights: property.highlights || [],
+        lat: property.lat ?? null, lng: property.lng ?? null,
       });
       setImages(
         (property.images || []).map(img => ({
@@ -130,6 +145,10 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         map_url: '',
         facebook_title: '',
         facebook_description: '',
+        bedrooms: '', bathrooms: '', parking: '',
+        has_water: false, has_power: false, has_deed: false,
+        highlights: [],
+        lat: null, lng: null,
       });
       setImages([]);
     }
@@ -138,7 +157,40 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
 
   if (!open) return null;
 
-  const set = (key: string, value: string | boolean) => setForm({ ...form, [key]: value });
+  const set = (key: string, value: string | boolean | number | null | string[]) => setForm({ ...form, [key]: value });
+
+  // ── IA: prompt/descripción cruda → campos del formulario ──
+  const generarConIA = async () => {
+    setAiError('');
+    if (aiPrompt.trim().length < 15) { setAiError('Escribí un poco más de contexto (mínimo 15 caracteres).'); return; }
+    setAiLoading(true);
+    try {
+      const d = await aiAdapter.propertyDraft(aiPrompt);
+      const dep = d.departamento ? departamentos.find(x => x.nombre.toLowerCase() === d.departamento!.toLowerCase()) : null;
+      const muni = dep && d.municipio ? dep.municipios.find(m => m.nombre.toLowerCase() === d.municipio!.toLowerCase()) : null;
+      if (d.type) setTab(d.type === 'Terreno' || d.type === 'Lote' ? 'lote' : 'propiedad');
+      setForm(f => ({
+        ...f,
+        title: d.title || f.title,
+        description: d.description || f.description,
+        price: d.price != null ? String(d.price) : f.price,
+        bedrooms: d.bedrooms != null ? String(d.bedrooms) : f.bedrooms,
+        bathrooms: d.bathrooms != null ? String(d.bathrooms) : f.bathrooms,
+        parking: d.parking != null ? String(d.parking) : f.parking,
+        area_varas: d.area_varas || f.area_varas,
+        area_m2: d.area_m2 || f.area_m2,
+        has_water: d.has_water, has_power: d.has_power, has_deed: d.has_deed,
+        highlights: d.highlights?.length ? d.highlights : f.highlights,
+        departamento: dep ? dep.nombre : f.departamento,
+        dep_code: dep?.id ? String(dep.id) : f.dep_code,
+        municipio: muni ? muni.nombre : f.municipio,
+      }));
+    } catch (err) {
+      setAiError((err as Error).message || 'No se pudo generar.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleDimensionsChange = (val: string) => {
     const regex = /([0-9.]+)\s*[xX*]\s*([0-9.]+)/;
@@ -285,6 +337,15 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         map_url: form.map_url.trim(),
         facebook_title: form.facebook_title.trim(),
         facebook_description: form.facebook_description.trim(),
+        bedrooms: form.bedrooms ? Number(form.bedrooms) : null,
+        bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
+        parking: form.parking ? Number(form.parking) : null,
+        has_water: form.has_water,
+        has_power: form.has_power,
+        has_deed: form.has_deed,
+        highlights: form.highlights,
+        lat: form.lat,
+        lng: form.lng,
       };
 
       // 1. Save property
@@ -391,6 +452,32 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
           {/* Left: form fields */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
+            {/* Asistente IA: pegar prompt/descripción cruda → llena el formulario */}
+            <div style={{
+              background: isDark ? 'rgba(31,91,66,0.12)' : '#EEF5F0',
+              border: `1.5px solid ${isDark ? 'rgba(31,91,66,0.4)' : '#CDE2D4'}`,
+              borderRadius: 12, padding: '14px 16px',
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#7FB596' : '#1F5B42', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1" />
+                  <path d="M12 8l1.2 2.8L16 12l-2.8 1.2L12 16l-1.2-2.8L8 12l2.8-1.2z" />
+                </svg>
+                Llenado con IA — pegá la descripción cruda o escribí las notas
+              </div>
+              <textarea
+                rows={3}
+                value={aiPrompt}
+                onChange={e => setAiPrompt(e.target.value)}
+                placeholder="Ej: casa de esquina en la 19 de Junio, 3 cuartos, 2 baños, agua y luz, 350 varas, L 2.5M…"
+                style={{ ...inputStyle, resize: 'vertical', marginBottom: 8 }}
+              />
+              {aiError && <div style={{ fontSize: 12, color: '#8C3A2E', fontWeight: 600, marginBottom: 8 }}>{aiError}</div>}
+              <Button variant="primary" size="sm" onClick={generarConIA}>
+                {aiLoading ? 'Generando…' : 'Generar campos con IA'}
+              </Button>
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
                 <span style={labelStyle}>Departamento</span>
@@ -426,11 +513,104 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
             </div>
 
             <div>
+              <span style={labelStyle}>Ubicación en el mapa — clic o arrastrá el pin (así sale en el buscador)</span>
+              <LocationPicker
+                height={220}
+                initial={form.lat != null && form.lng != null ? [form.lat, form.lng] : null}
+                onPick={(lat, lng) => setForm(f => ({ ...f, lat, lng }))}
+              />
+              <div style={{ fontSize: 11, color: form.lat != null ? '#4A7C59' : textDim, marginTop: 6, fontWeight: 600 }}>
+                {form.lat != null
+                  ? `Pin: ${form.lat.toFixed(5)}, ${form.lng?.toFixed(5)} — al público solo se muestra la zona aproximada`
+                  : 'Sin pin: la propiedad no aparece en el mapa del buscador'}
+              </div>
+            </div>
+
+            <div>
               <span style={labelStyle}>Ubicación en Google Maps (Link o Embed)</span>
               <input
                 style={inputStyle} value={form.map_url}
                 onChange={e => set('map_url', e.target.value)}
                 placeholder="Ej: https://maps.app.goo.gl/xxx o iframe embed"
+                onFocus={e => e.target.style.borderColor = '#D4B254'}
+                onBlur={e => e.target.style.borderColor = border}
+              />
+            </div>
+
+            {tab === 'propiedad' && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                <div>
+                  <span style={labelStyle}>Habitaciones</span>
+                  <input type="number" min={0} style={inputStyle} value={form.bedrooms} onChange={e => set('bedrooms', e.target.value)}
+                    onFocus={e => e.target.style.borderColor = '#D4B254'} onBlur={e => e.target.style.borderColor = border} />
+                </div>
+                <div>
+                  <span style={labelStyle}>Baños</span>
+                  <input type="number" min={0} step="0.5" style={inputStyle} value={form.bathrooms} onChange={e => set('bathrooms', e.target.value)}
+                    onFocus={e => e.target.style.borderColor = '#D4B254'} onBlur={e => e.target.style.borderColor = border} />
+                </div>
+                <div>
+                  <span style={labelStyle}>Parqueos</span>
+                  <input type="number" min={0} style={inputStyle} value={form.parking} onChange={e => set('parking', e.target.value)}
+                    onFocus={e => e.target.style.borderColor = '#D4B254'} onBlur={e => e.target.style.borderColor = border} />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <span style={labelStyle}>Servicios y documentos</span>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {([
+                  { key: 'has_water', label: 'Agua potable' },
+                  { key: 'has_power', label: 'Energía eléctrica' },
+                  { key: 'has_deed', label: 'Escritura en regla' },
+                ] as const).map(t => {
+                  const on = form[t.key];
+                  return (
+                    <button key={t.key} type="button" onClick={() => set(t.key, !on)} aria-pressed={on} style={{
+                      padding: '8px 14px', borderRadius: 999, cursor: 'pointer',
+                      fontFamily: 'inherit', fontSize: 12.5, fontWeight: 600,
+                      border: on ? '1.5px solid #4A7C59' : `1.5px solid ${border}`,
+                      background: on ? (isDark ? 'rgba(74,124,89,0.15)' : '#E8F0EA') : 'transparent',
+                      color: on ? '#4A7C59' : textDim,
+                      transition: 'all 0.15s',
+                    }}>
+                      {on ? '✓ ' : ''}{t.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <span style={labelStyle}>Lo especial (chips en la ficha) — Enter para agregar</span>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: form.highlights.length ? 8 : 0 }}>
+                {form.highlights.map((h, i) => (
+                  <span key={`${h}-${i}`} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    border: `1px solid ${border}`, borderRadius: 999, padding: '5px 10px',
+                    fontSize: 12, fontWeight: 600, color: textMuted,
+                  }}>
+                    {h}
+                    <button type="button" aria-label={`Quitar ${h}`}
+                      onClick={() => set('highlights', form.highlights.filter((_, j) => j !== i))}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', color: textDim, padding: 0, fontSize: 13, lineHeight: 1 }}>✕</button>
+                  </span>
+                ))}
+              </div>
+              <input
+                style={inputStyle}
+                placeholder='Ej. "Casa de esquina"'
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const v = (e.target as HTMLInputElement).value.trim();
+                    if (v && form.highlights.length < 6) {
+                      set('highlights', [...form.highlights, v]);
+                      (e.target as HTMLInputElement).value = '';
+                    }
+                  }
+                }}
                 onFocus={e => e.target.style.borderColor = '#D4B254'}
                 onBlur={e => e.target.style.borderColor = border}
               />

@@ -213,6 +213,25 @@ export const IconPhoneCall = ({ size = 24 }: IconProps) => (
   </svg>
 );
 
+export const IconSparkles = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1" />
+    <path d="M12 8l1.2 2.8L16 12l-2.8 1.2L12 16l-1.2-2.8L8 12l2.8-1.2z" />
+  </svg>
+);
+
+export const IconDroplet = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+  </svg>
+);
+
+export const IconZap = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+);
+
 export const IconPause = ({ size = 24 }: IconProps) => (
   <svg {...base(size)}>
     <rect x="6" y="4" width="4" height="16" />

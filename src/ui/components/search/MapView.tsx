@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useEffect, useRef, useState } from 'react';
+import type { Map as LeafletMap, LayerGroup } from 'leaflet';
 import { cleanTitle, type Property } from '../../../core/domain/entities/types';
 import { shortPrice, priceParts, type Currency } from '../../hooks/useCurrency';
 import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
@@ -16,7 +15,6 @@ function tileUrl(): string {
     : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 }
 
-
 interface MapViewProps {
   properties: Property[];
   currency: Currency;
@@ -26,29 +24,39 @@ interface MapViewProps {
 }
 
 /**
- * Mapa con tiles CARTO Voyager (look limpio y pro) y pins de precio.
- * Verde pino = normal · terracota = seleccionado. Solo montar con client:only.
+ * Mapa con tiles CARTO (voyager / dark_all según tema) y pins de precio.
+ * Verde pino = normal · terracota = seleccionado.
+ * Leaflet se importa dinámicamente — seguro con SSR (client:load).
  */
 export function MapView({ properties, currency, selectedId, onSelect, onOpen }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const layerRef = useRef<L.LayerGroup | null>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const layerRef = useRef<LayerGroup | null>(null);
+  const LRef = useRef<typeof import('leaflet') | null>(null);
   const fittedRef = useRef(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
-    const map = L.map(containerRef.current, { zoomControl: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
-    // Tiles CARTO Voyager — más limpios que OSM estándar, gratis con atribución
-    L.tileLayer(tileUrl(), {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20,
-    }).addTo(map);
-    L.control.zoom({ position: 'topright' }).addTo(map);
-    layerRef.current = L.layerGroup().addTo(map);
-    mapRef.current = map;
+    let cancelled = false;
+    (async () => {
+      const L = (await import('leaflet')).default;
+      await import('leaflet/dist/leaflet.css');
+      if (cancelled || !containerRef.current || mapRef.current) return;
+      LRef.current = L;
+      const map = L.map(containerRef.current, { zoomControl: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+      L.tileLayer(tileUrl(), {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20,
+      }).addTo(map);
+      L.control.zoom({ position: 'topright' }).addTo(map);
+      layerRef.current = L.layerGroup().addTo(map);
+      mapRef.current = map;
+      setReady(true);
+    })();
     return () => {
-      map.remove();
+      cancelled = true;
+      mapRef.current?.remove();
       mapRef.current = null;
       layerRef.current = null;
       fittedRef.current = false;
@@ -56,9 +64,10 @@ export function MapView({ properties, currency, selectedId, onSelect, onOpen }: 
   }, []);
 
   useEffect(() => {
+    const L = LRef.current;
     const map = mapRef.current;
     const layer = layerRef.current;
-    if (!map || !layer) return;
+    if (!L || !map || !layer) return;
 
     layer.clearLayers();
     const located = properties.filter(p => p.lat != null && p.lng != null);
@@ -96,7 +105,7 @@ export function MapView({ properties, currency, selectedId, onSelect, onOpen }: 
       map.fitBounds(bounds.pad(0.2), { maxZoom: 14 });
       fittedRef.current = true;
     }
-  }, [properties, currency, selectedId, onSelect, onOpen]);
+  }, [properties, currency, selectedId, onSelect, onOpen, ready]);
 
   // Al seleccionar desde la lista, centra el mapa en el pin
   useEffect(() => {
@@ -108,5 +117,5 @@ export function MapView({ properties, currency, selectedId, onSelect, onOpen }: 
     }
   }, [selectedId]);
 
-  return <div ref={containerRef} style={{ width: '100%', height: '100%', zIndex: 0 }} />;
+  return <div ref={containerRef} style={{ width: '100%', height: '100%', zIndex: 0, background: 'var(--pub-border)' }} />;
 }

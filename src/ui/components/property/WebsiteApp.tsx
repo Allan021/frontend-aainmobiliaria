@@ -1,9 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { QueryProvider } from '../../providers/QueryProvider';
-import { PropertyCard } from './PropertyCard';
-import { FilterBar } from './FilterBar';
-import { useProperties } from '../../hooks/useProperties';
-import type { Property } from '../../../core/domain/entities/types';
 import { useSettings } from '../../hooks/useSettings';
 
 /* ── WhatsApp FAB ───────────────────────────────────────────── */
@@ -96,35 +92,6 @@ export function WhatsAppFAB({ onClick }: { onClick?: () => void }) {
   );
 }
 
-/* ── Stagger grid animation ────────────────────────────────── */
-function useStaggerCards(containerRef: React.RefObject<Element | null>, deps: unknown[]) {
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const cards = Array.from(container.querySelectorAll('.prop-card'));
-    if (!cards.length) return;
-
-    // Set initial state
-    cards.forEach((c: Element) => {
-      (c as HTMLElement).style.opacity = '0';
-      (c as HTMLElement).style.transform = 'translateY(28px)';
-    });
-
-    import('animejs').then(mod => {
-      const animate = (mod as any).animate;
-      const stagger = (mod as any).stagger;
-      if (!animate || !stagger) return;
-      animate(cards, {
-        opacity: [0, 1],
-        y: [28, 0],
-        duration: 550,
-        ease: 'outExpo',
-        delay: stagger(65),
-      });
-    });
-  }, deps);
-}
-
 /* ── Section reveal ─────────────────────────────────────────── */
 function useReveal(ref: React.RefObject<Element | null>) {
   useEffect(() => {
@@ -148,110 +115,6 @@ function useReveal(ref: React.RefObject<Element | null>) {
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
-}
-
-/* ── Catalog view ───────────────────────────────────────────── */
-function CatalogViewInner({
-  initialFilters,
-  onOpen,
-  onWhatsApp,
-  theme = 'light',
-}: {
-  initialFilters?: { dep?: string; pay?: string; type?: string };
-  onOpen?: (p: Property) => void;
-  onWhatsApp?: (p: Property) => void;
-  theme?: 'light' | 'dark';
-}) {
-  const [filters, setFilters] = useState<{ dep?: string; pay?: string; type?: string }>(initialFilters || {});
-  const { data, isLoading } = useProperties({ dep: filters.dep, pay: filters.pay });
-
-  const handleOpen = (p: Property) => {
-    if (onOpen) onOpen(p);
-    else window.location.href = `/propiedad/${p.id}`;
-  };
-
-  const handleWhatsApp = (p: Property) => {
-    if (onWhatsApp) onWhatsApp(p);
-    else window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property: p } }));
-  };
-  const rawProperties = data?.data || [];
-  const properties = filters.type
-    ? rawProperties.filter((p: any) => p.property_type === filters.type)
-    : rawProperties;
-  const gridRef = useRef<HTMLDivElement>(null!);
-
-  const heading = filters.type === 'lotificadora' ? 'Lotificaciones en Honduras' : 'Propiedades en Honduras';
-  const subtext = filters.type === 'lotificadora'
-    ? 'Proyectos de lotificación verificados, con lotes individuales disponibles.'
-    : 'Terrenos, lotes y casas verificadas en Honduras.';
-
-  useStaggerCards(gridRef, [properties.length, filters.dep, filters.pay]);
-
-  return (
-    <div style={{ background: 'var(--pub-bg)', minHeight: '100vh' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>
-        {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: 'clamp(30px, 5vw, 50px)', fontWeight: 800, letterSpacing: '-0.035em', color: 'var(--pub-ink)', margin: '0 0 0.375rem' }}>
-            {heading}
-          </h1>
-          <p style={{ fontSize: '1rem', color: '#9A9383', margin: 0 }}>
-            {subtext}
-          </p>
-        </div>
-
-        {/* Filter bar */}
-        <div style={{ background: 'var(--pub-surface)', borderRadius: 16, border: '1px solid var(--pub-border)', padding: '1.25rem 1.5rem', marginBottom: '2rem' }}>
-          <FilterBar filters={filters} setFilters={setFilters} theme="light" />
-        </div>
-
-        {/* Count */}
-        <div style={{ fontSize: '0.875rem', color: '#9A9383', fontWeight: 500, marginBottom: '1.5rem' }}>
-          {isLoading
-            ? 'Buscando…'
-            : `${properties.length} ${properties.length === 1 ? 'resultado' : 'resultados'}`}
-        </div>
-
-        {/* Grid */}
-        <div ref={gridRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-          {properties.map(p => (
-            <div key={p.id} className="prop-card">
-              <PropertyCard property={p} onOpen={handleOpen} onWhatsApp={handleWhatsApp} />
-            </div>
-          ))}
-          {!isLoading && properties.length === 0 && (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '5rem 1rem' }}>
-              <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--pub-ink)', marginBottom: '0.5rem' }}>
-                Sin resultados
-              </div>
-              <p style={{ color: '#9A9383', marginBottom: '1.5rem', fontSize: '0.9375rem' }}>
-                Intente cambiar los filtros para ver más opciones.
-              </p>
-              <button
-                onClick={() => setFilters({})}
-                style={{ padding: '0.75rem 1.5rem', borderRadius: 999, background: 'var(--pub-ink)', color: 'var(--pub-bg)', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function CatalogView(props: {
-  initialFilters?: { dep?: string; pay?: string; type?: string };
-  onOpen?: (p: Property) => void;
-  onWhatsApp?: (p: Property) => void;
-  theme?: 'light' | 'dark';
-}) {
-  return (
-    <QueryProvider>
-      <CatalogViewInner {...props} />
-    </QueryProvider>
-  );
 }
 
 /* ── About page ─────────────────────────────────────────────── */

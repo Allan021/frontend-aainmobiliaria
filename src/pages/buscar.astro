@@ -1,15 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Header } from '../ui/components/layout/Header';
+import { Footer } from '../ui/components/layout/Footer';
 import { SearchApp } from '../ui/components/search/SearchApp';
 import { WhatsAppModal } from '../ui/components/property/WhatsAppModal';
 ---
 
 <BaseLayout
-  title="Buscar propiedades con mapa — A&A Inmobiliaria"
-  description="Explore casas, terrenos y lotes en Honduras sobre el mapa. Filtre por precio, tipo y habitaciones."
+  title="Propiedades en Honduras — Casas, Terrenos y Lotes | A&A Inmobiliaria"
+  description="Explore casas, terrenos, lotes y lotificaciones verificadas en Honduras sobre el mapa. Filtre por precio, tipo y habitaciones. Escrituradas y listas para visitar."
 >
   <Header client:load currentRoute="buscar" />
-  <SearchApp client:only="react" />
-  <WhatsAppModal client:load open={false} onClose={() => {}} />
+  <SearchApp client:load />
+  <Footer />
+  <WhatsAppModal client:idle open={false} onClose={() => {}} />
 </BaseLayout>

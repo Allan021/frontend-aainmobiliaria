@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useEffect, useState } from 'react';
 import { QueryProvider } from '../../providers/QueryProvider';
 import { isLoggedIn } from '../../hooks/useFavorites';
 import { useLogin, useRegister } from '../../hooks/useAuth';
 import { useHondurasData } from '../../hooks/useHondurasData';
 import { propertyAdapter } from '../../../infrastructure/api/propertyAdapter';
+import { aiAdapter } from '../../../infrastructure/api/aiAdapter';
 import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
-import type { Property, PropertyImage } from '../../../core/domain/entities/types';
+import type { Property, PropertyImage, PropertyDraft } from '../../../core/domain/entities/types';
 import { WhatsAppIcon } from '../shared/Icon';
-import { IconHome, IconMountain, IconGrid, IconArea, IconLock, IconHandshake, IconScroll, IconCheck, IconTrash, IconCamera, IconEye, IconList } from '../shared/rs-icons';
+import { LocationPicker } from '../shared/LocationPicker';
+import { IconHome, IconMountain, IconGrid, IconArea, IconLock, IconHandshake, IconScroll, IconCheck, IconTrash, IconCamera, IconEye, IconList, IconSparkles, IconDroplet, IconZap } from '../shared/rs-icons';
 
 const F_ARCHIVO = "'Archivo', 'Plus Jakarta Sans', sans-serif";
 const F_SANS = "'Instrument Sans', 'Plus Jakarta Sans', sans-serif";
@@ -21,14 +21,6 @@ const DEP_CODES: Record<string, string> = {
   'El Paraíso': 'EP', 'Copán': 'CP', 'Santa Bárbara': 'SB', 'Lempira': 'LE',
   'Ocotepeque': 'OC', 'Colón': 'CL', 'Valle': 'VA', 'Gracias a Dios': 'GD', 'Islas de la Bahía': 'IB',
 };
-
-
-function tileUrl(): string {
-  const dark = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
-  return dark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-}
 
 const TIPOS = [
   { label: 'Casa', icon: <IconHome size={22} /> },
@@ -63,32 +55,6 @@ const ghostBtn: React.CSSProperties = {
 const card: React.CSSProperties = {
   background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 20, padding: 36,
 };
-
-/* ── Selector de ubicación (CARTO tiles) ── */
-function LocationPicker({ initial, onPick }: { initial?: [number, number] | null; onPick: (lat: number, lng: number) => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
-
-  useEffect(() => {
-    if (!ref.current || mapRef.current) return;
-    const map = L.map(ref.current).setView(initial || [15.35, -87.8], initial ? 14 : 9);
-    L.tileLayer(tileUrl(), {
-      attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 20,
-    }).addTo(map);
-    const icon = L.divIcon({ className: 'map-pin-wrap', html: '<div class="map-price-pin map-price-pin--active">Aquí</div>', iconSize: [0, 0] });
-    if (initial) markerRef.current = L.marker(initial, { icon }).addTo(map);
-    map.on('click', e => {
-      if (markerRef.current) markerRef.current.setLatLng(e.latlng);
-      else markerRef.current = L.marker(e.latlng, { icon }).addTo(map);
-      onPick(e.latlng.lat, e.latlng.lng);
-    });
-    mapRef.current = map;
-    return () => { map.remove(); mapRef.current = null; markerRef.current = null; };
-  }, []);
-
-  return <div ref={ref} style={{ position: 'relative', height: 260, borderRadius: 14, overflow: 'hidden', border: '1.5px solid var(--pub-border2)', zIndex: 0, cursor: 'crosshair' }} />;
-}
 
 /* ── Indicador de pasos ── */
 function Steps({ current, onGo }: { current: number; onGo: (n: number) => void }) {
@@ -211,8 +177,57 @@ function PublishInner() {
     price: '', currency: 'L', area_varas: '', area_m2: '',
     bedrooms: '', bathrooms: '', parking: '', description: '',
     lat: null as number | null, lng: null as number | null,
+    has_water: false, has_power: false, has_deed: false,
+    highlights: [] as string[],
   });
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }));
+
+  // ── IA: prompt libre → borrador estructurado ──
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+
+  const applyDraft = (d: PropertyDraft) => {
+    setForm(f => {
+      const dep = d.departamento
+        ? departamentos.find(x => x.nombre.toLowerCase() === d.departamento!.toLowerCase())
+        : null;
+      const muni = dep && d.municipio
+        ? dep.municipios.find(m => m.nombre.toLowerCase() === d.municipio!.toLowerCase())
+        : null;
+      return {
+        ...f,
+        title: d.title || f.title,
+        type: d.type || f.type,
+        description: d.description || f.description,
+        price: d.price != null ? String(d.price) : f.price,
+        currency: d.currency || f.currency,
+        bedrooms: d.bedrooms != null ? String(d.bedrooms) : f.bedrooms,
+        bathrooms: d.bathrooms != null ? String(d.bathrooms) : f.bathrooms,
+        parking: d.parking != null ? String(d.parking) : f.parking,
+        area_varas: d.area_varas || f.area_varas,
+        area_m2: d.area_m2 || f.area_m2,
+        has_water: d.has_water, has_power: d.has_power, has_deed: d.has_deed,
+        highlights: d.highlights?.length ? d.highlights : f.highlights,
+        departamento: dep ? dep.nombre : f.departamento,
+        municipio: muni ? muni.nombre : f.municipio,
+      };
+    });
+  };
+
+  const generarConIA = async () => {
+    setAiError('');
+    if (aiPrompt.trim().length < 15) { setAiError('Contanos un poco más (ubicación, cuartos, precio…)'); return; }
+    setAiLoading(true);
+    try {
+      const draft = await aiAdapter.propertyDraft(aiPrompt);
+      applyDraft(draft);
+    } catch (err) {
+      setAiError((err as Error).message || 'No se pudo generar. Intentá de nuevo.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('id');
@@ -238,6 +253,8 @@ function PublishInner() {
           parking: p.parking != null ? String(p.parking) : '',
           description: p.description || '',
           lat: p.lat ?? null, lng: p.lng ?? null,
+          has_water: !!p.has_water, has_power: !!p.has_power, has_deed: !!p.has_deed,
+          highlights: p.highlights || [],
         });
         setPaso(2);
       })
@@ -272,6 +289,10 @@ function PublishInner() {
     parking: form.parking ? Number(form.parking) : null,
     lat: form.lat,
     lng: form.lng,
+    has_water: form.has_water,
+    has_power: form.has_power,
+    has_deed: form.has_deed,
+    highlights: form.highlights,
   });
 
   const enviar = async () => {
@@ -392,7 +413,38 @@ function PublishInner() {
       {paso === 2 && (
         <div style={card}>
           <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 24, margin: '0 0 6px', letterSpacing: '-0.02em' }}>Contanos de tu propiedad</h2>
-          <p style={{ fontSize: '14.5px', color: 'var(--pub-muted)', margin: '0 0 28px' }}>Entre más completa la información, más rápido encontramos comprador.</p>
+          <p style={{ fontSize: '14.5px', color: 'var(--pub-muted)', margin: '0 0 24px' }}>Entre más completa la información, más rápido encontramos comprador.</p>
+
+          {/* ── Asistente IA: escribí como hablás y llenamos todo ── */}
+          <div style={{
+            background: 'var(--pub-green-bg)', border: '1.5px solid var(--pub-green-border)',
+            borderRadius: 14, padding: '18px 20px', marginBottom: 28,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 15, color: '#1F5B42', marginBottom: 4 }}>
+              <IconSparkles size={17} /> Llenado automático con IA
+            </div>
+            <div style={{ fontSize: '13px', color: 'var(--pub-green-ink)', marginBottom: 12, lineHeight: 1.5 }}>
+              Escribí como hablás — "casa de esquina en la 19 de Junio, 3 cuartos, 2 baños, con agua y luz, 350 varas, pido 2.5 millones" — y llenamos el formulario por vos.
+            </div>
+            <textarea
+              rows={3}
+              value={aiPrompt}
+              onChange={e => setAiPrompt(e.target.value)}
+              placeholder="Contanos de tu propiedad con tus palabras…"
+              style={{ ...inputStyle, resize: 'vertical', background: 'var(--pub-surface)', marginBottom: 10 }}
+            />
+            {aiError && <div style={{ fontSize: '12.5px', color: '#8C3A2E', fontWeight: 600, marginBottom: 10 }} role="alert">{aiError}</div>}
+            <button type="button" onClick={generarConIA} disabled={aiLoading} style={{
+              ...primaryBtn, width: '100%', padding: '13px 0', fontSize: 15,
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              opacity: aiLoading ? 0.7 : 1,
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#17452F'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#1F5B42'; }}
+            >
+              <IconSparkles size={16} /> {aiLoading ? 'Generando…' : 'Generar con IA'}
+            </button>
+          </div>
 
           <span style={labelText}>¿Qué vendés?</span>
           <div className="pub-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 24 }}>
@@ -463,9 +515,70 @@ function PublishInner() {
             </label>
           </div>
 
+          {/* Servicios (clave para terrenos y solares) */}
+          <span style={labelText}>Servicios y documentos</span>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 22 }}>
+            {([
+              { key: 'has_water', label: 'Agua potable', icon: <IconDroplet size={15} /> },
+              { key: 'has_power', label: 'Energía eléctrica', icon: <IconZap size={15} /> },
+              { key: 'has_deed', label: 'Escritura en regla', icon: <IconScroll size={15} /> },
+            ] as const).map(t => {
+              const on = form[t.key];
+              return (
+                <button key={t.key} type="button" onClick={() => set(t.key, !on)} aria-pressed={on} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 7,
+                  padding: '10px 16px', borderRadius: 999, cursor: 'pointer',
+                  fontFamily: F_SANS, fontSize: '13.5px', fontWeight: 700,
+                  border: on ? '2px solid #1F5B42' : '1.5px solid var(--pub-border2)',
+                  background: on ? 'var(--pub-green-bg)' : 'var(--pub-bg)',
+                  color: on ? '#1F5B42' : 'var(--pub-muted)',
+                  transition: 'all 0.15s',
+                }}>
+                  {t.icon} {t.label} {on && <IconCheck size={13} />}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Lo especial (chips) */}
+          <span style={labelText}>Lo especial de tu propiedad</span>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+            {form.highlights.map((h, i) => (
+              <span key={`${h}-${i}`} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: 'var(--pub-surface)', border: '1.5px solid var(--pub-border2)',
+                borderRadius: 999, padding: '7px 12px', fontSize: 13, fontWeight: 600, color: 'var(--pub-muted2)',
+              }}>
+                {h}
+                <button type="button" aria-label={`Quitar ${h}`}
+                  onClick={() => set('highlights', form.highlights.filter((_, j) => j !== i))}
+                  style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--pub-dim)', padding: 0, display: 'flex', fontSize: 14, lineHeight: 1 }}>
+                  ✕
+                </button>
+              </span>
+            ))}
+            {form.highlights.length === 0 && (
+              <span style={{ fontSize: 13, color: 'var(--pub-dim)' }}>La IA los genera por vos, o agregalos abajo.</span>
+            )}
+          </div>
+          <input
+            placeholder='Ej. "Casa de esquina" — Enter para agregar'
+            style={{ ...inputStyle, marginBottom: 22 }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                const v = (e.target as HTMLInputElement).value.trim();
+                if (v && form.highlights.length < 6) {
+                  set('highlights', [...form.highlights, v]);
+                  (e.target as HTMLInputElement).value = '';
+                }
+              }
+            }}
+          />
+
           <label style={{ display: 'block', marginBottom: 22 }}>
             <span style={labelText}>Descripción breve</span>
-            <textarea placeholder="Ej. Casa en circuito cerrado, sala amplia, patio con espacio para ampliar…" rows={3}
+            <textarea placeholder="Ej. Casa en circuito cerrado, sala amplia, patio con espacio para ampliar…" rows={5}
               value={form.description} onChange={e => set('description', e.target.value)}
               style={{ ...inputStyle, resize: 'vertical' }} />
           </label>

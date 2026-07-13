@@ -19,6 +19,8 @@ const TIPO_CHIPS = [
   { label: 'Terrenos', value: 'Terreno' },
   { label: 'Lotes', value: 'Lote' },
   { label: 'Comercial', value: 'Comercial' },
+  // Lotificaciones se filtra por property_type (client-side), no por type
+  { label: 'Lotificaciones', value: 'lotificadora' },
 ];
 
 const PRICE_RANGES = [
@@ -146,12 +148,13 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
     return () => clearTimeout(t);
   }, [searchInput]);
 
+  const esLotif = type === 'lotificadora';
   const range = PRICE_RANGES[priceIdx];
   const { data, isLoading } = useProperties({
     status: 'disponible',
     limit: 100,
     search: search || undefined,
-    type: type || undefined,
+    type: type && !esLotif ? type : undefined,
     minPrice: range.min ? Number(range.min) : undefined,
     maxPrice: range.max ? Number(range.max) : undefined,
     beds: beds ? Number(beds) : undefined,
@@ -159,11 +162,12 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
   });
 
   const properties = useMemo(() => {
-    const list = [...(data?.data || [])];
+    let list = [...(data?.data || [])];
+    if (esLotif) list = list.filter(p => p.property_type === 'lotificadora');
     if (sort === 'priceAsc') list.sort((a, b) => (a.discount_price ?? a.price) - (b.discount_price ?? b.price));
     if (sort === 'priceDesc') list.sort((a, b) => (b.discount_price ?? b.price) - (a.discount_price ?? a.price));
     return list;
-  }, [data, sort]);
+  }, [data, sort, esLotif]);
 
   const favIds = useFavoriteIds();
   const toggleFav = useToggleFavorite();
@@ -215,16 +219,6 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
               }}>{c.label}</button>
             );
           })}
-
-          <a href="/lotificaciones" style={{
-            fontFamily: F_SANS, fontSize: '13.5px', fontWeight: 600,
-            padding: '9px 16px', borderRadius: 999,
-            border: '1.5px solid var(--pub-border2)', background: 'var(--pub-surface)', color: 'var(--pub-muted2)',
-            textDecoration: 'none', transition: 'all 0.15s',
-          }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#1F5B42'; e.currentTarget.style.color = '#1F5B42'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--pub-border2)'; e.currentTarget.style.color = 'var(--pub-muted2)'; }}
-          >Lotificaciones →</a>
 
           <div className="search-filter-divider" style={{ width: 1, height: 28, background: 'var(--pub-border2)' }} />
 
