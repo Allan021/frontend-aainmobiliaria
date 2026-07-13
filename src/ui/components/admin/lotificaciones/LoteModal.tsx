@@ -99,7 +99,7 @@ export function LoteModal({ lotificationId, lote, onClose, m }: {
           <div style={{ display: 'flex', gap: '8px', marginBottom: '6px' }}>
             {[{ v: false, label: '% Porcentaje' }, { v: true, label: 'L Monto fijo' }].map(({ v, label }) => (
               <button key={String(v)} onClick={() => setForm(f => ({ ...f, prima_es_fija: v }))} style={{
-                padding: '4px 12px', borderRadius: '999px', fontSize: '11px', fontWeight: 600,
+                padding: '4px 12px', borderRadius: 8, fontSize: '11px', fontWeight: 600,
                 border: `1px solid ${form.prima_es_fija === v ? '#D4B254' : b}`,
                 background: form.prima_es_fija === v ? 'rgba(212,178,84,0.1)' : m.mainSurface,
                 color: form.prima_es_fija === v ? '#D4B254' : m.mainTextMuted,

@@ -15,8 +15,8 @@ function getStoredTheme(): 'light' | 'dark' {
   return (localStorage.getItem('aa_theme') as 'light' | 'dark') || 'light';
 }
 
-const toneAccent: Record<string, string> = {
-  default: '#D4B254',
+const toneAccent: Record<string, string | null> = {
+  default: null,
   success: '#4A7C59',
   warning: '#B8862E',
   danger: '#8C3A2E',
@@ -45,6 +45,7 @@ export function MetricTile({ label, value, delta, sub, dark, icon, tone = 'defau
     : (isDarkTheme ? '#26262B' : '#E6E0D2');
   const textColor = dark ? '#FAF8F3' : (isDarkTheme ? '#FAF8F3' : '#111113');
   const subColor = dark ? '#C9C2B1' : (isDarkTheme ? '#5A5A63' : '#9A9383');
+  const labelColor = dark ? '#9A9383' : (isDarkTheme ? '#9A9383' : '#5A5A63');
 
   return (
     <div style={{
@@ -54,19 +55,13 @@ export function MetricTile({ label, value, delta, sub, dark, icon, tone = 'defau
       transition: 'background 0.3s ease, border-color 0.3s ease, color 0.3s ease',
       position: 'relative', overflow: 'hidden',
     }}>
-      {/* accent bar */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
-        background: accent, opacity: 0.8,
-      }} />
-
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.875rem' }}>
         <div style={{
           fontSize: '0.625rem', fontWeight: 600, letterSpacing: '0.14em',
-          textTransform: 'uppercase', color: accent,
+          textTransform: 'uppercase', color: labelColor,
         }}>{label}</div>
         {icon && (
-          <span style={{ display: 'flex', lineHeight: 1, opacity: 0.75, color: accent }}>{icon}</span>
+          <span style={{ display: 'flex', lineHeight: 1, color: accent || labelColor }}>{icon}</span>
         )}
       </div>
 

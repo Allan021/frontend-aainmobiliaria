@@ -58,7 +58,7 @@ export function LeadsList({ leads, m }: Props) {
             gap: '1rem', padding: '0.75rem 1.25rem',
             borderBottom: border,
             fontSize: '0.625rem', fontWeight: 600, letterSpacing: '0.14em',
-            textTransform: 'uppercase', color: '#D4B254',
+            textTransform: 'uppercase', color: m?.mainTextDim || '#9A9383',
           }}>
             <div>Contacto</div>
             <div>Propiedad</div>

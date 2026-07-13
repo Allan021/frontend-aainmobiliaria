@@ -135,7 +135,7 @@ export function PagoModal({ lote, lotificationId, onClose, m }: {
           <div style={{ border: `1px solid ${b}`, borderRadius: '0.625rem', overflow: 'hidden' }}>
             <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               <div style={{ minWidth: '460px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 120px 80px 28px', gap: '0.5rem', padding: '0.5rem 0.75rem', fontSize: '0.625rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#D4B254', borderBottom: `1px solid ${b}` }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 120px 80px 28px', gap: '0.5rem', padding: '0.5rem 0.75rem', fontSize: '0.625rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: m.mainTextDim, borderBottom: `1px solid ${b}` }}>
                   <div>Concepto</div><div>Fecha</div><div>Método</div><div style={{ textAlign: 'right' }}>Monto</div><div></div>
                 </div>
                 {pagos.map((p, i) => (

@@ -12,7 +12,7 @@ export interface Departamento {
 
 export const DEPARTAMENTOS: Departamento[] = [
   {
-    id: 1, code: 'AT', nombre: 'Atlántida',
+    id: 1, code: 'ATL', nombre: 'Atlántida',
     municipios: [
       { id: 101, nombre: 'La Ceiba' }, { id: 102, nombre: 'El Porvenir' },
       { id: 103, nombre: 'Esparta' }, { id: 104, nombre: 'Jutiapa' },
@@ -78,7 +78,7 @@ export const DEPARTAMENTOS: Departamento[] = [
     ],
   },
   {
-    id: 6, code: 'CR', nombre: 'Cortés',
+    id: 6, code: 'CO', nombre: 'Cortés',
     municipios: [
       { id: 601, nombre: 'San Pedro Sula' }, { id: 602, nombre: 'Choloma' },
       { id: 603, nombre: 'La Lima' }, { id: 604, nombre: 'Omoa' },

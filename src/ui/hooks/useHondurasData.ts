@@ -7,6 +7,7 @@ export interface MunicipioData {
 
 export interface DepartamentoData {
   id: number;
+  code: string;
   nombre: string;
   municipios: MunicipioData[];
 }

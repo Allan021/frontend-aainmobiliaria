@@ -78,7 +78,7 @@ export function LotificationDetail({ lotification, m, onBack, onEditLotification
             { label: 'Vendidos', value: vendidos, color: '#8C3A2E' },
           ].map(({ label, value, color }) => (
             <div key={label} style={{ padding: '1.25rem', background: m.mainCardBg, borderRadius: '0.875rem', border: `1px solid ${m.mainBorder}` }}>
-              <div style={{ fontSize: '0.625rem', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#D4B254', marginBottom: '0.5rem' }}>{label}</div>
+              <div style={{ fontSize: '0.625rem', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: m.mainTextDim, marginBottom: '0.5rem' }}>{label}</div>
               <div style={{ fontSize: '2rem', fontWeight: 700, color }}>{value}</div>
             </div>
           ))}

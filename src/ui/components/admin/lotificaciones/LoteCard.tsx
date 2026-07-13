@@ -40,7 +40,7 @@ export function LoteCard({ lote, lotificationId, onEdit, m }: {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
           <div>
-            <div style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#D4B254' }}>
+            <div style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: m.mainTextDim }}>
               Lote {lote.numero}
             </div>
             {lote.nombre && <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: m.mainText, marginTop: '2px' }}>{lote.nombre}</div>}
@@ -96,8 +96,8 @@ export function LoteCard({ lote, lotificationId, onEdit, m }: {
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           <button onClick={() => setShowPagos(true)} style={{
             flex: 1, padding: '6px 10px', borderRadius: '0.375rem',
-            background: 'rgba(212,178,84,0.08)', border: '1px solid rgba(212,178,84,0.2)',
-            color: '#D4B254', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+            background: m.mainSurface, border: `1px solid ${m.mainBorder}`,
+            color: m.mainTextMuted, fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
           }}>
             Pagos {pagos.length > 0 ? `(${pagos.length})` : ''}
           </button>

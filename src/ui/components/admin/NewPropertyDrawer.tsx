@@ -184,7 +184,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         has_water: d.has_water, has_power: d.has_power, has_deed: d.has_deed,
         highlights: d.highlights?.length ? d.highlights : f.highlights,
         departamento: dep ? dep.nombre : f.departamento,
-        dep_code: dep?.id ? String(dep.id) : f.dep_code,
+        dep_code: dep?.code || f.dep_code,
         municipio: muni ? muni.nombre : f.municipio,
       }));
     } catch (err) {
@@ -489,7 +489,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                     value={form.departamento}
                     onChange={nombre => {
                       const d = departamentos.find(d => d.nombre === nombre);
-                      setForm(f => ({ ...f, departamento: d?.nombre || nombre, dep_code: d?.id ? String(d.id) : '', municipio: '' }));
+                      setForm(f => ({ ...f, departamento: d?.nombre || nombre, dep_code: d?.code || '', municipio: '' }));
                     }}
                     placeholder="Departamento"
                     theme={isDark ? 'dark' : 'light'}
@@ -570,7 +570,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                   const on = form[t.key];
                   return (
                     <button key={t.key} type="button" onClick={() => set(t.key, !on)} aria-pressed={on} style={{
-                      padding: '8px 14px', borderRadius: 999, cursor: 'pointer',
+                      padding: '8px 14px', borderRadius: 8, cursor: 'pointer',
                       fontFamily: 'inherit', fontSize: 12.5, fontWeight: 600,
                       border: on ? '1.5px solid #4A7C59' : `1.5px solid ${border}`,
                       background: on ? (isDark ? 'rgba(74,124,89,0.15)' : '#E8F0EA') : 'transparent',
@@ -699,7 +699,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                     <label key={key} style={{
                       display: 'flex', alignItems: 'center', gap: '8px',
                       padding: '8px 14px', border: `1px solid ${checked ? '#D4B254' : border}`,
-                      borderRadius: '999px', fontSize: '13px', fontWeight: 600,
+                      borderRadius: 8, fontSize: '13px', fontWeight: 600,
                       cursor: 'pointer',
                       background: checked ? (isDark ? 'rgba(212,178,84,0.12)' : '#FBF6E9') : surface,
                       color: checked ? '#D4B254' : textMuted,
@@ -747,7 +747,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                     {[{ v: false, label: 'Porcentaje (%)' }, { v: true, label: 'Monto fijo (L)' }].map(({ v, label }) => (
                       <button key={String(v)} onClick={() => set('prima_es_fija', v)}
                         style={{
-                          padding: '6px 14px', borderRadius: '999px', fontSize: '12px', fontWeight: 600,
+                          padding: '6px 14px', borderRadius: 8, fontSize: '12px', fontWeight: 600,
                           border: `1px solid ${form.prima_es_fija === v ? '#D4B254' : border}`,
                           background: form.prima_es_fija === v ? (isDark ? 'rgba(212,178,84,0.12)' : '#FBF6E9') : surface,
                           color: form.prima_es_fija === v ? '#D4B254' : textMuted,
@@ -895,10 +895,11 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                     style={{
                       marginTop: 6, padding: '0.4rem 0.75rem',
                       background: form.facebook_description.includes(`/propiedad/${property.id}`)
-                        ? 'var(--main-bg, #F0EDE4)' : 'linear-gradient(135deg, #D4B254 0%, #8C6F1C 100%)',
+                        ? 'rgba(74,124,89,0.1)' : surface,
                       color: form.facebook_description.includes(`/propiedad/${property.id}`)
-                        ? 'var(--main-text-dim, #9A9383)' : '#fff',
-                      border: 'none', borderRadius: 8,
+                        ? '#4A7C59' : textMuted,
+                      border: `1px solid ${form.facebook_description.includes(`/propiedad/${property.id}`) ? 'rgba(74,124,89,0.3)' : border}`,
+                      borderRadius: 8,
                       fontSize: '0.75rem', fontWeight: 600,
                       fontFamily: 'inherit', cursor: 'pointer',
                       display: 'inline-flex', alignItems: 'center', gap: 6,

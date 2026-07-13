@@ -338,11 +338,12 @@ function CatalogAdminView({ onNew, onEdit, onToggleSidebar, isOpen, m }: {
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {statusTabs.map(t => (
                 <button key={String(t.value)} onClick={() => setStatusFilter(t.value)} style={{
-                  padding: '5px 13px', borderRadius: 999, border: '1px solid',
+                  padding: '6px 13px', borderRadius: 8, border: '1px solid',
                   fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
                   background: statusFilter === t.value || (!statusFilter && !t.value) ? '#D4B254' : m.mainCardBg,
-                  color: statusFilter === t.value || (!statusFilter && !t.value) ? '#111113' : '#D4B254',
-                  borderColor: '#D4B254', transition: 'all 0.15s',
+                  color: statusFilter === t.value || (!statusFilter && !t.value) ? '#111113' : m.mainText,
+                  borderColor: statusFilter === t.value || (!statusFilter && !t.value) ? '#D4B254' : m.mainBorder,
+                  transition: 'all 0.15s',
                 }}>{t.label}</button>
               ))}
             </div>
@@ -667,7 +668,7 @@ function TeamView({ onToggleSidebar, isOpen, m }: {
                     <td style={{ padding: '0.875rem 0.5rem', color: m.mainTextMuted }}>{u.email}</td>
                     <td style={{ padding: '0.875rem 0.5rem' }}>
                       <span style={{
-                        padding: '2px 8px', borderRadius: 4, background: 'rgba(212,178,84,0.12)', color: '#D4B254',
+                        padding: '2px 8px', borderRadius: 4, background: m.mainBorder, color: m.mainTextMuted,
                         fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.02em'
                       }}>
                         {u.role}

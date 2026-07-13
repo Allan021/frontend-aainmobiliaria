@@ -13,7 +13,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-obsidian-900 text-bone-50 hover:bg-obsidian-800 hover:shadow-gold',
+  primary: 'bg-obsidian-900 text-bone-50 hover:bg-obsidian-800 hover:shadow-md hover:-translate-y-px',
   gold: 'bg-gold-300 text-obsidian-900 font-semibold hover:bg-gold-400',
   outline: 'bg-transparent text-obsidian-900 border border-obsidian-900 hover:bg-obsidian-900 hover:text-bone-50',
   ghost: 'bg-transparent text-obsidian-500 hover:text-obsidian-900',
@@ -30,7 +30,7 @@ export function Button({ variant = 'primary', size = 'md', icon, iconEl, childre
   return (
     <button
       {...props}
-      className={`inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200 cursor-pointer ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 cursor-pointer ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
     >
       {iconEl}

@@ -110,7 +110,6 @@
   --shadow-md:   0 8px 20px -8px rgba(17,17,19,0.12), 0 2px 6px rgba(17,17,19,0.06);
   --shadow-lg:   0 18px 40px -16px rgba(17,17,19,0.18), 0 4px 12px rgba(17,17,19,0.08);
   --shadow-xl:   0 32px 64px -24px rgba(17,17,19,0.28), 0 8px 20px rgba(17,17,19,0.10);
-  --shadow-gold: 0 10px 30px -12px rgba(212,178,84,0.45);
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
