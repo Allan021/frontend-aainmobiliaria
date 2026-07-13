@@ -78,6 +78,7 @@ export interface PropertyImage {
   order: number;
   title?: string;
   description?: string;
+  label?: string;
 }
 
 export interface Lead {

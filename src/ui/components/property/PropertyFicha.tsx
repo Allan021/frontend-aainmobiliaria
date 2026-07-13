@@ -7,6 +7,7 @@ import { leadAdapter } from '../../../infrastructure/api/leadAdapter';
 import { cleanTitle, fmtVaras, parseDescription, type Property } from '../../../core/domain/entities/types';
 import { optimizeCloudinaryUrl, cloudinarySrcSet } from '../../../core/utils/cloudinaryUtils';
 import { GalleryModal } from './detail/GalleryModal';
+import { LotMassingViewer } from './detail/LotMassingViewer';
 import { WhatsAppIcon } from '../shared/Icon';
 import { IconShield, IconCheck, IconCamera, IconMapPin, IconVideo, IconDroplet, IconZap, IconScroll, IconArea } from '../shared/rs-icons';
 
@@ -193,7 +194,9 @@ function FichaInner({ property }: Props) {
   const [currency] = useCurrency();
   const { data: settings } = useSettings();
   const phone = settings?.whatsapp_phone || PHONE_FALLBACK;
-  const [gallery, setGallery] = useState<{ open: boolean; idx: number }>({ open: false, idx: 0 });
+  const [gallery, setGallery] = useState<{ open: boolean; idx: number; label?: string | null }>({ open: false, idx: 0, label: null });
+  const agendaRef = useRef<HTMLDivElement>(null);
+  const scrollToAgenda = () => agendaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
   const favIds = useFavoriteIds();
   const toggleFav = useToggleFavorite();
@@ -203,7 +206,13 @@ function FichaInner({ property }: Props) {
     toggleFav.mutate({ propertyId: property.id, saved });
   };
 
-  const images = (property.images || []).map(i => ({ url: i.url }));
+  const images = (property.images || []).map(i => ({ url: i.url, label: i.label }));
+  const imageCategories = useMemo(() => {
+    const order = ['Fachada', 'Sala', 'Cocina', 'Comedor', 'Dormitorio', 'Baño', 'Patio o jardín', 'Garaje', 'Otro'];
+    const counts = new Map<string, number>();
+    images.forEach(i => { if (i.label) counts.set(i.label, (counts.get(i.label) || 0) + 1); });
+    return order.filter(l => counts.has(l)).map(l => ({ label: l, count: counts.get(l)! }));
+  }, [property.images]);
   const { main, alt } = priceParts(property.discount_price ?? property.price, property.currency, currency);
 
   // Financiamiento estimado
@@ -237,7 +246,7 @@ function FichaInner({ property }: Props) {
   });
 
   return (
-    <div style={{ background: 'var(--pub-bg)', color: 'var(--pub-ink)', fontFamily: F_SANS, minHeight: '60vh' }}>
+    <div className="ficha-page" style={{ background: 'var(--pub-bg)', color: 'var(--pub-ink)', fontFamily: F_SANS, minHeight: '60vh' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: 24 }}>
         {/* Migas */}
         <div style={{ fontSize: 13, color: 'var(--pub-dim)', marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -264,9 +273,16 @@ function FichaInner({ property }: Props) {
             )}
             <div style={{ position: 'absolute', top: 14, left: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <span style={{ background: '#111113', color: '#D4B254', fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 999, textTransform: 'uppercase' }}>{property.type}</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#4A7C59', color: '#FFFFFF', fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 999 }}>
-                <IconCheck size={12} /> Escritura verificada
-              </span>
+              {property.property_type === 'lotificadora' && (
+                <span style={{ background: '#111113', color: '#8CA394', fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 999 }}>
+                  Parte de lotificación
+                </span>
+              )}
+              {property.has_deed && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#4A7C59', color: '#FFFFFF', fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 999 }}>
+                  <IconCheck size={12} /> Escritura verificada
+                </span>
+              )}
             </div>
             <button onClick={e => { e.stopPropagation(); handleFav(); }}
               aria-label={saved ? 'Quitar de favoritos' : 'Guardar en favoritos'}
@@ -305,10 +321,24 @@ function FichaInner({ property }: Props) {
           </div>
         </div>
 
+        {/* Filtro rápido de fotos por ambiente — sólo si la IA etiquetó fotos */}
+        {imageCategories.length > 0 && (
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '14px 0 0', paddingBottom: 2 }}>
+            {imageCategories.map(c => (
+              <button key={c.label} onClick={() => setGallery({ open: true, idx: 0, label: c.label })} style={{
+                flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 999,
+                padding: '8px 15px', fontSize: '13px', fontWeight: 600, color: 'var(--pub-muted2)',
+                cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
+              }}>{c.label} <span style={{ opacity: 0.55 }}>({c.count})</span></button>
+            ))}
+          </div>
+        )}
+
         {/* Cuerpo */}
         <div className="ficha-body" style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 40, marginTop: 32, alignItems: 'start' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap' }}>
+            <div className="ficha-title-block" style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap' }}>
               <h1 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 34, letterSpacing: '-0.025em', margin: 0 }}>{main}</h1>
               <span style={{ fontSize: 15, color: 'var(--pub-dim)', fontWeight: 600 }}>{alt}</span>
             </div>
@@ -356,7 +386,7 @@ function FichaInner({ property }: Props) {
                 <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: '28px 0 12px' }}>Lo especial</h3>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {property.highlights.map(h => (
-                    <span key={h} style={{
+                    <span key={h} className="ficha-highlight-chip" style={{
                       background: 'var(--pub-bg)', border: '1px solid var(--pub-border2)',
                       borderRadius: 8, padding: '8px 13px',
                       fontSize: '12.5px', fontWeight: 700, letterSpacing: '0.03em',
@@ -403,7 +433,10 @@ function FichaInner({ property }: Props) {
                 <IconShield size={17} /> Verificado por A&A Inmobiliaria
               </div>
               <div className="ficha-verify-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, fontSize: 14, color: 'var(--pub-green-ink)' }}>
-                {['Escritura revisada en el Instituto de la Propiedad', 'Libre de gravámenes y anotaciones', 'Medidas confirmadas en sitio', 'Vendedor con identidad verificada'].map(t => (
+                {[
+                  property.has_deed ? 'Escritura revisada en el Instituto de la Propiedad' : null,
+                  'Libre de gravámenes y anotaciones', 'Medidas confirmadas en sitio', 'Vendedor con identidad verificada',
+                ].filter((t): t is string => !!t).map(t => (
                   <span key={t} style={{ display: 'inline-flex', alignItems: 'flex-start', gap: 7 }}>
                     <span style={{ color: '#4A7C59', display: 'flex', marginTop: 3 }}><IconCheck size={13} /></span>{t}
                   </span>
@@ -465,11 +498,23 @@ function FichaInner({ property }: Props) {
                 <IconMapPin size={13} /> Zona aproximada por seguridad — la dirección exacta se comparte al agendar
               </div>
             </div>
+
+            {/* Simulación 3D — sólo terrenos/lotes sin construcción */}
+            {(property.type === 'Terreno' || property.type === 'Lote') && (
+              <>
+                <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: '32px 0 12px' }}>
+                  Así podría verse tu casa acá
+                </h3>
+                <LotMassingViewer areaM2={property.area_m2} />
+              </>
+            )}
           </div>
 
           {/* Sidebar */}
           <aside className="ficha-sidebar" style={{ position: 'sticky', top: 88, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <AgendarVisita property={property} phone={phone} />
+            <div ref={agendaRef}>
+              <AgendarVisita property={property} phone={phone} />
+            </div>
 
             <div style={{ background: '#111113', borderRadius: 18, padding: 22, color: '#FAF8F3' }}>
               <div style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: '15.5px', marginBottom: 6 }}>
@@ -526,11 +571,27 @@ function FichaInner({ property }: Props) {
 
       {gallery.open && images.length > 0 && (
         <GalleryModal
-          images={images.map(i => ({ url: optimizeCloudinaryUrl(i.url, 1920) }))}
+          images={images.map(i => ({ url: optimizeCloudinaryUrl(i.url, 1920), title: i.label, label: i.label }))}
           startIdx={gallery.idx}
+          initialLabel={gallery.label}
           onClose={() => setGallery({ open: false, idx: 0 })}
         />
       )}
+
+      {/* Barra de contacto fija — sólo mobile/tablet, donde el sidebar deja de ser sticky */}
+      <div className="ficha-mobile-cta">
+        <button onClick={scrollToAgenda} style={{
+          flex: 1, textAlign: 'center', background: '#1F5B42', color: '#EEF5F0',
+          fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 14, padding: '13px 0',
+          borderRadius: 12, border: 'none', cursor: 'pointer',
+        }}>Agendar visita</button>
+        <button onClick={openConsulta} style={{
+          flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+          background: '#25D366', color: '#0A3D22',
+          fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 14, padding: '13px 0',
+          borderRadius: 12, border: 'none', cursor: 'pointer',
+        }}><WhatsAppIcon size={15} color="#0A3D22" /> WhatsApp</button>
+      </div>
     </div>
   );
 }

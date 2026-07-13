@@ -24,6 +24,7 @@ interface ImageItem {
   file?: File;
   preview?: string;
   deleting?: boolean;
+  label?: string;
 }
 
 function getStoredTheme(): 'light' | 'dark' {
@@ -130,6 +131,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
           id: img.id,
           url: img.url,
           preview: img.url,
+          label: img.label,
         }))
       );
     } else {
@@ -1042,6 +1044,15 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
                           fontSize: '9px', fontWeight: 700, letterSpacing: '0.04em',
                           padding: '2px 5px', borderRadius: '3px', textTransform: 'uppercase',
                         }}>Nuevo</span>
+                      )}
+                      {/* Etiqueta IA */}
+                      {img.label && (
+                        <span style={{
+                          position: 'absolute', bottom: '4px', left: '4px',
+                          background: 'rgba(17,17,19,0.78)', color: '#EEF5F0',
+                          fontSize: '9px', fontWeight: 600,
+                          padding: '2px 5px', borderRadius: '3px',
+                        }}>IA: {img.label}</span>
                       )}
                     </div>
                   ))}

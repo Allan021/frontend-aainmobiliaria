@@ -1346,15 +1346,56 @@ body {
   }
 }
 
-/* ── Ficha de propiedad rediseñada — responsive ── */
+/* ── Ficha de propiedad rediseñada — responsive ──
+   Galería y sidebar colapsan JUNTOS en el mismo breakpoint: si el sidebar
+   deja de ser sticky, la galería también deja de ser 2 columnas de altura
+   fija — evita que la card "Agendá tu visita" quede flotando sobre las fotos. */
 @media (max-width: 1024px) {
   .ficha-body { grid-template-columns: 1fr !important; }
   .ficha-sidebar { position: static !important; }
-}
-@media (max-width: 768px) {
   .ficha-gallery { grid-template-columns: 1fr !important; height: auto !important; }
   .ficha-gallery > div:first-child { height: 300px; border-radius: 18px !important; }
   .ficha-gallery-side { display: none !important; }
+  .ficha-mobile-cta { display: flex !important; }
+  .ficha-page { padding-bottom: 78px; }
+}
+
+.ficha-mobile-cta {
+  display: none;
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 900;
+  gap: 10px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: var(--pub-bg);
+  border-top: 1px solid var(--pub-border);
+  box-shadow: 0 -8px 24px -12px rgba(17,17,19,0.18);
+}
+
+/* ── Entrada sutil al cargar la ficha — sólo si el usuario no pidió reducir movimiento ── */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fichaFadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .ficha-gallery, .ficha-title-block, .ficha-highlight-chip {
+    animation: fichaFadeUp 420ms cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .ficha-stats > div {
+    animation: fichaFadeUp 380ms cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .ficha-stats > div:nth-child(1) { animation-delay: 60ms; }
+  .ficha-stats > div:nth-child(2) { animation-delay: 110ms; }
+  .ficha-stats > div:nth-child(3) { animation-delay: 160ms; }
+  .ficha-stats > div:nth-child(4) { animation-delay: 210ms; }
+  .ficha-highlight-chip:nth-child(1) { animation-delay: 40ms; }
+  .ficha-highlight-chip:nth-child(2) { animation-delay: 70ms; }
+  .ficha-highlight-chip:nth-child(3) { animation-delay: 100ms; }
+  .ficha-highlight-chip:nth-child(4) { animation-delay: 130ms; }
+  .ficha-highlight-chip:nth-child(5) { animation-delay: 160ms; }
+  .ficha-highlight-chip:nth-child(6) { animation-delay: 190ms; }
+}
+@media (max-width: 768px) {
   .ficha-verify-grid { grid-template-columns: 1fr !important; }
   .ficha-sliders { grid-template-columns: 1fr !important; }
 }
@@ -1424,9 +1465,47 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
   padding: 1rem 1.5rem;
   flex-shrink: 0;
   z-index: 1010;
+}
+
+.gallery-modal-filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  flex: 1 1 auto;
+  order: 2;
+  scrollbar-width: none;
+}
+.gallery-modal-filters::-webkit-scrollbar { display: none; }
+
+.gallery-modal-filter-chip {
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(250,248,243,0.75);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.gallery-modal-filter-chip:hover { background: rgba(255,255,255,0.14); color: #FAF8F3; }
+.gallery-modal-filter-chip--active {
+  background: #4A7C59;
+  border-color: #4A7C59;
+  color: #FFFFFF;
+}
+
+@media (max-width: 640px) {
+  .gallery-modal-filters { flex: 1 1 100%; order: 3; }
+  .gallery-modal-counter { order: 1; }
+  .gallery-modal-close { order: 2; }
 }
 
 .gallery-modal-counter {

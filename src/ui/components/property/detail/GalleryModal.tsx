@@ -1,13 +1,17 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { optimizeCloudinaryUrl } from '../../../../core/utils/cloudinaryUtils';
 
 interface GalleryModalProps {
-  images: { url: string; title?: string; description?: string }[];
+  images: { url: string; title?: string; description?: string; label?: string }[];
   startIdx: number;
+  initialLabel?: string | null;
   onClose: () => void;
 }
 
-export function GalleryModal({ images, startIdx, onClose }: GalleryModalProps) {
+const LABEL_ORDER = ['Fachada', 'Sala', 'Cocina', 'Comedor', 'Dormitorio', 'Baño', 'Patio o jardín', 'Garaje', 'Otro'];
+
+export function GalleryModal({ images, startIdx, initialLabel = null, onClose }: GalleryModalProps) {
+  const [filter, setFilter] = useState<string | null>(initialLabel);
   const [idx, setIdx] = useState(startIdx);
   const [zoomed, setZoomed] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
@@ -20,14 +24,32 @@ export function GalleryModal({ images, startIdx, onClose }: GalleryModalProps) {
   const touchDeltaX = useRef(0);
   const isSwiping = useRef(false);
 
+  const categories = useMemo(() => {
+    const counts = new Map<string, number>();
+    images.forEach(i => { if (i.label) counts.set(i.label, (counts.get(i.label) || 0) + 1); });
+    return LABEL_ORDER.filter(l => counts.has(l)).map(l => ({ label: l, count: counts.get(l)! }));
+  }, [images]);
+
+  const shown = useMemo(
+    () => (filter ? images.filter(i => i.label === filter) : images),
+    [images, filter]
+  );
+
+  const selectCategory = useCallback((label: string | null) => {
+    setFilter(label);
+    setZoomed(false);
+    setImgLoaded(false);
+    setIdx(0);
+  }, []);
+
   const goTo = useCallback((newIdx: number) => {
     setZoomed(false);
     setImgLoaded(false);
     setIdx(newIdx);
   }, []);
 
-  const goPrev = useCallback(() => goTo((idx - 1 + images.length) % images.length), [idx, images.length, goTo]);
-  const goNext = useCallback(() => goTo((idx + 1) % images.length), [idx, images.length, goTo]);
+  const goPrev = useCallback(() => goTo((idx - 1 + shown.length) % shown.length), [idx, shown.length, goTo]);
+  const goNext = useCallback(() => goTo((idx + 1) % shown.length), [idx, shown.length, goTo]);
 
   // Keyboard nav
   useEffect(() => {
@@ -79,7 +101,7 @@ export function GalleryModal({ images, startIdx, onClose }: GalleryModalProps) {
     isSwiping.current = false;
   };
 
-  const img = images[idx];
+  const img = shown[idx];
   if (!img) return null;
 
   return (
@@ -93,8 +115,23 @@ export function GalleryModal({ images, startIdx, onClose }: GalleryModalProps) {
       <div className="gallery-modal-topbar">
         <div className="gallery-modal-counter">
           <span style={{ fontWeight: 700 }}>{idx + 1}</span>
-          <span style={{ opacity: 0.5 }}> / {images.length}</span>
+          <span style={{ opacity: 0.5 }}> / {shown.length}</span>
         </div>
+        {categories.length > 0 && (
+          <div className="gallery-modal-filters">
+            <button
+              onClick={() => selectCategory(null)}
+              className={`gallery-modal-filter-chip ${filter === null ? 'gallery-modal-filter-chip--active' : ''}`}
+            >Todas ({images.length})</button>
+            {categories.map(c => (
+              <button
+                key={c.label}
+                onClick={() => selectCategory(c.label)}
+                className={`gallery-modal-filter-chip ${filter === c.label ? 'gallery-modal-filter-chip--active' : ''}`}
+              >{c.label} ({c.count})</button>
+            ))}
+          </div>
+        )}
         <button
           onClick={onClose}
           className="gallery-modal-close"
@@ -182,7 +219,7 @@ export function GalleryModal({ images, startIdx, onClose }: GalleryModalProps) {
 
       {/* Thumbnail strip */}
       <div ref={thumbsRef} className="gallery-modal-thumbs">
-        {images.map((thumb, i) => (
+        {shown.map((thumb, i) => (
           <button
             key={i}
             data-active={i === idx ? 'true' : 'false'}
