@@ -156,41 +156,42 @@ function Hero({ properties }: { properties: Property[] }) {
     fontFamily: F_MONO, fontSize: 10, letterSpacing: '0.12em', color: '#9A9383', marginBottom: 3,
   };
   const chip: React.CSSProperties = {
-    fontSize: 13, fontWeight: 600, color: '#B9B9C0', border: '1px solid #38383F',
+    fontSize: 13, fontWeight: 600, color: 'var(--hero-qchip-text)', border: '1px solid var(--hero-qchip-border)',
     borderRadius: 999, padding: '6px 14px', textDecoration: 'none', transition: 'color 0.15s, border-color 0.15s',
   };
 
   return (
     <section style={{
-      background: '#111113',
-      backgroundImage: 'radial-gradient(ellipse 900px 500px at 75% 110%, rgba(212,178,84,0.13), transparent), radial-gradient(ellipse 700px 400px at 10% -10%, rgba(212,178,84,0.06), transparent)',
-      padding: '64px 24px 80px', fontFamily: F_SANS,
+      background: 'var(--hero-bg)',
+      backgroundImage: 'radial-gradient(ellipse 900px 500px at 75% 110%, var(--hero-glow), transparent), radial-gradient(ellipse 700px 400px at 10% -10%, var(--hero-glow), transparent)',
+      padding: '64px 24px 80px', fontFamily: F_SANS, transition: 'background 0.3s',
     }}>
       <div className="hero-grid" style={{
         maxWidth: 1280, margin: '0 auto', display: 'grid',
         gridTemplateColumns: 'minmax(440px, 1.1fr) minmax(380px, 0.9fr)', gap: 56, alignItems: 'center',
       }}>
         <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid #5E4A11', borderRadius: 999, padding: '7px 16px', marginBottom: 28 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid var(--hero-chip-border)', borderRadius: 999, padding: '7px 16px', marginBottom: 28 }}>
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#D4B254', display: 'inline-block' }} />
-            <span style={{ fontFamily: F_MONO, fontSize: '11.5px', letterSpacing: '0.14em', color: '#D4B254' }}>EL PROGRESO, YORO · HONDURAS</span>
+            <span style={{ fontFamily: F_MONO, fontSize: '11.5px', letterSpacing: '0.14em', color: 'var(--hero-chip-text)' }}>EL PROGRESO, YORO · HONDURAS</span>
           </div>
           <h1 style={{
             fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 'clamp(44px, 5vw, 68px)',
-            lineHeight: 1.02, letterSpacing: '-0.03em', margin: '0 0 20px', color: '#FAF8F3',
+            lineHeight: 1.02, letterSpacing: '-0.03em', margin: '0 0 20px', color: 'var(--hero-ink)',
           }}>
             Encontrá tu propiedad.<br />
-            <span style={{ color: '#D4B254' }}>Nosotros la cerramos.</span>
+            <span style={{ color: 'var(--hero-accent)' }}>Nosotros la cerramos.</span>
           </h1>
-          <p style={{ fontSize: '17.5px', lineHeight: 1.6, color: '#B9B9C0', margin: '0 0 36px', maxWidth: 520 }}>
-            Casas, terrenos y lotes con <strong style={{ color: '#FAF8F3' }}>escritura verificada en el Instituto de la Propiedad</strong>. Buscá en el mapa, agendá tu visita y cerramos por WhatsApp.
+          <p style={{ fontSize: '17.5px', lineHeight: 1.6, color: 'var(--hero-muted)', margin: '0 0 36px', maxWidth: 520 }}>
+            Casas, terrenos y lotes con <strong style={{ color: 'var(--hero-ink)' }}>escritura verificada en el Instituto de la Propiedad</strong>. Buscá en el mapa, agendá tu visita y cerramos por WhatsApp.
           </p>
 
           {/* Buscador protagonista */}
           <div className="hero-search" style={{
-            background: '#FAF8F3', borderRadius: 16, padding: 8,
+            background: '#FFFFFF', borderRadius: 16, padding: 8,
+            border: '1px solid var(--pub-border2)',
             display: 'flex', alignItems: 'stretch',
-            boxShadow: '0 24px 60px -12px rgba(0,0,0,0.55)',
+            boxShadow: '0 24px 60px -12px rgba(17,17,19,0.35)',
           }}>
             <div style={{ flex: 1.3, padding: '10px 18px', borderRight: '1px solid #E4DFD2' }}>
               <div style={fieldLabel}>UBICACIÓN</div>
@@ -228,8 +229,8 @@ function Hero({ properties }: { properties: Property[] }) {
               { label: 'Lotificaciones', url: '/lotificaciones' },
             ].map(c => (
               <a key={c.label} href={c.url} style={chip}
-                onMouseEnter={e => { e.currentTarget.style.color = '#D4B254'; e.currentTarget.style.borderColor = '#5E4A11'; }}
-                onMouseLeave={e => { e.currentTarget.style.color = '#B9B9C0'; e.currentTarget.style.borderColor = '#38383F'; }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--hero-accent)'; e.currentTarget.style.borderColor = 'var(--hero-chip-border)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--hero-qchip-text)'; e.currentTarget.style.borderColor = 'var(--hero-qchip-border)'; }}
               >{c.label}</a>
             ))}
           </div>
@@ -242,7 +243,7 @@ function Hero({ properties }: { properties: Property[] }) {
       <div className="hero-stats" style={{
         maxWidth: 1280, margin: '64px auto 0',
         display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1,
-        background: '#2A2A30', border: '1px solid #2A2A30', borderRadius: 16, overflow: 'hidden',
+        background: 'var(--hero-stat-border)', border: '1px solid var(--hero-stat-border)', borderRadius: 16, overflow: 'hidden',
       }}>
         {[
           { n: '120+', l: 'Propiedades activas' },
@@ -250,9 +251,9 @@ function Hero({ properties }: { properties: Property[] }) {
           { n: '12 años', l: 'De experiencia en Yoro' },
           { n: '4.9★', l: 'Valoración promedio' },
         ].map(s => (
-          <div key={s.l} style={{ background: '#161618', padding: '24px 28px' }}>
-            <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 34, color: '#D4B254', letterSpacing: '-0.02em' }}>{s.n}</div>
-            <div style={{ fontSize: '13.5px', color: '#B9B9C0', marginTop: 2 }}>{s.l}</div>
+          <div key={s.l} style={{ background: 'var(--hero-stat-bg)', padding: '24px 28px' }}>
+            <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 34, color: 'var(--hero-stat-num)', letterSpacing: '-0.02em' }}>{s.n}</div>
+            <div style={{ fontSize: '13.5px', color: 'var(--hero-stat-label)', marginTop: 2 }}>{s.l}</div>
           </div>
         ))}
       </div>
@@ -392,22 +393,22 @@ function Trust() {
     { t: '04 — 12 años en Yoro', d: 'Más de 200 familias han comprado con nosotros — locales y de la diáspora en Estados Unidos.' },
   ];
   return (
-    <section style={{ background: '#111113', padding: '80px 24px', fontFamily: F_SANS }}>
+    <section style={{ background: 'var(--hero-bg)', padding: '80px 24px', fontFamily: F_SANS, transition: 'background 0.3s' }}>
       <div className="trust-grid" style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 56, alignItems: 'start' }}>
         <div>
-          <Eyebrow color="#D4B254">POR QUÉ A&A</Eyebrow>
-          <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 'clamp(26px, 5vw, 38px)', letterSpacing: '-0.025em', margin: '0 0 18px', color: '#FAF8F3', lineHeight: 1.12 }}>
+          <Eyebrow color="var(--hero-accent)">POR QUÉ A&A</Eyebrow>
+          <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 'clamp(26px, 5vw, 38px)', letterSpacing: '-0.025em', margin: '0 0 18px', color: 'var(--hero-ink)', lineHeight: 1.12 }}>
             En Honduras el fraude de terrenos abunda. Por eso verificamos todo.
           </h2>
-          <p style={{ fontSize: 16, lineHeight: 1.65, color: '#B9B9C0', margin: 0 }}>
+          <p style={{ fontSize: 16, lineHeight: 1.65, color: 'var(--hero-muted)', margin: 0 }}>
             Ninguna propiedad se publica sin pasar por nuestra revisión legal. Su patrimonio merece rigor, no sorpresas.
           </p>
         </div>
         <div className="trust-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
           {items.map(i => (
-            <div key={i.t} style={{ background: '#1C1C1F', border: '1px solid #2A2A30', borderRadius: 16, padding: 26 }}>
-              <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 15, color: '#D4B254', marginBottom: 8 }}>{i.t}</div>
-              <div style={{ fontSize: 14, lineHeight: 1.6, color: '#B9B9C0' }}>{i.d}</div>
+            <div key={i.t} style={{ background: 'var(--hero-stat-bg)', border: '1px solid var(--hero-stat-border)', borderRadius: 16, padding: 26 }}>
+              <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 15, color: 'var(--hero-accent)', marginBottom: 8 }}>{i.t}</div>
+              <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--hero-muted)' }}>{i.d}</div>
             </div>
           ))}
         </div>
@@ -475,15 +476,15 @@ function Diaspora() {
 function FinalCTA() {
   return (
     <section style={{
-      background: '#111113',
-      backgroundImage: 'radial-gradient(ellipse 800px 400px at 50% 120%, rgba(212,178,84,0.15), transparent)',
-      padding: '96px 24px', textAlign: 'center', fontFamily: F_SANS,
+      background: 'var(--hero-bg)',
+      backgroundImage: 'radial-gradient(ellipse 800px 400px at 50% 120%, var(--hero-glow), transparent)',
+      padding: '96px 24px', textAlign: 'center', fontFamily: F_SANS, transition: 'background 0.3s',
     }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 'clamp(30px, 7vw, 46px)', letterSpacing: '-0.03em', margin: '0 0 16px', color: '#FAF8F3', lineHeight: 1.08 }}>
-          Tu próxima propiedad<br /><span style={{ color: '#D4B254' }}>está a un mensaje.</span>
+        <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 'clamp(30px, 7vw, 46px)', letterSpacing: '-0.03em', margin: '0 0 16px', color: 'var(--hero-ink)', lineHeight: 1.08 }}>
+          Tu próxima propiedad<br /><span style={{ color: 'var(--hero-accent)' }}>está a un mensaje.</span>
         </h2>
-        <p style={{ fontSize: 17, color: '#B9B9C0', margin: '0 0 36px' }}>Respuesta en minutos, sin compromiso. Todo por WhatsApp.</p>
+        <p style={{ fontSize: 17, color: 'var(--hero-muted)', margin: '0 0 36px' }}>Respuesta en minutos, sin compromiso. Todo por WhatsApp.</p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => openWhatsAppModal()} style={{
             background: '#25D366', color: '#0A3D22', fontFamily: F_ARCHIVO, fontWeight: 700,
@@ -494,10 +495,10 @@ function FinalCTA() {
             onMouseLeave={e => { e.currentTarget.style.background = '#25D366'; }}
           ><WhatsAppIcon size={17} color="#0A3D22" /> Consultar por WhatsApp</button>
           <a href="/buscar" style={{
-            border: '1.5px solid #5E4A11', color: '#D4B254', fontFamily: F_ARCHIVO, fontWeight: 700,
+            border: '1.5px solid var(--hero-chip-border)', color: 'var(--hero-chip-text)', fontFamily: F_ARCHIVO, fontWeight: 700,
             fontSize: '16.5px', padding: '16px 34px', borderRadius: 14, textDecoration: 'none', transition: 'background 0.15s',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#1C1C1F'; }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--hero-stat-bg)'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
           >Buscar propiedades</a>
         </div>
