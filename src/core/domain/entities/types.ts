@@ -40,6 +40,7 @@ export interface Property {
   has_water?: boolean;
   has_power?: boolean;
   has_deed?: boolean;
+  house_preview_url?: string | null;
   created_at: string;
   updated_at: string;
 }

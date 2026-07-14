@@ -1346,15 +1346,13 @@ body {
 }
 
 /* ── Ficha de propiedad rediseñada — responsive ──
-   Galería y sidebar colapsan JUNTOS en el mismo breakpoint: si el sidebar
-   deja de ser sticky, la galería también deja de ser 2 columnas de altura
-   fija — evita que la card "Agendá tu visita" quede flotando sobre las fotos. */
+   Galería (hero único) y sidebar colapsan JUNTOS en el mismo breakpoint: si
+   el sidebar deja de ser sticky, la galería también baja de altura — evita
+   que la card "Agendá tu visita" quede flotando sobre las fotos. */
 @media (max-width: 1024px) {
   .ficha-body { grid-template-columns: 1fr !important; }
   .ficha-sidebar { position: static !important; }
-  .ficha-gallery { grid-template-columns: 1fr !important; height: auto !important; }
-  .ficha-gallery > div:first-child { height: 300px; border-radius: 18px !important; }
-  .ficha-gallery-side { display: none !important; }
+  .ficha-gallery { height: 300px !important; border-radius: 14px !important; }
   .ficha-mobile-cta { display: flex !important; }
   .ficha-page { padding-bottom: 78px; }
 }

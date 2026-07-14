@@ -5,11 +5,12 @@ import { useSettings } from '../../hooks/useSettings';
 import { useFavoriteIds, useToggleFavorite, isLoggedIn, requireLogin } from '../../hooks/useFavorites';
 import { leadAdapter } from '../../../infrastructure/api/leadAdapter';
 import { cleanTitle, fmtVaras, parseDescription, type Property } from '../../../core/domain/entities/types';
-import { optimizeCloudinaryUrl, cloudinarySrcSet } from '../../../core/utils/cloudinaryUtils';
+import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
 import { GalleryModal } from './detail/GalleryModal';
 import { LotMassingViewer } from './detail/LotMassingViewer';
+import { PropertyGallery } from './detail/PropertyGallery';
 import { WhatsAppIcon } from '../shared/Icon';
-import { IconShield, IconCheck, IconCamera, IconMapPin, IconVideo, IconDroplet, IconZap, IconScroll, IconArea } from '../shared/rs-icons';
+import { IconShield, IconCheck, IconMapPin, IconVideo, IconDroplet, IconZap, IconScroll, IconArea } from '../shared/rs-icons';
 
 const F_ARCHIVO = "'Archivo', 'Plus Jakarta Sans', sans-serif";
 const F_SANS = "'Instrument Sans', 'Plus Jakarta Sans', sans-serif";
@@ -195,8 +196,14 @@ function FichaInner({ property }: Props) {
   const { data: settings } = useSettings();
   const phone = settings?.whatsapp_phone || PHONE_FALLBACK;
   const [gallery, setGallery] = useState<{ open: boolean; idx: number; label?: string | null }>({ open: false, idx: 0, label: null });
+  const [galleryFilter, setGalleryFilter] = useState<string | null>(null);
   const agendaRef = useRef<HTMLDivElement>(null);
   const scrollToAgenda = () => agendaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const mapRef = useRef<HTMLDivElement>(null);
+  const threeDRef = useRef<HTMLDivElement>(null);
+  const scrollToMap = () => mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const scrollTo3D = () => threeDRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const [view3d, setView3d] = useState(false);
 
   const favIds = useFavoriteIds();
   const toggleFav = useToggleFavorite();
@@ -240,11 +247,6 @@ function FichaInner({ property }: Props) {
   const openConsulta = () =>
     window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property } }));
 
-  const galleryCell = (idx: number, radius: string): React.CSSProperties => ({
-    position: 'relative', cursor: images.length > idx ? 'pointer' : 'default',
-    background: 'var(--pub-border)', overflow: 'hidden', borderRadius: radius,
-  });
-
   return (
     <div className="ficha-page" style={{ background: 'var(--pub-bg)', color: 'var(--pub-ink)', fontFamily: F_SANS, minHeight: '60vh' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: 24 }}>
@@ -256,21 +258,17 @@ function FichaInner({ property }: Props) {
         </div>
 
         {/* Galería */}
-        <div className="ficha-gallery" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10, height: 440 }}>
-          <div onClick={() => images.length > 0 && setGallery({ open: true, idx: 0 })} style={galleryCell(0, '18px 0 0 18px')}>
-            {images[0] ? (
-              <img src={optimizeCloudinaryUrl(images[0].url, 1100)}
-                srcSet={cloudinarySrcSet(images[0].url, 1100)}
-                sizes="(max-width: 768px) 100vw, 66vw"
-                alt={cleanTitle(property.title)}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <div style={{
-                height: '100%', display: 'grid', placeItems: 'center',
-                background: 'repeating-linear-gradient(45deg, var(--pub-border) 0 14px, var(--pub-bg) 14px 28px)',
-                fontFamily: F_MONO, fontSize: 12, color: 'var(--pub-dim)',
-              }}>FOTO PENDIENTE</div>
-            )}
+        <PropertyGallery
+          images={images}
+          alt={cleanTitle(property.title)}
+          categories={imageCategories}
+          activeLabel={galleryFilter}
+          onSelectCategory={setGalleryFilter}
+          onOpenLightbox={(idx, label) => setGallery({ open: true, idx, label })}
+          threeDLabel={(property.type === 'Terreno' || property.type === 'Lote') ? '3D' : undefined}
+          onThreeDClick={scrollTo3D}
+          onMapClick={scrollToMap}
+          badges={
             <div style={{ position: 'absolute', top: 14, left: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <span style={{ background: '#111113', color: '#D4B254', fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 999, textTransform: 'uppercase' }}>{property.type}</span>
               {property.property_type === 'lotificadora' && (
@@ -284,6 +282,8 @@ function FichaInner({ property }: Props) {
                 </span>
               )}
             </div>
+          }
+          favoriteButton={
             <button onClick={e => { e.stopPropagation(); handleFav(); }}
               aria-label={saved ? 'Quitar de favoritos' : 'Guardar en favoritos'}
               style={{
@@ -295,45 +295,8 @@ function FichaInner({ property }: Props) {
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
             </button>
-            {images.length > 0 && (
-              <button onClick={e => { e.stopPropagation(); setGallery({ open: true, idx: 0 }); }} style={{
-                position: 'absolute', bottom: 14, right: 14,
-                display: 'inline-flex', alignItems: 'center', gap: 7,
-                background: 'rgba(17,17,19,0.8)', color: '#FAF8F3', fontSize: '12.5px', fontWeight: 600,
-                padding: '7px 14px', borderRadius: 999, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-              }}>
-                <IconCamera size={13} /> Ver las {images.length} fotos
-              </button>
-            )}
-          </div>
-          <div className="ficha-gallery-side" style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: 10 }}>
-            <div onClick={() => images.length > 1 && setGallery({ open: true, idx: 1 })} style={galleryCell(1, '0 18px 0 0')}>
-              {images[1] && <img src={optimizeCloudinaryUrl(images[1].url, 560)} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <div onClick={() => images.length > 2 && setGallery({ open: true, idx: 2 })} style={galleryCell(2, '0')}>
-                {images[2] && <img src={optimizeCloudinaryUrl(images[2].url, 320)} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-              </div>
-              <div onClick={() => images.length > 3 && setGallery({ open: true, idx: 3 })} style={galleryCell(3, '0 0 18px 0')}>
-                {images[3] && <img src={optimizeCloudinaryUrl(images[3].url, 320)} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Filtro rápido de fotos por ambiente — sólo si la IA etiquetó fotos */}
-        {imageCategories.length > 0 && (
-          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', margin: '14px 0 0', paddingBottom: 2 }}>
-            {imageCategories.map(c => (
-              <button key={c.label} onClick={() => setGallery({ open: true, idx: 0, label: c.label })} style={{
-                flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6,
-                background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 999,
-                padding: '8px 15px', fontSize: '13px', fontWeight: 600, color: 'var(--pub-muted2)',
-                cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
-              }}>{c.label} <span style={{ opacity: 0.55 }}>({c.count})</span></button>
-            ))}
-          </div>
-        )}
+          }
+        />
 
         {/* Cuerpo */}
         <div className="ficha-body" style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 40, marginTop: 32, alignItems: 'start' }}>
@@ -477,6 +440,7 @@ function FichaInner({ property }: Props) {
             </div>
 
             {/* Ubicación */}
+            <div ref={mapRef} style={{ scrollMarginTop: 88 }}>
             <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: '32px 0 12px' }}>Ubicación</h3>
             <div style={{
               position: 'relative', height: 260, borderRadius: 14, overflow: 'hidden',
@@ -498,15 +462,38 @@ function FichaInner({ property }: Props) {
                 <IconMapPin size={13} /> Zona aproximada por seguridad — la dirección exacta se comparte al agendar
               </div>
             </div>
+            </div>
 
-            {/* Simulación 3D — sólo terrenos/lotes sin construcción */}
+            {/* Simulación de casa — sólo terrenos/lotes sin construcción */}
             {(property.type === 'Terreno' || property.type === 'Lote') && (
-              <>
-                <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: '32px 0 12px' }}>
-                  Así podría verse tu casa acá
-                </h3>
-                <LotMassingViewer areaM2={property.area_m2} />
-              </>
+              <div ref={threeDRef} style={{ scrollMarginTop: 88 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, margin: '32px 0 12px' }}>
+                  <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: 0 }}>
+                    Así podría verse tu casa acá
+                  </h3>
+                  {property.house_preview_url && (
+                    <button onClick={() => setView3d(v => !v)} style={{
+                      background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                      fontSize: 13, fontWeight: 700, color: '#1F5B42', padding: 0,
+                    }}>
+                      {view3d ? '← Ver foto realista' : 'Ver modelo 3D interactivo →'}
+                    </button>
+                  )}
+                </div>
+                {property.house_preview_url && !view3d ? (
+                  <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden', border: '1px solid var(--pub-border2)' }}>
+                    <img src={optimizeCloudinaryUrl(property.house_preview_url, 1200)} alt="Simulación realista de la casa en este terreno"
+                      style={{ width: '100%', height: 320, objectFit: 'cover', display: 'block' }} />
+                    <div style={{
+                      position: 'absolute', bottom: 12, left: 12,
+                      background: 'rgba(17,17,19,0.7)', color: '#FAF8F3', fontSize: 12, fontWeight: 600,
+                      padding: '7px 12px', borderRadius: 999,
+                    }}>Simulación generada por IA — referencial, no representa una construcción real</div>
+                  </div>
+                ) : (
+                  <LotMassingViewer areaM2={property.area_m2} />
+                )}
+              </div>
             )}
           </div>
 

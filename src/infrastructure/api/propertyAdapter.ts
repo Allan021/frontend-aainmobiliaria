@@ -43,6 +43,10 @@ export const propertyAdapter: PropertyPort = {
     return api.delete(`/properties/${id}/images/${imageId}`);
   },
 
+  generateHousePreview(id: string, imageUrl: string) {
+    return api.post<{ url: string }>(`/properties/${id}/house-preview`, { imageUrl });
+  },
+
   getStats() {
     return api.get<PropertyStats>('/properties/stats');
   },

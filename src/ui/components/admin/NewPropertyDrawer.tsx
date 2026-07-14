@@ -61,6 +61,9 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
+  const [housePreviewUrl, setHousePreviewUrl] = useState<string | null>(null);
+  const [housePreviewLoading, setHousePreviewLoading] = useState<number | null>(null);
+  const [housePreviewError, setHousePreviewError] = useState('');
 
   const createProperty = useCreateProperty();
   const updateProperty = useUpdateProperty();
@@ -134,6 +137,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
           label: img.label,
         }))
       );
+      setHousePreviewUrl(property.house_preview_url || null);
     } else {
       setTab('propiedad');
       setForm({
@@ -153,6 +157,7 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
         lat: null, lng: null,
       });
       setImages([]);
+      setHousePreviewUrl(null);
     }
     setError('');
   }, [property, open]);
@@ -191,6 +196,20 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
       setAiError((err as Error).message || 'No se pudo generar.');
     } finally {
       setAiLoading(false);
+    }
+  };
+
+  const generateHousePreview = async (url: string, index: number) => {
+    if (!property?.id) return;
+    setHousePreviewError('');
+    setHousePreviewLoading(index);
+    try {
+      const res = await api.post<{ url: string }>(`/properties/${property.id}/house-preview`, { imageUrl: url });
+      setHousePreviewUrl(res.url);
+    } catch (err) {
+      setHousePreviewError((err as Error).message || 'No se pudo generar la vista con IA.');
+    } finally {
+      setHousePreviewLoading(null);
     }
   };
 
@@ -1063,6 +1082,52 @@ export function NewPropertyDrawer({ open, onClose, property }: Props) {
               {images.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '1rem', color: textDim, fontSize: '13px', fontStyle: 'italic' }}>
                   Sin imágenes
+                </div>
+              )}
+
+              {/* Vista realista con IA — solo terrenos/lotes ya guardados con fotos */}
+              {tab === 'lote' && property?.id && images.some(i => i.type === 'existing') && (
+                <div style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: `1px solid ${border}` }}>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: text, marginBottom: 4 }}>
+                    Vista realista con IA
+                  </div>
+                  <div style={{ fontSize: '12px', color: textDim, marginBottom: '0.75rem' }}>
+                    Elegí una foto del terreno — la IA genera una casa realista construida ahí, para mostrar en la página pública.
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+                    {images.filter(i => i.type === 'existing').map((img, i) => (
+                      <button key={img.id || i} type="button"
+                        onClick={() => img.url && generateHousePreview(img.url, i)}
+                        disabled={housePreviewLoading !== null}
+                        style={{
+                          position: 'relative', width: 64, height: 64, borderRadius: 8, overflow: 'hidden',
+                          border: `1px solid ${border}`, padding: 0, cursor: housePreviewLoading !== null ? 'wait' : 'pointer',
+                          background: 'none',
+                        }}
+                        title="Generar casa realista a partir de esta foto"
+                      >
+                        <img src={img.preview || img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        <span style={{
+                          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: 'rgba(17,17,19,0.45)', color: '#FAF8F3', fontSize: 18,
+                          opacity: housePreviewLoading === i ? 1 : 0,
+                          transition: 'opacity 0.15s',
+                        }}>{housePreviewLoading === i ? '⏳' : ''}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {housePreviewError && (
+                    <div style={{ fontSize: '12px', color: '#8C3A2E', marginBottom: '0.5rem' }}>{housePreviewError}</div>
+                  )}
+                  {housePreviewUrl && (
+                    <div>
+                      <div style={{ fontSize: '11px', fontWeight: 600, color: textDim, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>
+                        Vista generada
+                      </div>
+                      <img src={housePreviewUrl} alt="Vista generada por IA"
+                        style={{ width: '100%', maxWidth: 320, borderRadius: 10, border: `1px solid ${border}`, display: 'block' }} />
+                    </div>
+                  )}
                 </div>
               )}
 
