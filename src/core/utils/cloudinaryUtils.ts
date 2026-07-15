@@ -26,12 +26,17 @@ export function optimizeCloudinaryUrl(
 }
 
 /**
- * Generate a srcset string with 1x and 2x for retina screens.
+ * Generate a responsive srcset ladder up to `width` (plus a 2x retina step),
+ * so mobile viewports get a genuinely smaller file instead of only 1x/2x of
+ * the desktop size.
  */
 export function cloudinarySrcSet(url: string, width: number): string | undefined {
   if (!url || !CLOUDINARY_REGEX.test(url)) return undefined;
 
-  const w1 = optimizeCloudinaryUrl(url, width);
-  const w2 = optimizeCloudinaryUrl(url, width * 2);
-  return `${w1} ${width}w, ${w2} ${width * 2}w`;
+  const steps = [0.3, 0.5, 0.75, 1, 2]
+    .map(f => Math.round(width * f))
+    .filter((w, i, arr) => w >= 200 && arr.indexOf(w) === i)
+    .sort((a, b) => a - b);
+
+  return steps.map(w => `${optimizeCloudinaryUrl(url, w)} ${w}w`).join(', ');
 }

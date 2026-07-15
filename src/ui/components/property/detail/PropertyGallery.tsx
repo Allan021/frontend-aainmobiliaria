@@ -85,6 +85,7 @@ export function PropertyGallery({
             srcSet={cloudinarySrcSet(current.url, 1400)}
             sizes="(max-width: 768px) 100vw, 1280px"
             alt={alt}
+            fetchPriority={safeIdx === 0 ? 'high' : undefined}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (

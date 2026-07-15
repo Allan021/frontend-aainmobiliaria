@@ -39,8 +39,16 @@ export function MapView({ properties, currency, selectedId, onSelect, onOpen }: 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const L = (await import('leaflet')).default;
-      await import('leaflet/dist/leaflet.css');
+      const [L, leafletCss] = await Promise.all([
+        import('leaflet').then(m => m.default),
+        import('leaflet/dist/leaflet.css?inline').then(m => m.default),
+      ]);
+      if (!document.getElementById('leaflet-css')) {
+        const style = document.createElement('style');
+        style.id = 'leaflet-css';
+        style.textContent = leafletCss;
+        document.head.appendChild(style);
+      }
       if (cancelled || !containerRef.current || mapRef.current) return;
       LRef.current = L;
       const map = L.map(containerRef.current, { zoomControl: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);

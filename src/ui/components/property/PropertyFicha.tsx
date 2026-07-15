@@ -39,24 +39,43 @@ function waLink(phone: string, msg: string) {
 /* ── Mapa de zona aproximada (leaflet dinámico — sin romper SSR) ── */
 function ZoneMap({ lat, lng }: { lat: number; lng: number }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (!ref.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setVisible(true); observer.disconnect(); }
+    }, { rootMargin: '400px' });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
     let map: import('leaflet').Map | null = null;
     let cancelled = false;
     (async () => {
-      const L = (await import('leaflet')).default;
-      await import('leaflet/dist/leaflet.css');
+      const [L, leafletCss] = await Promise.all([
+        import('leaflet').then(m => m.default),
+        import('leaflet/dist/leaflet.css?inline').then(m => m.default),
+      ]);
+      if (!document.getElementById('leaflet-css')) {
+        const style = document.createElement('style');
+        style.id = 'leaflet-css';
+        style.textContent = leafletCss;
+        document.head.appendChild(style);
+      }
       if (cancelled || !ref.current) return;
       map = L.map(ref.current, { zoomControl: false, scrollWheelZoom: false, dragging: false, attributionControl: false })
         .setView([lat, lng], 14);
-      L.tileLayer(tileUrl(), { subdomains: 'abcd', maxZoom: 20 }).addTo(map);
+      L.tileLayer(tileUrl(), { subdomains: 'abcd', maxZoom: 20, detectRetina: false }).addTo(map);
       L.circle([lat, lng], {
         radius: 420, color: '#C65D3B', weight: 2, fillColor: '#C65D3B', fillOpacity: 0.18,
       }).addTo(map);
       L.circleMarker([lat, lng], { radius: 7, color: '#FFFFFF', weight: 3, fillColor: '#C65D3B', fillOpacity: 1 }).addTo(map);
     })();
     return () => { cancelled = true; map?.remove(); };
-  }, [lat, lng]);
+  }, [lat, lng, visible]);
 
   return <div ref={ref} style={{ position: 'absolute', inset: 0, zIndex: 0 }} />;
 }

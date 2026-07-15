@@ -9,6 +9,10 @@ interface Props {
   canonical?: string;
   jsonLd?: object;
   noindex?: boolean;
+  /** URL de la imagen LCP de la página (ya optimizada) — se precarga desde el <head> */
+  preloadImage?: string;
+  preloadImageSrcset?: string;
+  preloadImageSizes?: string;
 }
 
 const {
@@ -21,6 +25,9 @@ const {
   canonical,
   jsonLd,
   noindex = false,
+  preloadImage,
+  preloadImageSrcset,
+  preloadImageSizes,
 } = Astro.props;
 
 const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap';
@@ -76,6 +83,18 @@ const orgJsonLd = {
     <!-- Preconnect to Cloudinary and OpenStreetMap -->
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
     <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+
+    <!-- Precarga de la imagen LCP de la página — antes de que hidrate el island -->
+    {preloadImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={preloadImage}
+        fetchpriority="high"
+        imagesrcset={preloadImageSrcset}
+        imagesizes={preloadImageSizes}
+      />
+    )}
     <link rel="preconnect" href="https://www.openstreetmap.org" />
     <link rel="dns-prefetch" href="https://www.openstreetmap.org" />
 

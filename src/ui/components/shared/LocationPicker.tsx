@@ -29,8 +29,16 @@ export function LocationPicker({ initial, onPick, height = 280 }: LocationPicker
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const L = (await import('leaflet')).default;
-      await import('leaflet/dist/leaflet.css');
+      const [L, leafletCss] = await Promise.all([
+        import('leaflet').then(m => m.default),
+        import('leaflet/dist/leaflet.css?inline').then(m => m.default),
+      ]);
+      if (!document.getElementById('leaflet-css')) {
+        const style = document.createElement('style');
+        style.id = 'leaflet-css';
+        style.textContent = leafletCss;
+        document.head.appendChild(style);
+      }
       if (cancelled || !ref.current || mapRef.current) return;
 
       const map = L.map(ref.current).setView(initial || [15.35, -87.8], initial ? 15 : 9);
