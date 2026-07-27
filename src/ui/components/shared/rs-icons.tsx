@@ -244,3 +244,51 @@ export const IconPlay = ({ size = 24 }: IconProps) => (
     <polygon points="5 3 19 12 5 21 5 3" />
   </svg>
 );
+
+// ── Agregados para el admin: reemplazan los caracteres ✕ × ⏳ ✓ ★ → ──
+
+export const IconX = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+export const IconChevronLeft = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <polyline points="15 18 9 12 15 6" />
+  </svg>
+);
+
+export const IconChevronRight = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <polyline points="9 18 15 12 9 6" />
+  </svg>
+);
+
+export const IconStar = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+export const IconAlert = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="8" x2="12" y2="12" />
+    <line x1="12" y1="16" x2="12.01" y2="16" />
+  </svg>
+);
+
+export const IconFacebook = ({ size = 24 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
+
+/** Spinner: reemplaza el ⏳. Respeta prefers-reduced-motion vía la clase CSS. */
+export const IconSpinner = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)} className="rs-spin">
+    <path d="M21 12a9 9 0 1 1-6.22-8.56" />
+  </svg>
+);

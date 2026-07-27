@@ -99,8 +99,10 @@ const orgJsonLd = {
          el preconnect apuntaba a un host que la página nunca pide. -->
     <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin />
     <link rel="dns-prefetch" href="https://a.basemaps.cartocdn.com" />
+    {/* Solo dns-prefetch: los tiles de Mapbox no se piden hasta que el usuario
+        cambia a satélite. Un 5º preconnect compite con los que sí bloquean el LCP. */}
     {import.meta.env.PUBLIC_MAPBOX_TOKEN && (
-      <link rel="preconnect" href="https://api.mapbox.com" crossorigin />
+      <link rel="dns-prefetch" href="https://api.mapbox.com" />
     )}
 
     <!-- Tipografías del rediseño (Archivo/Instrument Sans/JetBrains Mono) —
@@ -135,6 +137,7 @@ const orgJsonLd = {
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body>
+    <a href="#contenido" class="skip-link">Saltar al contenido</a>
     <slot />
   </body>
 </html>
@@ -151,4 +154,5 @@ const orgJsonLd = {
 <!-- Full CSS loaded normally (still render-blocking but browser already has critical styles above) -->
 <style is:global>
   @import '../styles/global.css';
+  @import '../styles/admin-form.css';
 </style>

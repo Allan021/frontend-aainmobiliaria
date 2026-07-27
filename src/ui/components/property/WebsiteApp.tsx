@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { QueryProvider } from '../../providers/QueryProvider';
 import { useSettings } from '../../hooks/useSettings';
+import { IconChevronRight } from '../shared/rs-icons';
 
 /* ── WhatsApp FAB ───────────────────────────────────────────── */
 export function WhatsAppFAB({ onClick }: { onClick?: () => void }) {
@@ -209,8 +210,8 @@ function AboutPageInner() {
             <a href={`tel:${telLink}`} style={{ display: 'block', fontSize: '1.0625rem', fontWeight: 600, color: 'var(--main-text, #111113)', marginBottom: '0.25rem', textDecoration: 'none' }}>
               {displayPhone}
             </a>
-            <a href={`https://wa.me/${rawPhone}`} target="_blank" rel="noopener" style={{ fontSize: '0.9375rem', color: '#D4B254', fontWeight: 600, textDecoration: 'none' }}>
-              Escribir por WhatsApp →
+            <a href={`https://wa.me/${rawPhone}`} target="_blank" rel="noopener" style={{ fontSize: '0.9375rem', color: '#D4B254', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              Escribir por WhatsApp <IconChevronRight size={14} />
             </a>
           </div>
           <div>

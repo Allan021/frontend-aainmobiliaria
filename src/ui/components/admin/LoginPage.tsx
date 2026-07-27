@@ -3,6 +3,7 @@ import { Eyebrow } from '../shared/Button';
 import { useLogin, useRegister } from '../../hooks/useAuth';
 import { QueryProvider } from '../../providers/QueryProvider';
 import { Sun, Moon } from 'lucide-react';
+import { IconChevronLeft, IconStar } from '../shared/rs-icons';
 
 /* ── Theme helpers ─────────────────────────── */
 function getStoredTheme(): 'light' | 'dark' {
@@ -67,7 +68,8 @@ function LoginNavbar({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: ()
             fontSize: '0.8125rem', fontWeight: 500, color: isDark ? '#C9C2B1' : '#5A5A63',
             textDecoration: 'none', padding: '0.5rem 0.75rem', borderRadius: '0.375rem',
             transition: 'color 0.2s',
-          }}>← Volver al sitio</a>
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+          }}><IconChevronLeft size={14} /> Volver al sitio</a>
         </div>
       </div>
     </header>
@@ -327,10 +329,12 @@ function LoginForm() {
               {[
                 { num: '50+', label: 'Propiedades' },
                 { num: '200+', label: 'Clientes' },
-                { num: '4.9★', label: 'Rating' },
+                { num: '4.9', star: true, label: 'Rating' },
               ].map(s => (
                 <div key={s.label} className="lstat" style={{ textAlign: 'center', opacity: 0 }}>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#D4B254' }}>{s.num}</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#D4B254', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    {s.num}{s.star && <IconStar size={16} />}
+                  </div>
                   <div style={{ fontSize: '0.6875rem', color: '#5A5A63', fontWeight: 500, letterSpacing: '0.05em', marginTop: 2 }}>{s.label}</div>
                 </div>
               ))}

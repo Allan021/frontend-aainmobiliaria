@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { ConfirmModal } from '../ConfirmModal';
+import { IconX } from '../../shared/rs-icons';
 import { Button, Eyebrow } from '../../shared/Button';
 import { useAddPago, useDeletePago } from '../../../hooks/useLotes';
 import { type Lote, type Pago } from '../../../../core/domain/entities/types';
@@ -99,7 +100,7 @@ export function PagoModal({ lote, lotificationId, onClose, m }: {
             </h3>
             {lote.buyer_name && <div style={{ fontSize: '0.8125rem', color: m.mainTextMuted, marginTop: '2px' }}>{lote.buyer_name}</div>}
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: m.mainTextMuted, fontSize: '20px', lineHeight: 1 }}>×</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: m.mainTextMuted, fontSize: '20px', lineHeight: 1, display: 'flex' }} aria-label="Cerrar"><IconX size={19} /></button>
         </div>
 
         {/* Summary */}
@@ -147,7 +148,7 @@ export function PagoModal({ lote, lotificationId, onClose, m }: {
                     <div style={{ fontSize: '0.75rem', color: m.mainTextMuted }}>{new Date(p.fecha).toLocaleDateString('es-HN', { day: 'numeric', month: 'short' })}</div>
                     <div style={{ fontSize: '0.75rem', color: m.mainTextMuted, textTransform: 'capitalize' }}>{p.metodo_pago}</div>
                     <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#4A7C59', textAlign: 'right', fontFeatureSettings: "'tnum' 1" }}>L {p.monto.toLocaleString('en-US')}</div>
-                    <button onClick={() => setConfirmPago(p)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8C3A2E', fontSize: '14px', padding: '2px', lineHeight: 1 }}>×</button>
+                    <button onClick={() => setConfirmPago(p)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8C3A2E', padding: '2px', lineHeight: 1, display: 'flex' }} aria-label="Quitar pago"><IconX size={14} /></button>
                   </div>
                 ))}
               </div>

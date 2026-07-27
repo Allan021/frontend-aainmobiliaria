@@ -5,9 +5,10 @@ import { MetricTile } from './MetricTile';
 import { ListingsTable } from './ListingsTable';
 import { LeadsList } from './LeadsList';
 import { SalesHistory } from './SalesHistory';
-import { NewPropertyDrawer } from './NewPropertyDrawer';
+import { PropertyDrawer } from './property-form/PropertyDrawer';
 import { Button, Eyebrow, Capsule } from '../shared/Button';
 import { WhatsAppIcon } from '../shared/Icon';
+import { IconChevronRight, IconPlus } from '../shared/rs-icons';
 import { useProperties, usePropertyStats } from '../../hooks/useProperties';
 import { useLeads } from '../../hooks/useLeads';
 import { useSales } from '../../hooks/useSales';
@@ -140,7 +141,8 @@ function Dashboard({ onNew, onToggleSidebar, isOpen, m, onNavigate }: {
               <button onClick={() => onNavigate('leads')} style={{
                 fontSize: '0.75rem', color: '#8C6F1C', fontWeight: 500, background: 'none',
                 border: 'none', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '3px',
-              }}>Ver todos →</button>
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+              }}>Ver todos <IconChevronRight size={13} /></button>
             </div>
             {leads.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '2rem', color: m.mainTextDim, fontSize: '0.875rem' }}>
@@ -192,11 +194,11 @@ function Dashboard({ onNew, onToggleSidebar, isOpen, m, onNavigate }: {
               <div style={{ marginBottom: '1rem' }}><Eyebrow>Acciones rápidas</Eyebrow></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {[
-                  { label: '+ Nueva propiedad', action: onNew, accent: true },
-                  { label: '→ Ver catálogo', action: () => onNavigate('catalog') },
-                  { label: '→ Ver leads', action: () => onNavigate('leads') },
-                  { label: '→ Registrar venta', action: () => onNavigate('sales') },
-                ].map(({ label, action, accent }) => (
+                  { label: 'Nueva propiedad', Icon: IconPlus, action: onNew, accent: true },
+                  { label: 'Ver catálogo', Icon: IconChevronRight, action: () => onNavigate('catalog') },
+                  { label: 'Ver leads', Icon: IconChevronRight, action: () => onNavigate('leads') },
+                  { label: 'Registrar venta', Icon: IconChevronRight, action: () => onNavigate('sales') },
+                ].map(({ label, Icon, action, accent }) => (
                   <button key={label} onClick={action} style={{
                     width: '100%', padding: '0.625rem 0.875rem', borderRadius: '0.5rem',
                     background: accent ? '#111113' : 'transparent',
@@ -204,7 +206,9 @@ function Dashboard({ onNew, onToggleSidebar, isOpen, m, onNavigate }: {
                     color: accent ? '#FAF8F3' : m.mainText,
                     fontSize: '0.8125rem', fontWeight: 600, cursor: 'pointer',
                     textAlign: 'left', fontFamily: 'inherit', transition: 'all 0.2s',
+                    display: 'flex', alignItems: 'center', gap: 8,
                   }}>
+                    <Icon size={15} />
                     {label}
                   </button>
                 ))}
@@ -475,8 +479,8 @@ function SettingsView({ onToggleSidebar, isOpen, m }: {
             )}
 
             {success && (
-              <div style={{ fontSize: '0.8125rem', color: '#81C784', fontWeight: 500 }}>
-                ✓ Ajustes guardados correctamente.
+              <div role="status" style={{ fontSize: '0.8125rem', color: '#81C784', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <IconCheck size={14} /> Ajustes guardados correctamente.
               </div>
             )}
 
@@ -775,7 +779,7 @@ function AdminContent() {
         {route === 'settings' && <SettingsView {...sharedProps} />}
       </main>
 
-      <NewPropertyDrawer
+      <PropertyDrawer
         open={drawer}
         onClose={() => { setDrawer(false); setEditingProperty(null); }}
         property={editingProperty}

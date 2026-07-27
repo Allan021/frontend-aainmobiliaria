@@ -10,18 +10,38 @@ import type { Property, PaginatedResponse } from '../../core/domain/entities/typ
 import { optimizeCloudinaryUrl, cloudinarySrcSet } from '../../core/utils/cloudinaryUtils';
 
 export async function getStaticPaths() {
+  // Las constantes van adentro: Astro extrae getStaticPaths a su propio ámbito
+  // y no ve el resto del frontmatter.
+  //
+  // La API topa `limit` en 100 para que nadie pueda pedir la tabla entera de un
+  // tirón. Esto pedía 300 y el 400 caía en el catch: cero fichas generadas, en
+  // silencio. Ahora pagina hasta traerlas todas.
+  const PAGE_SIZE = 100;
+  const MAX_PAGES = 50;
+  const properties: Property[] = [];
+
   try {
-    const data = await serverFetch<PaginatedResponse<Property>>(
-      '/properties?limit=300'
-    );
-    const properties: Property[] = data.data ?? [];
-    return properties.map((p) => ({
-      params: { id: p.id },
-      props: { property: p },
-    }));
-  } catch {
-    return [];
+    for (let page = 1; page <= MAX_PAGES; page++) {
+      const data = await serverFetch<PaginatedResponse<Property>>(
+        `/properties?limit=${PAGE_SIZE}&page=${page}`
+      );
+      const lote = data.data ?? [];
+      properties.push(...lote);
+      if (lote.length < PAGE_SIZE) break;
+    }
+  } catch (err) {
+    // Sin API no hay fichas que generar, pero que se vea en el log del build
+    console.error('[propiedad] No se pudieron listar las propiedades:', (err as Error).message);
   }
+
+  if (properties.length === 0) {
+    console.warn('[propiedad] 0 fichas generadas — ¿está arriba el backend?');
+  }
+
+  return properties.map((p) => ({
+    params: { id: p.id },
+    props: { property: p },
+  }));
 }
 
 const { property } = Astro.props as { property: Property };

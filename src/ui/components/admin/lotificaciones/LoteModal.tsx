@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { ConfirmModal } from '../ConfirmModal';
+import { IconX } from '../../shared/rs-icons';
 import { Button } from '../../shared/Button';
 import { useCreateLote, useUpdateLote, useDeleteLote } from '../../../hooks/useLotes';
 import { type Lote } from '../../../../core/domain/entities/types';
@@ -80,7 +81,7 @@ export function LoteModal({ lotificationId, lote, onClose, m }: {
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: m.mainText }}>{lote ? `Editar Lote ${lote.numero}` : 'Nuevo Lote'}</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: m.mainTextMuted, fontSize: '20px' }}>×</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: m.mainTextMuted, fontSize: '20px', display: 'flex' }} aria-label="Cerrar"><IconX size={19} /></button>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '10px' }}>

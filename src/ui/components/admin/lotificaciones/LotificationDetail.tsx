@@ -7,6 +7,7 @@ import { LoteModal } from './LoteModal';
 import { ConfirmModal } from '../ConfirmModal';
 import { Button, Eyebrow } from '../../shared/Button';
 import { SidebarMobileToggle } from '../AdminSidebar';
+import { IconChevronLeft } from '../../shared/rs-icons';
 
 interface M {
   mainBg: string; mainSurface: string; mainBorder: string;
@@ -45,7 +46,7 @@ export function LotificationDetail({ lotification, m, onBack, onEditLotification
           )}
           <div>
             <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: m.mainTextMuted, fontSize: '13px', fontWeight: 500, padding: 0, marginBottom: '0.5rem', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              ← Lotificaciones
+              <IconChevronLeft size={14} /> Lotificaciones
             </button>
             <Eyebrow>Lotificación</Eyebrow>
             <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, marginTop: '0.375rem', letterSpacing: '-0.025em', color: m.mainText, lineHeight: 1.1 }}>{lotification.title}</h1>

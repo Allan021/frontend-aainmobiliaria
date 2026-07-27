@@ -5,7 +5,7 @@ import { useCurrency, priceParts } from '../../hooks/useCurrency';
 import { useFavoriteIds, useToggleFavorite, isLoggedIn, requireLogin } from '../../hooks/useFavorites';
 import { MapView } from './MapView';
 import { cleanTitle, fmtVaras, type Property } from '../../../core/domain/entities/types';
-import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
+import { optimizeCloudinaryUrl, cloudinarySrcSet } from '../../../core/utils/cloudinaryUtils';
 import { WhatsAppIcon } from '../shared/Icon';
 import { IconSearch, IconMap, IconList, IconHome, IconBed, IconBath, IconArea, IconCheck } from '../shared/rs-icons';
 
@@ -37,13 +37,16 @@ function getInitialParam(name: string): string {
 }
 
 /* ── Card horizontal de la lista ── */
-function ResultCard({ p, active, saved, onSelect, onOpen, onWhatsApp, onToggleSave }: {
-  p: Property; active: boolean; saved: boolean;
+function ResultCard({ p, index, active, saved, onSelect, onOpen, onWhatsApp, onToggleSave }: {
+  p: Property; index: number; active: boolean; saved: boolean;
   onSelect: () => void; onOpen: () => void; onWhatsApp: () => void; onToggleSave: () => void;
 }) {
   const [currency] = useCurrency();
   const { main } = priceParts(p.discount_price ?? p.price, p.currency, currency);
   const img = p.images?.[0]?.url;
+  // Las dos primeras tarjetas están sobre el pliegue: una de ellas es el LCP.
+  // Con loading="lazy" el navegador no la descubre hasta después del layout.
+  const aboveFold = index < 2;
 
   return (
     <div onClick={onSelect} className="result-card" style={{
@@ -56,7 +59,20 @@ function ResultCard({ p, active, saved, onSelect, onOpen, onWhatsApp, onToggleSa
       <div className="result-card__media" style={{ position: 'relative', width: 168, flexShrink: 0, alignSelf: 'stretch', minHeight: 150 }}>
         <div style={{ position: 'absolute', inset: 0, borderRadius: 10, overflow: 'hidden', background: 'var(--pub-border)' }}>
           {img ? (
-            <img src={optimizeCloudinaryUrl(img, 340)} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img
+              src={optimizeCloudinaryUrl(img, 336)}
+              srcSet={cloudinarySrcSet(img, 336)}
+              // El media mide 168px CSS; sin `sizes` el navegador asume 100vw
+              // y baja el escalón más grande del srcset
+              sizes="168px"
+              width={168}
+              height={150}
+              alt={`${cleanTitle(p.title)} — ${p.municipio}, ${p.departamento}`}
+              loading={aboveFold ? 'eager' : 'lazy'}
+              fetchPriority={aboveFold ? 'high' : 'auto'}
+              decoding={aboveFold ? 'sync' : 'async'}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
           ) : (
             <div style={{ height: '100%', display: 'grid', placeItems: 'center', fontFamily: F_MONO, fontSize: '8.5px', color: 'var(--pub-dim)', textAlign: 'center', padding: '0 8px' }}>FOTO PENDIENTE</div>
           )}
@@ -271,10 +287,11 @@ function SearchInner({ initialSearch }: { initialSearch?: string }) {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {isLoading && <><RowSkeleton /><RowSkeleton /><RowSkeleton /></>}
-            {properties.map(p => (
+            {properties.map((p, i) => (
               <ResultCard
                 key={p.id}
                 p={p}
+                index={i}
                 active={p.id === selectedId}
                 saved={favIds.has(p.id)}
                 onSelect={() => setSelectedId(p.id)}
