@@ -95,8 +95,10 @@ const orgJsonLd = {
         imagesizes={preloadImageSizes}
       />
     )}
-    <link rel="preconnect" href="https://www.openstreetmap.org" />
-    <link rel="dns-prefetch" href="https://www.openstreetmap.org" />
+    <!-- Los tiles salen de CARTO, no de openstreetmap.org (eso quedó del iframe viejo):
+         el preconnect apuntaba a un host que la página nunca pide. -->
+    <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin />
+    <link rel="dns-prefetch" href="https://a.basemaps.cartocdn.com" />
 
     <!-- Tipografías del rediseño (Archivo/Instrument Sans/JetBrains Mono) —
          carga NO bloqueante: se aplica sin retrasar el primer paint (LCP) -->

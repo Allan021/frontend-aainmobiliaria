@@ -8,12 +8,23 @@ import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
 const DEFAULT_CENTER: [number, number] = [15.35, -87.8];
 const DEFAULT_ZOOM = 10;
 
+// Un solo host a propósito: CARTO sirve por HTTP/2, donde repartir en a/b/c/d
+// abre 4 conexiones TLS en vez de multiplexar sobre una. El sharding es un
+// truco de HTTP/1.1 que hoy hace más lento el primer render.
 function tileUrl(): string {
   const dark = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
   return dark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    ? 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 }
+
+// Arranca la descarga de Leaflet al evaluar el módulo, no dentro del efecto:
+// así baja en paralelo con la hidratación de React en vez de esperarla.
+// Guardado por `window` porque Astro también renderiza este island en el server.
+const leafletReady = typeof window === 'undefined' ? null : Promise.all([
+  import('leaflet').then(m => m.default),
+  import('leaflet/dist/leaflet.css?inline').then(m => m.default),
+]);
 
 interface MapViewProps {
   properties: Property[];
@@ -39,10 +50,8 @@ export function MapView({ properties, currency, selectedId, onSelect, onOpen }: 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [L, leafletCss] = await Promise.all([
-        import('leaflet').then(m => m.default),
-        import('leaflet/dist/leaflet.css?inline').then(m => m.default),
-      ]);
+      if (!leafletReady) return;
+      const [L, leafletCss] = await leafletReady;
       if (!document.getElementById('leaflet-css')) {
         const style = document.createElement('style');
         style.id = 'leaflet-css';
@@ -54,8 +63,13 @@ export function MapView({ properties, currency, selectedId, onSelect, onOpen }: 
       const map = L.map(containerRef.current, { zoomControl: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
       L.tileLayer(tileUrl(), {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
         maxZoom: 20,
+        // CARTO solo tiene raster hasta z19; más allá reescala el último tile
+        // en vez de pedir 404 y dejar el hueco gris
+        maxNativeZoom: 19,
+        // Pinta mientras se arrastra en lugar de esperar a que el gesto pare
+        updateWhenIdle: false,
+        keepBuffer: 2,
       }).addTo(map);
       L.control.zoom({ position: 'topright' }).addTo(map);
       layerRef.current = L.layerGroup().addTo(map);
