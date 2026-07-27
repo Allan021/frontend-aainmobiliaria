@@ -112,6 +112,39 @@ textarea.admin-input { min-height: 88px; line-height: 1.55; }
 }
 .admin-chip:focus-visible { outline: 3px solid rgba(31, 91, 66, 0.45); outline-offset: 2px; }
 
+/* Dictado por voz */
+.mic-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1.5px solid;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.mic-btn:focus-visible { outline: 3px solid rgba(140, 58, 46, 0.45); outline-offset: 2px; }
+
+/* Punto rojo latiendo: señal de que el micrófono está abierto */
+.mic-pulse {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #8C3A2E;
+  animation: mic-pulse 1.1s ease-in-out infinite;
+}
+@keyframes mic-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.75); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mic-pulse { animation: none; }
+}
+
 .admin-link-btn {
   padding: 0;
   border: none;

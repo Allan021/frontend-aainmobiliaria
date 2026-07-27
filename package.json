@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/check.ts"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.3",

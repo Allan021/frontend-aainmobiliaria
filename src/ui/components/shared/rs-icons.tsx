@@ -286,6 +286,21 @@ export const IconFacebook = ({ size = 24 }: IconProps) => (
   </svg>
 );
 
+export const IconMic = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+    <line x1="12" y1="19" x2="12" y2="22" />
+  </svg>
+);
+
+export const IconStopCircle = ({ size = 24 }: IconProps) => (
+  <svg {...base(size)}>
+    <circle cx="12" cy="12" r="10" />
+    <rect x="9" y="9" width="6" height="6" />
+  </svg>
+);
+
 /** Spinner: reemplaza el ⏳. Respeta prefers-reduced-motion vía la clase CSS. */
 export const IconSpinner = ({ size = 24 }: IconProps) => (
   <svg {...base(size)} className="rs-spin">

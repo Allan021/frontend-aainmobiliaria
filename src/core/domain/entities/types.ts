@@ -63,6 +63,8 @@ export interface PropertyDraft {
   highlights: string[];
   municipio: string | null;
   departamento: string | null;
+  /** Referencia de ubicación cruda (colonia, barrio, punto de referencia) — alimenta el geocoder */
+  address: string | null;
 }
 
 export interface Favorite {

@@ -2,6 +2,7 @@ import { IconMapPin, IconCheck, IconAlert } from '../../../shared/rs-icons';
 import { SelectField } from '../../../shared/SelectField';
 import { LocationPicker } from '../../../shared/LocationPicker';
 import { FieldShell } from '../fields/FieldShell';
+import { AddressSearch } from '../fields/AddressSearch';
 import { useHondurasData } from '../../../../hooks/useHondurasData';
 import { useAdminTheme } from '../theme';
 import type { PropertyForm } from '../types';
@@ -51,6 +52,12 @@ export function StepLocation({ form, set, patch }: Props) {
           />
         </FieldShell>
       </div>
+
+      <AddressSearch
+        municipio={form.municipio}
+        departamento={form.departamento}
+        onFound={(lat, lng) => patch({ lat, lng })}
+      />
 
       <FieldShell
         label="Marcá el punto en el mapa"

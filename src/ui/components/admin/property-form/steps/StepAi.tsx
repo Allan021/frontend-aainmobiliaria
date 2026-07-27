@@ -1,7 +1,10 @@
 import { useState } from 'react';
-import { IconSparkles, IconSpinner, IconCheck } from '../../../shared/rs-icons';
+import { IconSparkles, IconSpinner, IconCheck, IconMapPin, IconAlert } from '../../../shared/rs-icons';
 import { aiAdapter } from '../../../../../infrastructure/api/aiAdapter';
 import { useHondurasData } from '../../../../hooks/useHondurasData';
+import { useSpeechInput } from '../../../../hooks/useSpeechInput';
+import { geocode, esPrecisa, type GeocodeHit } from '../../../shared/map/geocode';
+import { MicButton } from '../fields/MicButton';
 import { useAdminTheme } from '../theme';
 import type { PropertyForm, PropertyKind } from '../types';
 
@@ -10,7 +13,7 @@ interface Props {
   onSkip: () => void;
 }
 
-const EJEMPLO = 'casa de esquina en la 19 de Junio, El Progreso, 3 cuartos, 2 baños, agua y luz, 350 varas, escriturada, 2.5 millones';
+const EJEMPLO = 'casa de esquina en la Colonia 19 de Junio, El Progreso, Yoro, 3 cuartos, 2 baños, agua y luz, 350 varas, escriturada, 2.5 millones';
 
 /** Campos que la IA puede llenar, con nombre legible para el resumen previo. */
 const NOMBRES: Partial<Record<keyof PropertyForm, string>> = {
@@ -27,12 +30,20 @@ export function StepAi({ onApply, onSkip }: Props) {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  // Resultado en espera: se muestra qué se va a llenar ANTES de tocar el
-  // formulario. Antes la IA pisaba los campos sin avisar ni permitir deshacer.
-  const [pending, setPending] = useState<{ values: Partial<PropertyForm>; kind?: PropertyKind } | null>(null);
+  const [pending, setPending] = useState<{
+    values: Partial<PropertyForm>;
+    kind?: PropertyKind;
+    ubicacion: GeocodeHit | null;
+  } | null>(null);
+
+  // Dictado: cada frase cerrada se agrega al final de lo ya escrito
+  const voz = useSpeechInput({
+    onFinal: texto => setPrompt(prev => (prev ? `${prev.trimEnd()} ${texto}` : texto)),
+  });
 
   const generar = async () => {
     setError('');
+    if (voz.listening) voz.stop();
     if (prompt.trim().length < 15) {
       setError('Contanos un poco más — al menos una frase completa.');
       return;
@@ -63,10 +74,15 @@ export function StepAi({ onApply, onSkip }: Props) {
       values.has_power = d.has_power;
       values.has_deed = d.has_deed;
 
+      // Si la persona dio una referencia, buscamos el punto en el mapa.
+      // Nunca bloquea: si no hay match, el pin se pone a mano en el paso 3.
+      const ubicacion = await geocode(d.address, muni?.nombre || d.municipio, dep?.nombre || d.departamento);
+      if (ubicacion) { values.lat = ubicacion.lat; values.lng = ubicacion.lng; }
+
       const kind: PropertyKind | undefined =
         d.type === 'Terreno' || d.type === 'Lote' ? 'terreno' : d.type ? 'casa' : undefined;
 
-      setPending({ values, kind });
+      setPending({ values, kind, ubicacion });
     } catch (err) {
       setError((err as Error).message || 'No se pudo generar. Podés llenar los campos a mano.');
     } finally {
@@ -85,8 +101,8 @@ export function StepAi({ onApply, onSkip }: Props) {
           Contanos de tu propiedad
         </h3>
         <p style={{ fontSize: 14.5, color: t.textMuted, margin: '8px 0 0', lineHeight: 1.55 }}>
-          Escribilo como se lo contarías a un cliente. Nosotros llenamos el formulario
-          y después lo revisás.
+          Escribilo o dictalo como se lo contarías a un cliente. Nosotros llenamos el
+          formulario y después lo revisás.
         </p>
       </div>
 
@@ -94,20 +110,31 @@ export function StepAi({ onApply, onSkip }: Props) {
         <textarea
           className="admin-input"
           rows={5}
-          value={prompt}
+          value={voz.interim ? `${prompt} ${voz.interim}`.trim() : prompt}
           onChange={e => setPrompt(e.target.value)}
           placeholder={`Por ejemplo: ${EJEMPLO}`}
           aria-label="Descripción de la propiedad"
           style={{ resize: 'vertical', fontSize: 15, lineHeight: 1.6 }}
         />
-        <button
-          type="button"
-          onClick={() => setPrompt(EJEMPLO)}
-          className="admin-btn admin-btn--ghost"
-          style={{ marginTop: 8, fontSize: 12.5 }}
-        >
-          Usar este ejemplo
-        </button>
+
+        <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          {voz.supported && <MicButton listening={voz.listening} onToggle={voz.toggle} />}
+          <button type="button" onClick={() => setPrompt(EJEMPLO)}
+            className="admin-btn admin-btn--ghost" style={{ fontSize: 12.5 }}>
+            Usar este ejemplo
+          </button>
+          {voz.listening && (
+            <span role="status" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: t.danger, fontWeight: 600 }}>
+              <span className="mic-pulse" aria-hidden="true" /> Escuchando…
+            </span>
+          )}
+        </div>
+
+        {voz.error && (
+          <div role="alert" style={{ fontSize: 13, color: t.danger, fontWeight: 600, marginTop: 8 }}>
+            {voz.error}
+          </div>
+        )}
       </div>
 
       {error && (
@@ -123,6 +150,7 @@ export function StepAi({ onApply, onSkip }: Props) {
             <IconCheck size={17} />
             Listo — esto es lo que vamos a llenar
           </div>
+
           <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13.5, color: t.textMuted, lineHeight: 1.8 }}>
             {listos.map(k => {
               const v = pending.values[k];
@@ -135,6 +163,27 @@ export function StepAi({ onApply, onSkip }: Props) {
               );
             })}
           </ul>
+
+          {/* Resultado de la geocodificación: siempre se dice cuán exacto es y
+              que se puede corregir — el pin lo decide la persona, no el servicio */}
+          <div style={{
+            display: 'flex', alignItems: 'flex-start', gap: 7, marginTop: 12, paddingTop: 12,
+            borderTop: `1px solid ${t.border}`, fontSize: 13, lineHeight: 1.5,
+            color: pending.ubicacion ? t.textMuted : t.textDim,
+          }}>
+            {pending.ubicacion ? <IconMapPin size={15} /> : <IconAlert size={15} />}
+            {pending.ubicacion ? (
+              <span>
+                Lo ubicamos en <strong style={{ color: t.text }}>{pending.ubicacion.label}</strong>.{' '}
+                {esPrecisa(pending.ubicacion.precision)
+                  ? 'Revisalo en el paso "Dónde queda" y movelo si hace falta.'
+                  : 'Es una ubicación aproximada — movés el pin al punto exacto en el paso "Dónde queda".'}
+              </span>
+            ) : (
+              <span>No pudimos ubicarla sola. Vas a marcar el punto en el mapa en el paso "Dónde queda".</span>
+            )}
+          </div>
+
           <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
             <button type="button" className="admin-btn admin-btn--primary"
               onClick={() => { onApply(pending.values, pending.kind); setPending(null); }}>
