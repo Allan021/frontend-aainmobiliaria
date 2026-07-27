@@ -1,22 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Map as LeafletMap, LayerGroup } from 'leaflet';
+import type { Map as LeafletMap, LayerGroup, TileLayer } from 'leaflet';
 import { cleanTitle, type Property } from '../../../core/domain/entities/types';
 import { shortPrice, priceParts, type Currency } from '../../hooks/useCurrency';
 import { optimizeCloudinaryUrl } from '../../../core/utils/cloudinaryUtils';
+import { getBasemap, hasSatellite, type BasemapId } from './basemaps';
 
 // Centro de Honduras (Yoro y alrededores)
 const DEFAULT_CENTER: [number, number] = [15.35, -87.8];
 const DEFAULT_ZOOM = 10;
 
-// Un solo host a propósito: CARTO sirve por HTTP/2, donde repartir en a/b/c/d
-// abre 4 conexiones TLS en vez de multiplexar sobre una. El sharding es un
-// truco de HTTP/1.1 que hoy hace más lento el primer render.
-function tileUrl(): string {
-  const dark = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
-  return dark
-    ? 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-}
+const isDark = () =>
+  typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
 
 // Arranca la descarga de Leaflet al evaluar el módulo, no dentro del efecto:
 // así baja en paralelo con la hidratación de React en vez de esperarla.
@@ -35,17 +29,19 @@ interface MapViewProps {
 }
 
 /**
- * Mapa con tiles CARTO (voyager / dark_all según tema) y pins de precio.
- * Verde pino = normal · terracota = seleccionado.
+ * Mapa con pins de precio. Verde pino = normal · terracota = seleccionado.
+ * Capa base conmutable (mapa / satélite) — ver `basemaps.ts`.
  * Leaflet se importa dinámicamente — seguro con SSR (client:load).
  */
 export function MapView({ properties, currency, selectedId, onSelect, onOpen }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const layerRef = useRef<LayerGroup | null>(null);
+  const tileRef = useRef<TileLayer | null>(null);
   const LRef = useRef<typeof import('leaflet') | null>(null);
   const fittedRef = useRef(false);
   const [ready, setReady] = useState(false);
+  const [basemap, setBasemap] = useState<BasemapId>('mapa');
 
   useEffect(() => {
     let cancelled = false;
@@ -61,12 +57,11 @@ export function MapView({ properties, currency, selectedId, onSelect, onOpen }: 
       if (cancelled || !containerRef.current || mapRef.current) return;
       LRef.current = L;
       const map = L.map(containerRef.current, { zoomControl: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
-      L.tileLayer(tileUrl(), {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      const base = getBasemap('mapa', isDark());
+      tileRef.current = L.tileLayer(base.url, {
+        attribution: base.attribution,
         maxZoom: 20,
-        // CARTO solo tiene raster hasta z19; más allá reescala el último tile
-        // en vez de pedir 404 y dejar el hueco gris
-        maxNativeZoom: 19,
+        maxNativeZoom: base.maxNativeZoom,
         // Pinta mientras se arrastra en lugar de esperar a que el gesto pare
         updateWhenIdle: false,
         keepBuffer: 2,
@@ -81,9 +76,32 @@ export function MapView({ properties, currency, selectedId, onSelect, onOpen }: 
       mapRef.current?.remove();
       mapRef.current = null;
       layerRef.current = null;
+      tileRef.current = null;
       fittedRef.current = false;
     };
   }, []);
+
+  // Cambio de capa base. Se recrea el layer en vez de `setUrl`: tileSize y
+  // zoomOffset (Mapbox usa tiles de 512) no se pueden cambiar en caliente.
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !ready) return;
+
+    const base = getBasemap(basemap, isDark());
+    tileRef.current?.remove();
+    tileRef.current = L.tileLayer(base.url, {
+      attribution: base.attribution,
+      maxZoom: 20,
+      maxNativeZoom: base.maxNativeZoom,
+      tileSize: base.tileSize ?? 256,
+      zoomOffset: base.zoomOffset ?? 0,
+      updateWhenIdle: false,
+      keepBuffer: 2,
+    }).addTo(map);
+    // Los tiles van al fondo o taparían los pins al recrearse
+    tileRef.current.bringToBack();
+  }, [basemap, ready]);
 
   useEffect(() => {
     const L = LRef.current;
@@ -139,5 +157,24 @@ export function MapView({ properties, currency, selectedId, onSelect, onOpen }: 
     }
   }, [selectedId]);
 
-  return <div ref={containerRef} style={{ width: '100%', height: '100%', zIndex: 0, background: 'var(--pub-border)' }} />;
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div ref={containerRef} style={{ width: '100%', height: '100%', zIndex: 0, background: 'var(--pub-border)' }} />
+      {hasSatellite && (
+        <div className="map-basemap-switch" role="group" aria-label="Vista del mapa">
+          {(['mapa', 'satelite'] as const).map(id => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setBasemap(id)}
+              aria-pressed={basemap === id}
+              className={basemap === id ? 'is-active' : ''}
+            >
+              {id === 'mapa' ? 'Mapa' : 'Satélite'}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }

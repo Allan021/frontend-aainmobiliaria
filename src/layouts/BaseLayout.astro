@@ -99,6 +99,9 @@ const orgJsonLd = {
          el preconnect apuntaba a un host que la página nunca pide. -->
     <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin />
     <link rel="dns-prefetch" href="https://a.basemaps.cartocdn.com" />
+    {import.meta.env.PUBLIC_MAPBOX_TOKEN && (
+      <link rel="preconnect" href="https://api.mapbox.com" crossorigin />
+    )}
 
     <!-- Tipografías del rediseño (Archivo/Instrument Sans/JetBrains Mono) —
          carga NO bloqueante: se aplica sin retrasar el primer paint (LCP) -->
