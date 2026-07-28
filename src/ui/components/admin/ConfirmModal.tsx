@@ -31,8 +31,11 @@ export function ConfirmModal({ title, message, confirmLabel = 'Eliminar', onConf
     setError('');
     try {
       await onConfirm();
-    } catch {
-      setError('No se pudo completar la acción. Intenta de nuevo.');
+    } catch (err) {
+      // El servidor explica el motivo real (ej. "todavía hay leads asociados").
+      // Tragarlo y mostrar siempre "intenta de nuevo" hacía que el usuario
+      // reintentara para siempre un borrado que nunca iba a funcionar.
+      setError((err as Error)?.message || 'No se pudo completar la acción. Intenta de nuevo.');
       setLoading(false);
     }
   };
