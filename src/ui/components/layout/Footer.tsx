@@ -90,6 +90,12 @@ export function Footer({ onWhatsApp }: FooterProps) {
         }}>
           <span>© 2026 A&A Inmobiliaria · El Progreso, Yoro, Honduras</span>
           <span>Escrituración verificada en el Instituto de la Propiedad</span>
+          <span>
+            Plataforma hecha por{' '}
+            <a href="https://www.kizercode.com/productos/portal-inmobiliario/" style={{ color: '#B9C0CC', textDecoration: 'underline' }}>
+              Kizercode
+            </a>
+          </span>
         </div>
       </div>
     </footer>
