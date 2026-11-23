@@ -1,6 +1,6 @@
 import { IconCheck, IconShield } from '../../shared/rs-icons';
 import { parseDescription, type Property } from '../../../../core/domain/entities/types';
-import { F_ARCHIVO, VERDE, VERDE_CLARO } from './tokens';
+import { F_ARCHIVO, VERDE_CLARO } from './tokens';
 
 /** Descripción con formato + bloque de verificación. */
 export function FichaDescription({ property }: { property: Property }) {
@@ -15,9 +15,7 @@ export function FichaDescription({ property }: { property: Property }) {
 
   return (
     <>
-      <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: '28px 0 12px' }}>
-        Sobre esta propiedad
-      </h3>
+      <h2 className="fx-h">Sobre esta propiedad</h2>
 
       {bloques.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -41,7 +39,7 @@ export function FichaDescription({ property }: { property: Property }) {
               );
             }
             return (
-              <p key={i} style={{ fontSize: '15.5px', lineHeight: 1.7, color: 'var(--pub-muted2)', margin: '6px 0' }}>
+              <p key={i} style={{ fontSize: '16.5px', lineHeight: 1.7, color: 'var(--pub-muted2)', margin: '6px 0', maxWidth: '68ch' }}>
                 {b.text}
               </p>
             );
@@ -55,11 +53,11 @@ export function FichaDescription({ property }: { property: Property }) {
 
       <div style={{
         background: 'var(--pub-green-bg)', border: '1px solid var(--pub-green-border)',
-        borderRadius: 14, padding: '20px 22px', marginTop: 28,
+        borderRadius: 16, padding: '24px 26px', marginTop: 32,
       }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 15, color: VERDE, marginBottom: 12,
+          fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em', color: 'var(--pub-green-ink)', marginBottom: 14,
         }}>
           <IconShield size={17} /> Verificado por A&A Inmobiliaria
         </div>

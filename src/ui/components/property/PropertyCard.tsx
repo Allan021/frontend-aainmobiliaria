@@ -44,30 +44,30 @@ export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, o
         background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 16,
         overflow: 'hidden', display: 'flex', flexDirection: 'column',
         fontFamily: F_SANS, color: 'var(--pub-ink)',
-        transition: 'box-shadow 0.2s, transform 0.2s',
-        boxShadow: hover ? '0 20px 48px -16px rgba(17,17,19,0.18)' : 'none',
-        transform: hover ? 'translateY(-3px)' : 'translateY(0)',
+        transition: 'box-shadow 0.35s cubic-bezier(0.22,1,0.36,1), transform 0.35s cubic-bezier(0.22,1,0.36,1)',
+        boxShadow: hover ? '0 32px 60px -28px rgba(17,17,19,0.28)' : 'none',
+        transform: hover ? 'translateY(-4px)' : 'translateY(0)',
       }}
     >
       {/* Foto */}
       <div style={{ position: 'relative' }}>
-        <div onClick={() => onOpen(property)} style={{ display: 'block', height: 200, background: 'var(--pub-border)', cursor: 'pointer', overflow: 'hidden' }}>
+        <div onClick={() => onOpen(property)} style={{ display: 'block', aspectRatio: '4 / 3', background: 'var(--pub-border)', cursor: 'pointer', overflow: 'hidden' }}>
           {img ? (
             <img
               src={optimizeCloudinaryUrl(img, 480)}
               srcSet={cloudinarySrcSet(img, 480)}
               sizes="(max-width: 768px) 100vw, 400px"
               alt={cleanTitle(property.title)}
-              width={480} height={200} loading="lazy" decoding="async"
+              width={480} height={360} loading="lazy" decoding="async"
               style={{
                 width: '100%', height: '100%', objectFit: 'cover',
                 transform: hover ? 'scale(1.04)' : 'scale(1)',
-                transition: 'transform 0.4s cubic-bezier(0.22,1,0.36,1)',
+                transition: 'transform 0.8s cubic-bezier(0.22,1,0.36,1)',
               }}
             />
           ) : (
             <div style={{ height: '100%', display: 'grid', placeItems: 'center', fontFamily: F_MONO, fontSize: '10.5px', color: 'var(--pub-dim)' }}>
-              FOTO PENDIENTE
+              Foto pendiente
             </div>
           )}
         </div>
@@ -100,9 +100,9 @@ export function PropertyCard({ property, onOpen, onWhatsApp, saved: savedProp, o
       </div>
 
       {/* Cuerpo */}
-      <div style={{ padding: '18px 18px 16px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+      <div style={{ padding: '20px 20px 18px', display: 'flex', flexDirection: 'column', gap: 11, flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
-          <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em' }}>{main}</div>
+          <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 25, letterSpacing: '-0.03em' }}>{main}</div>
           <div style={{ fontSize: '12.5px', color: 'var(--pub-dim)', fontWeight: 600, whiteSpace: 'nowrap' }}>{alt}</div>
         </div>
 

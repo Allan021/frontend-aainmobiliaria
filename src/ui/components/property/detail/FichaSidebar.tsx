@@ -4,6 +4,7 @@ import { WhatsAppIcon } from '../../shared/Icon';
 import type { Property } from '../../../../core/domain/entities/types';
 import { AgendarVisita } from './AgendarVisita';
 import { F_ARCHIVO } from './tokens';
+import { useCurrency, priceParts } from '../../../hooks/useCurrency';
 
 interface Props {
   property: Property;
@@ -14,16 +15,23 @@ interface Props {
 /** Columna derecha: agendar visita + contacto directo + tour en video. */
 export const FichaSidebar = forwardRef<HTMLDivElement, Props>(
   function FichaSidebar({ property, phone, onConsultar }, agendaRef) {
+    const [currency] = useCurrency();
+    const { main, alt } = priceParts(property.discount_price ?? property.price, property.currency, currency);
     return (
       <aside className="ficha-sidebar" style={{
         position: 'sticky', top: 88, display: 'flex', flexDirection: 'column', gap: 16,
       }}>
         <div ref={agendaRef}>
-          <AgendarVisita property={property} phone={phone} />
+          <AgendarVisita property={property} phone={phone} header={
+            <div className="fx-side-price">
+              <div className="fx-side-price__main">{main}</div>
+              <div className="fx-side-price__alt">{alt}</div>
+            </div>
+          } />
         </div>
 
-        <div style={{ background: '#111113', borderRadius: 18, padding: 22, color: '#FAF8F3' }}>
-          <div style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: '15.5px', marginBottom: 6 }}>
+        <div style={{ background: '#111113', borderRadius: 20, padding: 24, color: '#FAF8F3' }}>
+          <div style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 17, letterSpacing: '-0.02em', marginBottom: 6 }}>
             ¿Tenés preguntas sobre esta propiedad?
           </div>
           <div style={{ fontSize: '13.5px', color: '#B9B9C0', marginBottom: 16 }}>

@@ -1,6 +1,6 @@
 import { IconDroplet, IconZap, IconScroll } from '../../shared/rs-icons';
 import { fmtVaras, type Property } from '../../../../core/domain/entities/types';
-import { F_ARCHIVO, VERDE, VERDE_CLARO } from './tokens';
+import { VERDE, VERDE_CLARO } from './tokens';
 
 const SERVICIOS = [
   { key: 'has_water', label: 'Agua potable', Icon: IconDroplet, color: VERDE },
@@ -24,32 +24,24 @@ export function FichaSpecs({ property }: { property: Property }) {
   return (
     <>
       {stats.length > 0 && (
-        <div className="ficha-stats" style={{
-          display: 'grid', gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`,
-          gap: 12, margin: '24px 0',
-        }}>
+        <div className="ficha-stats fx-specs" style={{ gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)` }}>
           {stats.map(s => (
-            <div key={s.l} style={{
-              background: 'var(--pub-surface)', border: '1px solid var(--pub-border)',
-              borderRadius: 12, padding: 16, textAlign: 'center',
-            }}>
-              <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 22 }}>{s.v}</div>
-              <div style={{ fontSize: '12.5px', color: 'var(--pub-muted)', fontWeight: 600 }}>{s.l}</div>
+            <div key={s.l} className="fx-spec">
+              <div className="fx-spec__v">{s.v}</div>
+              <div className="fx-spec__l">{s.l}</div>
             </div>
           ))}
         </div>
       )}
 
       {servicios.length > 0 && (
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', margin: '0 0 4px' }}>
+        <div style={{ display: 'flex', gap: '10px 26px', flexWrap: 'wrap', margin: '0 0 4px' }}>
           {servicios.map(({ key, label, Icon, color }) => (
             <span key={key} style={{
-              display: 'inline-flex', alignItems: 'center', gap: 7,
-              background: 'var(--pub-surface)', border: '1px solid var(--pub-border)',
-              borderRadius: 10, padding: '9px 14px',
-              fontSize: '13.5px', fontWeight: 600, color: 'var(--pub-muted2)',
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              fontSize: '14.5px', fontWeight: 600, color: 'var(--pub-muted2)',
             }}>
-              <span style={{ color, display: 'flex' }}><Icon size={15} /></span> {label}
+              <span style={{ color, display: 'flex' }}><Icon size={17} /></span> {label}
             </span>
           ))}
         </div>
@@ -57,14 +49,13 @@ export function FichaSpecs({ property }: { property: Property }) {
 
       {(property.highlights?.length ?? 0) > 0 && (
         <>
-          <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: '28px 0 12px' }}>Lo especial</h3>
+          <h2 className="fx-h">Lo especial</h2>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {property.highlights.map(h => (
               <span key={h} className="ficha-highlight-chip" style={{
-                background: 'var(--pub-bg)', border: '1px solid var(--pub-border2)',
-                borderRadius: 8, padding: '8px 13px',
-                fontSize: '12.5px', fontWeight: 700, letterSpacing: '0.03em',
-                textTransform: 'uppercase', color: 'var(--pub-muted2)',
+                border: '1px solid var(--pub-border2)',
+                borderRadius: 999, padding: '8px 15px',
+                fontSize: '13.5px', fontWeight: 600, color: 'var(--pub-muted2)',
               }}>{h}</span>
             ))}
           </div>

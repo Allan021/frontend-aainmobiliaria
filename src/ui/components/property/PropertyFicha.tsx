@@ -15,7 +15,7 @@ import { FichaHousePreview } from './detail/FichaHousePreview';
 import { FichaSidebar } from './detail/FichaSidebar';
 import { WhatsAppIcon } from '../shared/Icon';
 import { IconCheck, IconChevronLeft } from '../shared/rs-icons';
-import { F_ARCHIVO, F_SANS, PHONE_FALLBACK } from './detail/tokens';
+import { F_SANS, PHONE_FALLBACK } from './detail/tokens';
 
 interface Props {
   property: Property;
@@ -55,13 +55,14 @@ function FichaInner({ property }: Props) {
 
   const { main, alt } = priceParts(property.discount_price ?? property.price, property.currency, currency);
   const esTerreno = property.type === 'Terreno' || property.type === 'Lote';
+  const tieneDescuento = property.discount_price != null && property.discount_price < property.price;
 
   const openConsulta = () =>
     window.dispatchEvent(new CustomEvent('open-whatsapp-modal', { detail: { property } }));
 
   return (
     <div className="ficha-page" style={{ background: 'var(--pub-bg)', color: 'var(--pub-ink)', fontFamily: F_SANS, minHeight: '60vh' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: 24 }}>
+      <div className="hl-wrap" style={{ paddingTop: 20, paddingBottom: 24 }}>
         <nav aria-label="Migas de pan" style={{ fontSize: 13, color: 'var(--pub-dim)', marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <a href="/buscar" style={{ color: 'var(--pub-muted)', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <IconChevronLeft size={13} /> Volver a resultados
@@ -81,7 +82,7 @@ function FichaInner({ property }: Props) {
           onThreeDClick={() => scrollA(threeDRef)}
           onMapClick={() => scrollA(mapRef)}
           badges={
-            <div style={{ position: 'absolute', top: 14, left: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div style={{ position: 'absolute', top: 14, left: 14, right: 70, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <span style={{ background: '#111113', color: '#D4B254', fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 999, textTransform: 'uppercase' }}>{property.type}</span>
               {property.property_type === 'lotificadora' && (
                 <span style={{ background: '#111113', color: '#8CA394', fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 999 }}>
@@ -111,16 +112,21 @@ function FichaInner({ property }: Props) {
           }
         />
 
-        <div className="ficha-body" style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 40, marginTop: 32, alignItems: 'start' }}>
+        <div className="ficha-body" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 400px', gap: 'clamp(32px, 4.5vw, 72px)', marginTop: 36, alignItems: 'start' }}>
           <div>
-            <div className="ficha-title-block" style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap' }}>
-              <h1 style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 34, letterSpacing: '-0.025em', margin: 0 }}>{main}</h1>
-              <span style={{ fontSize: 15, color: 'var(--pub-dim)', fontWeight: 600 }}>{alt}</span>
+            <div className="ficha-title-block">
+              <div className="fx-kicker">
+                <b>{property.type}</b>
+                <span aria-hidden="true">·</span>
+                <span>{property.municipio}, {property.departamento}</span>
+              </div>
+              <h1 className="fx-title">{cleanTitle(property.title)}</h1>
+              <div className="fx-price">
+                <span className="fx-price__main">{main}</span>
+                <span className="fx-price__alt">{alt}</span>
+                {tieneDescuento && <span className="fx-price__old">{priceParts(property.price, property.currency, currency).main}</span>}
+              </div>
             </div>
-            <h2 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 22, margin: '10px 0 4px', letterSpacing: '-0.02em' }}>
-              {cleanTitle(property.title)}
-            </h2>
-            <div style={{ fontSize: 15, color: 'var(--pub-muted)' }}>{property.municipio}, {property.departamento}</div>
 
             <FichaSpecs property={property} />
             <FichaDescription property={property} />
@@ -132,14 +138,9 @@ function FichaInner({ property }: Props) {
           <FichaSidebar ref={agendaRef} property={property} phone={phone} onConsultar={openConsulta} />
         </div>
 
-        <div style={{
-          marginTop: 64, padding: '28px 0', borderTop: '1px solid var(--pub-border2)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          fontSize: 13, color: 'var(--pub-dim)', flexWrap: 'wrap', gap: 12,
-        }}>
-          <span>© {new Date().getFullYear()} A&A Inmobiliaria · El Progreso, Yoro, Honduras</span>
-          <a href="/buscar" style={{ fontWeight: 700, color: '#1F5B42', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <IconChevronLeft size={13} /> Seguir buscando propiedades
+        <div style={{ marginTop: 72, paddingTop: 28, paddingBottom: 40, borderTop: '1px solid var(--pub-border2)' }}>
+          <a href="/buscar" className="hl-link" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <IconChevronLeft size={14} /> Seguir buscando propiedades
           </a>
         </div>
       </div>

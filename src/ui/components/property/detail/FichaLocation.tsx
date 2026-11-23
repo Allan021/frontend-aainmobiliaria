@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { IconMapPin } from '../../shared/rs-icons';
 import type { Property } from '../../../../core/domain/entities/types';
 import { ZoneMap } from './ZoneMap';
-import { F_ARCHIVO, F_MONO } from './tokens';
+import { F_MONO } from './tokens';
 
 /** Sección de ubicación: mapa de zona + aviso de privacidad. */
 export const FichaLocation = forwardRef<HTMLDivElement, { property: Property }>(
@@ -11,11 +11,9 @@ export const FichaLocation = forwardRef<HTMLDivElement, { property: Property }>(
 
     return (
       <div ref={ref} style={{ scrollMarginTop: 88 }}>
-        <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: '32px 0 12px' }}>
-          Ubicación
-        </h3>
+        <h2 className="fx-h">Ubicación</h2>
         <div style={{
-          position: 'relative', height: 320, borderRadius: 14, overflow: 'hidden',
+          position: 'relative', height: 'clamp(300px, 32vw, 400px)', borderRadius: 16, overflow: 'hidden',
           border: '1px solid var(--pub-border2)',
           background: 'linear-gradient(150deg, #F1F5EE 0%, #E6EEE2 60%, #EBF0DF 100%)',
         }}>
@@ -37,7 +35,7 @@ export const FichaLocation = forwardRef<HTMLDivElement, { property: Property }>(
           fontSize: '12.5px', fontWeight: 600, color: 'var(--pub-muted)',
         }}>
           <IconMapPin size={13} />
-          Zona aproximada por seguridad — la dirección exacta se comparte al agendar
+          Zona aproximada por seguridad. La dirección exacta se comparte al agendar.
         </div>
       </div>
     );

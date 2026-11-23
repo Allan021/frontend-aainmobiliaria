@@ -3,7 +3,7 @@ import { IconChevronLeft, IconChevronRight } from '../../shared/rs-icons';
 import { optimizeCloudinaryUrl, cloudinarySrcSet } from '../../../../core/utils/cloudinaryUtils';
 import type { Property } from '../../../../core/domain/entities/types';
 import { LotMassingViewer } from './LotMassingViewer';
-import { F_ARCHIVO, VERDE } from './tokens';
+import { VERDE } from './tokens';
 
 /** Simulación de casa — solo terrenos y lotes sin construcción. */
 export const FichaHousePreview = forwardRef<HTMLDivElement, { property: Property }>(
@@ -15,11 +15,12 @@ export const FichaHousePreview = forwardRef<HTMLDivElement, { property: Property
       <div ref={ref} style={{ scrollMarginTop: 88 }}>
         <div style={{
           display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-          flexWrap: 'wrap', gap: 8, margin: '32px 0 12px',
+          flexWrap: 'wrap', gap: 8, margin: '44px 0 18px', paddingTop: 36,
+          borderTop: '1px solid var(--pub-border2)',
         }}>
-          <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: 0 }}>
+          <h2 className="fx-h" style={{ margin: 0, padding: 0, border: 'none' }}>
             Así podría verse tu casa acá
-          </h3>
+          </h2>
           {foto && (
             <button onClick={() => setVer3d(v => !v)} style={{
               background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',

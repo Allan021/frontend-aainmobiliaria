@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { leadAdapter } from '../../../../infrastructure/api/leadAdapter';
 import { cleanTitle, type Property } from '../../../../core/domain/entities/types';
 import { WhatsAppIcon } from '../../shared/Icon';
@@ -13,7 +13,7 @@ function waLink(phone: string, msg: string) {
 }
 
 /* ── Tarjeta lateral: agendar visita ── */
-export function AgendarVisita({ property, phone }: { property: Property; phone: string }) {
+export function AgendarVisita({ property, phone, header }: { property: Property; phone: string; header?: ReactNode }) {
   const days = useMemo(() => {
     const dows = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
     const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
@@ -71,14 +71,15 @@ export function AgendarVisita({ property, phone }: { property: Property; phone: 
 
   return (
     <div style={{
-      background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 18, padding: 24,
-      boxShadow: '0 16px 40px -16px rgba(17,17,19,0.12)',
+      background: 'var(--pub-surface)', border: '1px solid var(--pub-border)', borderRadius: 20, padding: 26,
+      boxShadow: '0 30px 60px -32px rgba(17,17,19,0.22)',
     }}>
-      <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 19, letterSpacing: '-0.02em', marginBottom: 4, color: 'var(--pub-ink)' }}>
+      {header}
+      <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 21, letterSpacing: '-0.025em', marginBottom: 4, color: 'var(--pub-ink)' }}>
         Agendá tu visita
       </div>
       <div style={{ fontSize: '13.5px', color: 'var(--pub-muted)', marginBottom: 18 }}>
-        Elegí día y hora — te confirmamos por WhatsApp. Sin llamadas, sin compromiso.
+        Elegí día y hora y te confirmamos por WhatsApp. Sin llamadas, sin compromiso.
       </div>
 
       <div style={{ fontFamily: F_MONO, fontSize: '10.5px', letterSpacing: '0.12em', color: 'var(--pub-dim)', marginBottom: 8 }}>DÍA</div>

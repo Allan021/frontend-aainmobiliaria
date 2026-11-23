@@ -26,12 +26,10 @@ export function FichaFinancing({ property, currency }: Props) {
 
   return (
     <>
-      <h3 style={{ fontFamily: F_ARCHIVO, fontWeight: 700, fontSize: 18, margin: '32px 0 12px' }}>
-        Financiamiento estimado
-      </h3>
+      <h2 className="fx-h">Financiamiento estimado</h2>
       <div style={{
         background: 'var(--pub-surface)', border: '1px solid var(--pub-border)',
-        borderRadius: 14, padding: 22,
+        borderRadius: 16, padding: 'clamp(20px, 2.4vw, 30px)',
       }}>
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -39,7 +37,7 @@ export function FichaFinancing({ property, currency }: Props) {
         }}>
           <div>
             <div style={{ fontSize: 13, color: 'var(--pub-muted)', fontWeight: 600 }}>Cuota mensual estimada</div>
-            <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 28, color: VERDE }}>{cuotaTexto}</div>
+            <div style={{ fontFamily: F_ARCHIVO, fontWeight: 800, fontSize: 'clamp(30px, 3.2vw, 42px)', letterSpacing: '-0.035em', lineHeight: 1.1, color: 'var(--pub-ink)', fontVariantNumeric: 'tabular-nums' }}>{cuotaTexto}</div>
           </div>
           <div style={{ fontSize: 13, color: 'var(--pub-muted)', textAlign: 'right' }}>
             Prima {prima}% ({primaTexto})<br />
