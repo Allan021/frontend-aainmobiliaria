@@ -97,12 +97,9 @@ const orgJsonLd = {
     )}
     <!-- Los tiles salen de CARTO, no de openstreetmap.org (eso quedó del iframe viejo):
          el preconnect apuntaba a un host que la página nunca pide. -->
-    <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin />
-    <link rel="dns-prefetch" href="https://a.basemaps.cartocdn.com" />
-    {/* Solo dns-prefetch: los tiles de Mapbox no se piden hasta que el usuario
-        cambia a satélite. Un 5º preconnect compite con los que sí bloquean el LCP. */}
+    {/* El mapa base ahora sale de Mapbox (CARTO pide API key) */}
     {import.meta.env.PUBLIC_MAPBOX_TOKEN && (
-      <link rel="dns-prefetch" href="https://api.mapbox.com" />
+      <link rel="preconnect" href="https://api.mapbox.com" crossorigin />
     )}
 
     <!-- Tipografías del rediseño (Archivo/Instrument Sans/JetBrains Mono) —

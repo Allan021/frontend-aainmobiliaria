@@ -1834,8 +1834,8 @@ body {
   background: #EDF2E8;
 }
 .search-results-col {
-  border-left: 1px solid #E4DFD2;
-  background: #FAF8F3;
+  border-left: 1px solid var(--pub-border2);
+  background: var(--pub-bg);
   overflow-y: auto;
   max-height: calc(100vh - var(--search-chrome));
   padding: 20px;

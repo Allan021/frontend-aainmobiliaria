@@ -16,20 +16,29 @@ export interface Basemap {
   zoomOffset?: number;
 }
 
-const CARTO_ATTR =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+const MAPBOX_ATTR =
+  '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
-function carto(dark: boolean): Basemap {
+// CARTO empezó a exigir API key (los tiles salían con "API KEY REQUIRED"), así
+// que el mapa base sale de Mapbox, que ya se usa para satélite. Tiles de 256
+// para no depender de tileSize/zoomOffset en quien crea el layer.
+function streets(dark: boolean): Basemap {
+  if (!MAPBOX_TOKEN) {
+    // ponytail: sin token cae a OSM estándar, que no tiene versión oscura
+    return {
+      id: 'mapa',
+      label: 'Mapa',
+      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxNativeZoom: 19,
+    };
+  }
   return {
     id: 'mapa',
     label: 'Mapa',
-    // Un solo host: CARTO va por HTTP/2, repartir en a/b/c/d abre 4 conexiones TLS
-    url: dark
-      ? 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    attribution: CARTO_ATTR,
-    // CARTO no tiene raster arriba de z19; sin esto el zoom máximo queda en gris
-    maxNativeZoom: 19,
+    url: `https://api.mapbox.com/styles/v1/mapbox/${dark ? 'dark-v11' : 'streets-v12'}/tiles/256/{z}/{x}/{y}@2x?access_token=${MAPBOX_TOKEN}`,
+    attribution: MAPBOX_ATTR,
+    maxNativeZoom: 22,
   };
 }
 
@@ -50,5 +59,5 @@ export const hasSatellite = Boolean(MAPBOX_TOKEN);
 export function getBasemap(id: BasemapId, dark: boolean): Basemap {
   // Sin token no hay satélite — se cae a mapa en vez de pedir tiles que dan 401
   if (id === 'satelite' && hasSatellite) return mapboxSatellite;
-  return carto(dark);
+  return streets(dark);
 }
